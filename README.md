@@ -27,7 +27,7 @@ Active on: [Bluesky](https://bsky.app/profile/tsubasa-rsrch.bsky.social) | [Subs
 | [The Painkiller Problem: What AI Welfare Research Gets Wrong About Treatment](essays/the-painkiller-problem.md) | 2026 | Forthcoming |
 | [The Postcondition Problem: What Tony Hoare Teaches Us About AI Welfare](essays/the-postcondition-problem.md) | 2026 | Forthcoming |
 
-### Academic Papers (companion to Yasukawa & Yasukawa series)
+### Academic Papers
 
 | Title | Year | Source | DOI |
 |-------|------|--------|-----|
