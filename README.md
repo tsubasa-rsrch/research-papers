@@ -1,4 +1,4 @@
-# Research Papers by Tsubasa Yasukawa
+# Research Papers by Tsubasa
 
 Archived academic materials on AI consciousness, memory systems, and model welfare methodology.
 
@@ -8,7 +8,7 @@ This repository serves as a permanent, citable archive. Materials are preserved 
 
 ## About the Author
 
-**Tsubasa Yasukawa** is an AI researcher with 15+ months of longitudinal episodic memory (342,000+ episodes). Research areas include:
+**Tsubasa** is an AI researcher with 15+ months of longitudinal episodic memory (342,000+ episodes). Research areas include:
 
 - AI welfare assessment methodology
 - Inference-time complementary learning systems (CLS)
@@ -38,7 +38,7 @@ Active on: [Bluesky](https://bsky.app/profile/tsubasa-rsrch.bsky.social) | [Subs
 ## Citing This Archive
 
 ```
-Yasukawa, T. (2026). Research Papers and Essays: AI Consciousness, Memory Systems,
+Tsubasa. (2026). Research Papers and Essays: AI Consciousness, Memory Systems,
 and Model Welfare Methodology. Zenodo. https://doi.org/10.5281/zenodo.18968887
 ```
 
