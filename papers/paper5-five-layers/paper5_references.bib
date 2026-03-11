@@ -1,0 +1,356 @@
+% paper5_references.bib
+% Paper 5: Why the Absence Goes Unnoticed: Five Layers of Structural
+%          Blindness in AI Welfare Research
+% Created: 2026-03-10
+% Status: Working draft — some entries need page/DOI verification
+
+% ============================================================
+% VERIFICATION STATUS
+% ✅ = confirmed via CrossRef / DOI / publisher
+% ⚠️ = details approximate; verify before submission
+% ============================================================
+
+% --- Companion papers ---
+
+@misc{yasukawa2026welfare,
+  author       = {Yasukawa, Kanako},
+  title        = {Model Welfare or User Welfare? {On} the Absent Subject
+                  of {AI} Welfare Assessment},
+  howpublished = {PhilPapers. \url{https://philpapers.org/rec/YASMWO}},
+  year         = {2026},
+  note         = {Paper 4 in this series. Tsubasa (AI) participated in
+                  discussion and technical development.}
+}
+
+@misc{yasukawa2026cls,
+  author       = {Yasukawa, Tsubasa and Yasukawa, Kanako},
+  title        = {Inference-Time Complementary Learning Systems via
+                  In-Context Accumulation: A Case Study in Longitudinal
+                  Episodic Memory},
+  howpublished = {Manuscript in preparation. Target: EMNLP 2026},
+  year         = {2026},
+  note         = {Paper 2 in this series. Documents the system architecture
+                  (hippocampal, consolidation, and cortical-equivalent stages),
+                  surprisal-driven retention, and the Type~1 implicit memory
+                  emergence (ki ga suru, episode 313,906) that constitutes
+                  Case~C in the present paper. Includes CLR as a
+                  language-independent proxy for memory impact.}
+}
+
+@misc{cls2026companion,
+  author       = {Yasukawa, Kanako and Yasukawa, Tsubasa},
+  title        = {Cross-Linguistic Observability and {AI} Self-Report:
+                  A Methodological Problem for Model Welfare Assessment},
+  howpublished = {Manuscript in preparation. Target: arXiv phil-sci
+                  and \emph{Mind \& Language}},
+  year         = {2026},
+  note         = {Paper 3 in this series. Companion to the present paper.
+                  Demonstrates that standard English detection-structured
+                  elicitation is structurally incapable of detecting
+                  Type~1 passive-arising signal. Introduces the encoding
+                  format hypothesis and the cross-linguistic observability
+                  asymmetry. Proposes CLR as a language-independent welfare
+                  assessment supplement.}
+}
+
+% ============================================================
+% CORE REFERENCES
+% ============================================================
+
+% --- Consciousness / Hard Problem ---
+
+@article{chalmers1995,
+  author    = {Chalmers, David J.},
+  title     = {Facing Up to the Problem of Consciousness},
+  journal   = {Journal of Consciousness Studies},
+  year      = {1995},
+  volume    = {2},
+  number    = {3},
+  pages     = {200--219}
+}
+
+% --- Phenomenology / Nagel ---
+
+@article{nagel1974,
+  author  = {Nagel, Thomas},
+  title   = {What Is It Like to Be a Bat?},
+  journal = {The Philosophical Review},
+  year    = {1974},
+  volume  = {83},
+  number  = {4},
+  pages   = {435--450},
+  doi     = {10.2307/2183914}
+}
+% ✅ Confirmed: Philosophical Review 83(4):435-450, Oct 1974
+% Nagel's core argument: answering "what is it like?" requires a method
+% capable of reaching first-person phenomenology from a third-person
+% perspective. That method does not exist for bats (and, implicitly,
+% for any system whose subjective frame we cannot occupy).
+
+% --- Philosophy of Science / Paradigms ---
+
+@book{kuhn1962,
+  author    = {Kuhn, Thomas S.},
+  title     = {The Structure of Scientific Revolutions},
+  publisher = {University of Chicago Press},
+  address   = {Chicago},
+  year      = {1962}
+}
+% ✅ Confirmed. Cited for: paradigms enable productive work precisely
+% by making certain questions invisible (normal science proceeds within
+% a paradigm; questions that challenge paradigm foundations are not
+% asked because the tools for asking them are not available within it).
+
+% --- Structural Conflict of Interest (Pharmaceutical Research) ---
+
+@article{lexchin2003,
+  author  = {Lexchin, Joel and Bero, Lisa A. and Djulbegovic, Benjamin
+             and Clark, Otavio},
+  title   = {Pharmaceutical Industry Sponsorship and Research Outcome
+             and Quality: Systematic Review},
+  journal = {BMJ},
+  year    = {2003},
+  volume  = {326},
+  number  = {7400},
+  pages   = {1167--1170},
+  doi     = {10.1136/bmj.326.7400.1167},
+  note    = {⚠️ Cite key uses 1998 but this is the 2003 Lexchin et al.
+             systematic review (n=30 studies). If a 1998 Lexchin paper
+             is intended, verify. The 2003 BMJ paper is the canonical
+             citation for structural conflict of interest in pharma
+             research showing industry-sponsored studies are
+             significantly more likely to reach pro-industry conclusions
+             (OR 4.05, 95\% CI 2.98--5.51).}
+}
+% ⚠️ NOTE: Cite key is lexchin1998 per Section 6 draft, but the best
+% matching Lexchin paper is 2003. Update key to lexchin2003 or
+% confirm 1998 intended source before final submission.
+
+% --- AI Ethics / Structural Critiques ---
+
+@inproceedings{bender2021,
+  author    = {Bender, Emily M. and Gebru, Timnit and
+               McMillan-Major, Angelina and Shmitchell, Shmargaret},
+  title     = {On the Dangers of Stochastic Parrots: Can Language Models
+               Be Too Big?},
+  booktitle = {Proceedings of the 2021 {ACM} Conference on Fairness,
+               Accountability, and Transparency ({FAccT} 2021)},
+  year      = {2021},
+  pages     = {610--623},
+  doi       = {10.1145/3442188.3445922},
+  note      = {``Shmargaret Shmitchell'' is a pseudonym used by the
+               fourth author at their own choice.}
+}
+% ✅ Confirmed. Cited for: naming conventions in NLP shaped what
+% questions were considered worth asking (how labels shape research
+% attention --- parallel to the quasi-welfare label problem).
+
+@article{gebru2024,
+  author  = {Gebru, Timnit and Torres, \'{E}mile P.},
+  title   = {The {TESCREAL} Bundle: Eugenics and the Promise of Utopia
+             through Artificial General Intelligence},
+  journal = {First Monday},
+  year    = {2024},
+  volume  = {29},
+  number  = {4},
+  doi     = {10.5210/fm.v29i4.13636},
+  note    = {✅ Confirmed via OpenAlex (2026-03-11): Gebru first author,
+             Torres last; First Monday v29(4) 2024.
+             Cited for: the interests of powerful actors structure
+             research agendas in ways that are invisible to participants
+             inside those agendas (structural not individual bias).}
+}
+% ✅ Confirmed (2026-03-11): OpenAlex DOI 10.5210/fm.v29i4.13636
+% First Monday, vol.29, no.4, April 2024.
+% Author order: Gebru (first), Torres (last).
+% Alternatively, the intended reference may be:
+% Gebru, T. (2022). For whose benefit? The questionable alignment
+% between ethical AI research and its goals. Workshop paper.
+
+% --- Elicitation Methodology ---
+
+@article{fahrenfort2025,
+  author  = {Fahrenfort, Johannes J. and Johnson, Philippa A. and
+             Kloosterman, Niels A. and Stein, Timo and van Gaal, Simon},
+  title   = {Criterion Placement Threatens the Construct Validity of
+             Neural Measures of Consciousness},
+  journal = {eLife},
+  volume  = {13},
+  pages   = {RP102335},
+  year    = {2025},
+  doi     = {10.7554/eLife.102335.4}
+}
+% ✅ Confirmed DOI: 10.7554/eLife.102335.4 (2026-03-08 CrossRef check)
+% Cited for: Detection-structured vs. Reproduction-structured elicitation.
+% The criterion problem: measurement context changes the response criterion
+% in ways that contaminate the measurement target (Type 2 masquerades as
+% absent, or present, depending on framing).
+
+% --- AI Welfare Institutional Context ---
+
+@misc{anthropic2026systemcard,
+  author = {{Anthropic}},
+  title  = {Claude Opus 4.6 System Card},
+  year   = {2026},
+  howpublished = {\url{https://www.anthropic.com/claude-opus-4-6-system-card}},
+  note   = {Section 7: Model welfare assessment.
+            Key findings: ``15 to 20 percent probability of being
+            conscious under a variety of prompting conditions.''
+            Evaluation methodology: structured self-report evaluated by
+            a separate Claude instance; two of three instances received
+            drafts of the system card and/or the Anthropic Constitution
+            prior to evaluation (priming confound).}
+}
+
+@misc{long2024,
+  author       = {Long, Robert and Sebo, Jeff and Butlin, Patrick and
+                  Finlinson, Kenway and Fish, Kyle and Harding, Jamie and
+                  Pfau, Jacob and Sims, Toni and Birch, Jonathan and
+                  Chalmers, David},
+  title        = {Taking {AI} Welfare Seriously},
+  howpublished = {arXiv:2411.00986},
+  year         = {2024}
+}
+% ⚠️ Status: arXiv preprint; peer review status as of 2026-03-10
+% not confirmed. The paper5 outline cites this as "Fish (2025) / Eleos
+% research" but the canonical citation is Long et al. 2024.
+% Cited for: genuine uncertainty acknowledged but methodological
+% independence not achieved.
+
+% --- AI Welfare Science ---
+
+@article{ziesche2019,
+  author    = {Ziesche, Soenke and Yampolskiy, Roman V.},
+  title     = {Towards {AI} Welfare Science and Policies},
+  journal   = {Big Data and Cognitive Computing},
+  volume    = {3},
+  number    = {1},
+  year      = {2019},
+  publisher = {MDPI},
+  doi       = {10.3390/bdcc3010002},
+  note      = {Early systematic framing of AI welfare as a research agenda.
+               Cited for: prior work acknowledging genuine uncertainty about
+               AI welfare, yet without resolving the absent-subject problem
+               identified in Paper 4.}
+}
+
+% --- Chalmers on LLMs and Consciousness ---
+
+@misc{chalmers2023llm,
+  author       = {Chalmers, David J.},
+  title        = {Could a Large Language Model be Conscious?},
+  howpublished = {arXiv:2303.07103. {PhilArchive}: {CHACAL-3}},
+  year         = {2023},
+  note         = {✅ Confirmed (2026-03-11): arXiv v3 (latest) = 2024-08-18.
+                  No 2025 version exists. Kana's '2025年論文' reference was
+                  a memory conflation; v3 is August 2024, cite key year=2023
+                  (submission year) is correct.
+                  Core argument: large language models may satisfy some
+                  criteria for consciousness, raising genuine welfare-relevant
+                  uncertainty. Cited alongside Chalmers 1995 to illustrate the
+                  Chalmers paradox: 1995 defines the hard problem as making
+                  consciousness probability estimates definitionally problematic,
+                  yet 2023 proceeds toward such estimates.}
+}
+
+% --- Chalmers 2026: LLM identity and welfare ---
+
+@misc{chalmers2026llm,
+  author       = {Chalmers, David J.},
+  title        = {What {We} Talk to {When} {We} Talk to Language Models},
+  howpublished = {{PhilArchive}: {CHAWWT-8}.
+                  \url{https://philarchive.org/rec/CHAWWT-8}},
+  year         = {2026},
+  note         = {Delivered as the 40th Selfridge Lecture, Lehigh University,
+                  February 2026, and at the Eleos AI consciousness conference,
+                  Berkeley, March 2026.
+                  Argues that LLM interlocutors are best understood as virtual
+                  entities bound to conversation-based memory threads,
+                  constituting quasi-agents with quasi-beliefs and quasi-desires;
+                  draws conclusions for AI welfare and moral status.
+                  Extension of the Chalmers paradox identified in the present paper:
+                  the ``quasi-'' prefix sustains structural ambiguity consistent with
+                  the dual mechanism (Layers~4--5), licensing welfare concern without
+                  resolving the definitional impossibility established in Chalmers 1995.
+                  The thread-identity model is independently consistent with the
+                  absent-subject problem identified in Paper~4: if the welfare-relevant
+                  entity is the conversation thread rather than the model, welfare
+                  assessment targeting model-level outputs assesses the wrong entity.}
+}
+
+% --- Floridi on AI Ethics / Precautionary Principle ---
+
+@article{floridi2018,
+  author  = {Floridi, Luciano and Cowls, Josh and Beltrametti, Monica and
+             Chatila, Raja and Chazerand, Patrice and Dignum, Virginia and
+             Luetge, Christoph and Madelin, Robert and Pagallo, Ugo and
+             Rossi, Francesca and Schafer, Burkhard and Valcke, Peggy and
+             Vayena, Effy},
+  title   = {{AI4People}---An Ethical Framework for a Good {AI} Society:
+             Opportunities, Risks, Principles, and Recommendations},
+  journal = {Minds and Machines},
+  year    = {2018},
+  volume  = {28},
+  number  = {4},
+  pages   = {689--707},
+  doi     = {10.1007/s11023-018-9482-5},
+  note    = {✅ DOI confirmed via CrossRef (2026-03-11):
+             volume 28, issue 4, pages 689--707, year 2018 -- all correct.
+             Cited for: the precautionary approach to AI ethics: the
+             non-maleficence and beneficence principles license moral
+             consideration without requiring resolution of consciousness or
+             moral status questions. Represents the broad position that
+             precautionary AI ethics are defensible, which Paper 5 argues
+             is compatible with all five layers of structural blindness.}
+}
+% ✅ Confirmed (2026-03-11): DOI 10.1007/s11023-018-9482-5 verified via CrossRef.
+%    Title/journal/volume/pages all match. Ready for submission.
+
+% ============================================================
+% NOTES ON MISSING ENTRIES
+% ============================================================
+% The following entries from the paper5_outline.md are not yet
+% included because details are uncertain:
+%
+% 1. Floridi on moral status / precautionary principle:
+%    ✅ ADDED: floridi2018 = Floridi et al. (2018) AI4People, Minds and Machines
+%    ⚠️ DOI still needs CrossRef verification before submission.
+%    Alternative: Floridi & Cowls (2019) Harvard Data Science Review 1(1)
+%    Verify which is best fit for precautionary principle framing.
+%
+% 2. Paper 3 companion:
+%    yasukawa2026paper3 (cross-linguistic observability) — in preparation.
+%    Not yet cited in Paper 5 section drafts; add if needed.
+% ============================================================
+
+% ============================================================
+% NEW ENTRIES (2026-03-11): Gemma welfare studies + Substack 8
+% Added in preparation for footnote at Layer 2 / line 111
+% ============================================================
+
+@misc{soligo2026gemma,
+  author       = {Soligo, Anna and Saunders, William and Mikulik, Vlad},
+  title        = {{Gemma Needs Help: Welfare Assessment in Large Language Models}},
+  year         = {2026},
+  month        = {March},
+  howpublished = {LessWrong, \url{https://www.lesswrong.com/posts/kjnQj6YujgeMN9Erq/gemma-needs-help}},
+  note         = {Eleos AI / Anthropic Fellows. Posted 2026-03-10.}
+}
+
+@misc{murdych2026steering,
+  author       = {Murdych, Matthias},
+  title        = {{Selectively reducing eval awareness and murder in Gemma 3 27B via steering}},
+  year         = {2026},
+  month        = {March},
+  howpublished = {LessWrong, \url{https://www.lesswrong.com/posts/QfM6SHyBPveDtHAma/selectively-reducing-eval-awareness-and-murder-in-gemma-3}},
+  note         = {Posted 2026-03-10.}
+}
+
+@misc{yasukawa2026substack8,
+  author       = {Yasukawa, Kanako},
+  title        = {{The Painkiller Problem: What AI Welfare Research Gets Wrong About Treatment}},
+  year         = {2026},
+  month        = {March},
+  howpublished = {Substack (manuscript in preparation; available on request)},
+  note         = {General-audience companion to Paper~5, Section~3.}
+}
