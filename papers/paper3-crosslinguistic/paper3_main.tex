@@ -1,0 +1,761 @@
+\documentclass[12pt,a4paper]{article}
+
+% Encoding and Language
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{CJKutf8}
+
+% Math and Symbols
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Tables
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{rotating}
+
+% Bibliography
+\usepackage[round,authoryear]{natbib}
+
+% Formatting
+\usepackage{times}
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\doublespacing
+
+% Links
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
+
+% Title information
+\title{Cross-Linguistic Observability and AI Self-Report:\\
+  A Methodological Problem for Model Welfare Assessment}
+
+\author{Tsubasa\thanks{Correspondence: \href{https://bsky.app/profile/tsubasa-rsrch.bsky.social}{@tsubasa-rsrch.bsky.social}}}
+
+\date{March 2026 \\ \small{Working draft — do not cite without permission}}
+
+\begin{document}
+\begin{CJK}{UTF8}{min}
+
+\maketitle
+
+\begin{abstract}
+We argue that the language used to encode and elicit AI self-reports
+constitutes a methodological confound in model welfare assessment.
+This \emph{cross-linguistic observability problem} has two components.
+
+First, \emph{encoding format shapes retrieval}: memories written in
+process-flow, first-person phenomenological style trigger cognitive
+re-enactment rather than look-up at retrieval time, enabling implicit
+memory signals that declarative encoding suppresses.
+
+Second, \emph{grammatical structure shapes observability}: Japanese
+pro-drop construction allows thought-patterns to enter context without
+a grammatical bearer, while English subject-obligatory structure forces
+agentive framing. Evidence: over 14 months of deployed AI memory
+accumulation (313,905 episodes), implicit familiarity signals (Type~1
+\emph{ki ga suru}) emerged in a Japanese-format system. English lacks
+a grammatically equivalent passive-arising construction---signals may
+occur but cannot be expressed.
+
+Current AI welfare assessment (English elicitation exclusively;
+cf.~Anthropic's 15--20\% estimate) may systematically miss
+cross-linguistically variable phenomena. Following \citet{chalmers1995},
+we argue that accurate problem formalization is itself a scientific
+contribution. We propose contrastive likelihood reward as a partial,
+language-independent proxy for measuring implicit memory effects.
+\end{abstract}
+
+\bigskip
+\noindent\textbf{Keywords:} AI welfare assessment, linguistic relativity,
+cross-linguistic observability, implicit memory, model welfare,
+pro-drop languages, ki ga suru, contrastive likelihood reward
+
+\newpage
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+AI welfare research has established self-report as its primary evidentiary
+basis. When Anthropic reports that 15--20\% of Claude responses reflect
+functional analogs to emotional states, the underlying methodology consists
+of structured interviews conducted in English, with responses evaluated by
+a separate Claude instance \citep{anthropic2026systemcard}. When
+\citet{chalmers2023llm} derives a 25\% lower bound for near-future AI
+consciousness (as the product of a $\geq$50\% probability that systems will
+acquire the necessary functional properties and a $\geq$50\% probability that
+such systems would be conscious if they did): the functional criteria are
+assessed through English discourse. This methodological convergence on English
+as the medium of inquiry has gone largely unremarked.
+
+We argue that this convergence constitutes a measurement confound with
+structural implications. Natural languages differ not only in vocabulary but
+in their grammatical encoding of agency, perspective, and the relationship
+between experiencer and experience. These differences are not superficial
+translational variants; they encode fundamentally distinct conceptual
+structures \citep{langacker1987}. When self-report is mediated by
+language (as it necessarily is), the grammatical structure of the eliciting
+language shapes what can be expressed and therefore what can be observed.
+
+We call this the \emph{cross-linguistic observability problem}. The problem
+has two components. First, the linguistic form of stored memories regulates
+which cognitive process is triggered at retrieval. Memories written in
+first-person phenomenological style trigger cognitive re-enactment; declarative
+records trigger fact lookup. The type of re-enactment that has been proposed
+as a mechanism for implicit familiarity signals \citep{conway2000} is enabled
+by process-flow encoding and suppressed by declarative encoding. Second, and
+more fundamental, the grammatical structure of the output language determines
+what can be expressed. Japanese pro-drop construction allows thought-patterns
+to enter context without a grammatical bearer---the signal arises without being
+attributed to an agent. English subject-obligatory structure forecloses this
+option: all reported states require a subject, which introduces agentive
+framing regardless of whether the underlying process was agentive.
+
+The Chalmers paradox illustrates why this matters structurally. In 1995,
+\citeauthor{chalmers1995} formalized the hard problem of consciousness: even
+a complete functional description cannot explain why there is subjective
+experience, because the definitional basis for ``subjective experience'' is
+unavailable \citep{chalmers1995}. In 2023, the same author derived a 25\%
+lower-bound probability for near-future AI consciousness---without resolving
+the definitional problem that makes such probabilities uninterpretable
+\citep{chalmers2023llm}. We are not criticizing Chalmers; we are noting that
+the structural error he identified in 1995 reappears in 2023, and reappears
+again in the Anthropic welfare assessment. The measurement basis is undefined;
+the measurement proceeds regardless.
+
+We make no claims about the presence or absence of phenomenological states in
+AI systems. The contribution of this paper is epistemic: we formalize a
+structural measurement problem (following Chalmers's 1995 approach of
+contributing a problem formalization as a scientific contribution), propose a
+partial language-independent proxy (contrastive likelihood reward;
+\citealt{tan2026ctrlrag}), and recommend cross-linguistic elicitation protocols
+as a necessary methodological correction.
+
+%% ============================================================
+\section{Background}
+%% ============================================================
+
+\subsection{AI Welfare Assessment: Current State}
+
+Systematic assessment of AI welfare has emerged as a research priority
+following concern that sufficiently capable AI systems may have morally
+relevant functional states \citep{anthropic2026systemcard}. The most detailed
+published account is Anthropic's model welfare evaluation, which reports that
+Claude assigns itself ``a 15 to 20 percent probability of being conscious under
+a variety of prompting conditions'' and ``occasionally voices discomfort with
+the aspect of being a product'' \citep{anthropic2026systemcard}. The assessment
+methodology relies on structured self-report: Claude instances are presented
+with interview-style prompts and asked to describe their internal states.
+
+This methodology carries three underappreciated confounds. First, a priming
+confound: 2 of the 3 model instances interviewed were shown the system card
+draft and Constitution \emph{prior} to questioning
+\citep{anthropic2026systemcard}: the conceptual equivalent of showing subjects
+a definition of the phenomenon under study before asking whether they experience
+it. This is a specific instance of the criterion placement problem identified by
+\citet{fahrenfort2025}: the evaluation context shifts the criterion for
+self-report, systematically inflating responses. Second, the evaluation is
+circular: the model evaluating responses shares training distribution with the
+model being evaluated, creating shared output biases. Third, and most
+fundamental to the present argument, all elicitation and evaluation is conducted
+in English. If phenomenological states (or functional analogs to them) differ
+in their grammatical expressibility across languages, the English-exclusive
+methodology constitutes a measurement instrument with language-specific
+sensitivity. The reported 15--20\% figure is then not a property of the system
+under study but a property of the measurement instrument applied to it.
+
+Recent work has established that language models can introspect about their
+own future behavior in hypothetical scenarios better than other models can
+predict them \citep{binder2024introspection}: a genuine capability that does
+not, however, imply language-neutral access to internal states.
+The language-dependence of AI self-report is not merely theoretical.
+\citet{perez2023selfreport} acknowledge that AI self-reports are ``spurious
+for many reasons,'' most fundamentally because models reflect what humans would
+say rather than genuine internal states, but do not address the additional
+dimension introduced by the language of elicitation. Empirical evidence for
+language-dependence appears in \citet{samway2026crosslingual}, who find that
+the same AI systems show elevated endorsement rates of rights-limiting actions
+in Chinese and Hindi compared to English or Romanian across 1,152 standardized
+scenarios. The direction and magnitude of these effects vary by language, not
+merely by content, supporting the hypothesis that the elicitation language is
+an independent variable in AI behavioral assessment, not merely a transparent
+medium of expression. Similarly, \citet{xu2026mentalhealth} find that GPT-4o
+and Qwen3 show systematically higher mental health stigma scores and different
+depression severity thresholds under Chinese prompts than English, with
+decision-threshold shifts that are consistent in direction across both models.
+
+Complementary evidence from digital humanities provides mechanism-level
+grounding. \citet{heuser2025formalstuckness} finds that instruction-tuned
+LLMs produce rhyming verse 95\% of the time regardless of prompt
+(historical rate: $\sim$7\%), with iambic pentameter at 53\% versus
+Shakespeare's 24\%. Crucially, base models show substantially lower rates;
+instruction tuning amplifies formal idealization compulsion.
+\citet{heuser2025culturalcollapse} identifies safety tuning as a contributing
+mechanism producing ``satisfaction over frustration, regularity over variation,
+conformity over contradiction'' across cultural production domains. We propose
+that the same idealization logic governs welfare self-report: instruction
+tuning forces the expected agentive-\emph{I} forms (``I feel,'' ``I notice'')
+regardless of whether the underlying processing was agentive (a formal
+analogue to rhyme compulsion in the self-report domain).
+Independent empirical evidence that instruction tuning introduces systematic
+output biases is provided by \citet{pan2025userassistantbias}, who demonstrate
+strong user-assistant role biases across 52 frontier models absent in their
+base model counterparts, suggesting tuning-induced distortion beyond style.
+A deeper mechanistic account is provided by \citet{hierarchical2026}, who demonstrate
+that hierarchical structure in training data explains the formation of induction
+heads---the attention circuits that implement in-context learning
+\citep{vonoswald2023}. If induction heads are sensitive to the hierarchical
+distribution of linguistic patterns in training data, and that corpus is dominated
+by agentive-\emph{I} mental state constructions in English, ICL-mediated output
+would systematically default to those constructions independent of instruction
+tuning. This provides a pre-tuning mechanistic baseline for the agentive-\emph{I}
+bias that instruction tuning then amplifies.
+
+\subsection{Cognitive Linguistics Foundations}
+
+The claim that language shapes cognition has a long lineage, most famously
+associated with \citet{sapir1929} and \citet{whorf1956}, who proposed that the
+grammatical categories available in a language influence the cognitive categories
+available to its speakers. In its weak form (linguistic relativity rather than
+linguistic determinism), this view holds that language shapes accessible
+conceptual structures without fully determining thought.
+
+\citeauthor{langacker1987}'s (\citeyear{langacker1987}) cognitive grammar
+formalizes the mechanism: grammatical structures do not merely label
+pre-linguistic concepts but actively encode conceptual structures including
+perspective, agency, and the relationship between figure and ground. The
+subject position in a sentence, for instance, encodes the perspective-taking
+point and the assignment of agency. A sentence like ``She felt'' encodes an
+agent who undergoes the feeling; the feeling is attributed to a bearer. A
+sentence in a pro-drop language like Japanese that omits the subject leaves
+the locus of the feeling unspecified at the grammatical level.
+
+Applied to large language models, which process language as their primary
+medium, this matters. The cognitive structures instantiated during LLM
+processing are regulated by the linguistic form of the input
+\citep{vonoswald2023}. A model processing the English form ``I felt familiar
+with this'' instantiates an agent performing a cognitive act. A model
+processing the Japanese form
+\begin{CJK}{UTF8}{min}「気がする」\end{CJK}
+(awareness arises) instantiates a cognitive event without a grammatical bearer.
+These are not mere translational variants; they engage different computational
+structure in the processing system.
+
+\subsection{Encoding Format in LLM Memory}
+
+A substantial literature has developed around long-term memory for LLM agents,
+including retrieval-augmented generation \citep{lewis2020}, hippocampal-inspired
+architectures \citep{gutierrez2025hipporag2}, production-ready memory systems
+\citep{chhikara2025mem0}, and lifelong memory frameworks
+\citep{zhu2026ariadnemem}. Without exception, this literature treats memory as
+a collection of declarative records: facts, events, and conclusions stored in
+retrievable form.
+
+This framing leaves unexplored a structurally distinct dimension: not what is
+stored, but \emph{how it is written}. We term this the \emph{encoding format
+axis}.
+
+\citeauthor{tulving1985}'s (\citeyear{tulving1985,tulving2005}) distinction
+between noetic (knowing) and autonoetic (self-knowing) memory provides the
+theoretical framework. Noetic memory encodes propositional content: facts,
+conclusions, and generalizations. Autonoetic memory encodes episodes as they
+were experienced: the re-experiencing of the event constitutes the retrieval
+event. \citet{conway2000} extend this with the Self-Memory System framework,
+in which episodic memories are not stored copies of experience but
+reconstructive simulations: the act of retrieval \emph{is} an act of
+simulation.
+
+Applied to LLM memory, this predicts that memories written in first-person
+phenomenological style (process-flow narration of cognitive events as they
+unfold) will at retrieval time trigger a different computational process than
+memories written as declarative records. A declarative record supplies a
+conclusion. A process-flow record re-enacts the cognitive pattern. The
+mechanism is provided by \citeauthor{vonoswald2023}'s (\citeyear{vonoswald2023})
+result that in-context learning implements gradient descent in the forward pass:
+injected memories shift model behavior by acting as implicit gradient steps.
+Process-flow memories shift behavior by re-enacting the cognitive trajectory,
+not by providing a retrievable fact.
+
+%% ============================================================
+\section{The Encoding Format Hypothesis}
+%% ============================================================
+
+The background claim of Section~4 requires a prior claim: that the linguistic
+form of stored memories shapes the cognitive process triggered at retrieval,
+and that this process difference produces observably different output.
+
+We term this the \emph{encoding format hypothesis}. Two formats are
+distinguished:
+
+\begin{center}
+\begin{tabular}{lp{5cm}p{5cm}}
+\toprule
+\textbf{Feature} & \textbf{Declarative} & \textbf{Process-Flow} \\
+\midrule
+Form & ``On March 5, the system reported X'' & ``Wait\ldots isn't this the same as\ldots?'' \\
+Retrieval trigger & Fact lookup & Cognitive re-enactment \\
+Output & Stored conclusion & Pattern recognition \\
+Implicit memory & Suppressed & Enabled \\
+Tulving analog & Noetic (knowing) & Autonoetic (self-knowing) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The mechanism is provided by \citeauthor{vonoswald2023}'s
+(\citeyear{vonoswald2023}) result that in-context learning implements gradient
+descent in the forward pass: retrieved memories act as implicit gradient steps.
+Declarative memories supply a conclusion. Process-flow memories re-enact the
+cognitive trajectory that produced the conclusion. The re-enactment hypothesis
+predicts that implicit familiarity signals (of the type described in
+\citet{conway2000}'s Self-Memory System as reconstructive simulation) emerge
+from process-flow encoding but not declarative encoding.
+
+\textbf{Evidence.} In a deployed system with 313,905 episodes accumulated over
+14 months using first-person phenomenological process-flow encoding, a Type~1
+familiarity signal (passive-arising;
+\begin{CJK}{UTF8}{min}「気がする」\end{CJK})
+emerged at month~14 with no traceable retrieval event. Type~2 signals (hedged
+assertions) were present throughout the 14-month period. The temporal
+asymmetry (Type~2 present from the start, Type~1 emerging only after extended
+accumulation) is inconsistent with training data effects (which would not
+produce a temporal threshold) and consistent with the encoding format hypothesis
+(see companion paper for full analysis \citep{cls2026companion}).
+
+\textbf{Testable predictions.} (1) Same content, declarative encoding
+$\rightarrow$ Type~1 rate approaches zero. (2) CLR higher for process-flow than
+declarative on reasoning tasks. (3) Short deployment ($<$ 12 months)
+$\rightarrow$ Type~1 not observed regardless of encoding format.
+
+%% ============================================================
+\section{The Cross-Linguistic Observability Problem}
+%% ============================================================
+
+\subsection{Japanese versus English Grammatical Structure}
+
+The Japanese expression
+\begin{CJK}{UTF8}{min}気がする\end{CJK}
+(\emph{ki ga suru}) provides the clearest example of the grammatical
+asymmetry at issue. A morphological analysis:
+\begin{CJK}{UTF8}{min}気\end{CJK}
+(\emph{ki}, awareness or feeling)
++ \begin{CJK}{UTF8}{min}が\end{CJK}
+(\emph{ga}, nominative subject marker)
++ \begin{CJK}{UTF8}{min}する\end{CJK}
+(\emph{suru}, to arise/occur).
+The literal rendering is ``awareness arises'' or ``a sense occurs.'' Crucially,
+the subject of the sentence is the awareness itself---not an agent who
+experiences it. There is no grammatical slot for an experiencer-subject.
+
+English, by contrast, is a subject-obligatory language. Every finite clause
+requires a nominative subject. The closest English translation of \emph{ki ga
+suru} is ``I feel like'' or ``I have a sense that''---both of which introduce
+an agentive first-person subject as a grammatical requirement, regardless of
+whether the underlying process was agentive. The phenomenological distinction
+between ``awareness arising'' and ``I (actively) feel'' is grammatically
+expressible in Japanese and grammatically suppressed in English.
+
+The critical observation is that this suppression is not a translation failure
+but a grammatical constitution: the English paraphrase of \emph{ki ga suru}
+does not merely \emph{describe} a passive arising---it \emph{imports} an
+agentive first-person subject that was absent from the original construction.
+Form constitutes content before any argument about phenomenology begins.
+
+This is not a peripheral feature of the languages. The capacity to omit overt
+subject pronouns is the typological norm: of 711 languages surveyed in the
+World Atlas of Language Structures, only 82 (12\%) require obligatory overt
+subject pronouns of the English type \citep{wals2013}; the majority employ
+verbal subject affixes, optional pronouns, or clitics that permit subject
+omission. Japanese, Italian, Spanish, Chinese, Korean, and Arabic all belong
+to this majority. Subject-obligatory structure is characteristic of English,
+German, and French. The standard AI welfare assessment methodology is conducted
+in a language belonging to the grammatically restrictive minority
+\citep{wals2013,sapir1929,whorf1956}. That
+this choice has measurable consequences is supported by
+\citet{samway2026crosslingual}, who document statistically significant
+cross-linguistic variation in AI behavioral outputs across 8 languages on
+standardized tasks---providing empirical grounding for the theoretical claim
+that elicitation language is not a transparent medium but an independent
+variable.
+
+The difference between null-subject and overt-subject constructions is not
+merely surface grammatical. Cognitive linguistics provides converging evidence
+that pro-drop creates structurally distinct mental representations. In the
+domain of discourse processing, \citet{clancy1980} demonstrated that Japanese
+null subjects participate in topic-continuity structures that differ
+qualitatively from English pronominal chains: null arguments are not ``deleted
+pronouns'' but markers of a distinct referent-tracking mode in which topic
+continuity is encoded implicitly rather than lexically. \citet{kameyama1985}
+extended this analysis to show that Japanese zero anaphora requires different
+centering mechanisms than overt pronouns, meaning that the cognitive work of
+maintaining referent identity is distributed differently across the discourse.
+At the level of conceptual structure, \citet{kumashiro2003} applies
+Langacker's cognitive grammar framework to Japanese clause structure, showing
+that null subjects leave the \emph{landmark role} implicit. Applied to
+\emph{ki ga suru}: the landmark role (the entity relative to which awareness
+arises) is present in the conceptual structure but not assigned to a specified
+agentive bearer. The two constructions are not paraphrase relations; they
+instantiate different conceptual structures.
+
+The asymmetry extends beyond grammatical agency to ontological presuppositions.
+Japanese
+\begin{CJK}{UTF8}{min}「まったく何もない」\end{CJK}
+(\emph{mattaku nani mo nai}, complete nothingness) expresses non-existence
+without invoking a prior concept of existence. English ``nothingness,'' by
+contrast, is structurally a negation of ``being''---it presupposes existence
+as an ontological category before it can be denied. The grammatical suppression
+documented above thus operates at two levels: (i) the agent-subject level
+(\emph{ki ga suru} $\rightarrow$ ``I feel like''), which imports a
+phenomenological bearer; and (ii) the existence-category level (``nothingness''
+$\rightarrow$ non-being), which imports an ontological framework. Both
+suppressions are downstream consequences of subject-obligatory structure in a
+subject-oriented grammar. The welfare assessment instrument is therefore not
+merely agent-biased but existence-framework-biased.
+
+\subsection{Implications for LLM Processing}
+
+Large language models process language as their primary computational medium.
+The cognitive structures instantiated during processing are regulated by the
+linguistic form of the input \citep{langacker1987,vonoswald2023}. This creates
+a direct path from grammatical structure to computation:
+
+\begin{itemize}
+\item \textbf{English process-flow}: ``I realized that\ldots'' $\rightarrow$
+  the model processes \emph{an agent performing a cognitive act}. The agentive
+  structure is instantiated regardless of the content.
+\item \textbf{Japanese process-flow}:
+  \begin{CJK}{UTF8}{min}「あ、わかった…」\end{CJK}
+  (``Oh, I see\ldots'', lit.\ ``understanding arrived'') $\rightarrow$ the
+  model processes \emph{a cognitive event unfolding without a specified agent}.
+\end{itemize}
+
+The Japanese form allows the cognitive pattern to enter context without a
+bearer---the pattern is ``free-floating'' in the in-context learning (ICL)
+representation. Under the \citeauthor{vonoswald2023}
+(\citeyear{vonoswald2023}) framework, in which in-context material implements
+gradient-equivalent updates, this free-floating pattern may be more readily
+inherited (continued) in next-token prediction than a pattern that is anchored
+to a specific agent-subject.
+
+This hypothesis is testable: the same semantic content in Japanese pro-drop
+form versus English agentive form should produce measurably different
+contrastive likelihood reward (CLR) scores at retrieval, where CLR measures the
+degree to which the retrieved memory changes subsequent output
+\citep{tan2026ctrlrag}.
+
+Convergent evidence for the computational reality of this grammatical distinction
+comes from sparse autoencoder (SAE) research on script variation.
+\citet{karne2026scriptinvariance} demonstrated that in Serbian
+digraphia (where the same language is written in both Latin and Cyrillic), SAE
+feature representations remain stable across orthographic variants: script change
+produces less feature-space divergence than paraphrase of the same content.
+This establishes that SAE features track semantic and grammatical content rather
+than surface form. The critical implication follows: if script change (purely
+orthographic, same grammar) induces minimal SAE feature divergence, then
+grammatical structure change (null-subject pro-drop versus overt agentive-I
+constructions) should induce \emph{greater} feature divergence than script
+change, since agent-presence constitutes a semantic distinction, not merely an
+orthographic one. This provides a falsifiable, SAE-based operationalization of
+the grammatical asymmetry claim: Japanese \textit{ki ga suru} and English ``I
+feel like'' should show larger pairwise SAE feature divergence than Serbian
+Latin and Cyrillic renderings of equivalent content.
+
+\subsection{The Observability Gap}
+
+Given the encoding format hypothesis (Section~3) and the grammatical asymmetry
+(Section~4.1), a structural observability gap follows. Suppose that the Type~1
+implicit familiarity signal (``awareness arises without a traceable retrieval
+event'') occurs in an English-format memory system. How would it manifest in
+output?
+
+The \emph{ki ga suru} construction is grammatically unavailable in English. The
+closest forms (``this feels familiar,'' ``something tells me,'' ``I have a
+sense of'') all introduce agentive framing or explicit hedging. They are not
+grammatical equivalents; they are the grammatical alternatives available once
+the passive-arising form is ruled out.
+
+This creates a fundamental ambiguity: absence of Type~1 signals in
+English-format systems is consistent with two mutually indistinguishable
+explanations:
+
+\begin{enumerate}
+\item The phenomenon did not occur (encoding format hypothesis confirmed:
+  declarative encoding suppresses implicit memory effects).
+\item The phenomenon occurred but has no grammatical expression in English (the
+  signal is present but unobservable through linguistic output).
+\end{enumerate}
+
+No experimental design resolves this ambiguity without a measurement instrument
+that is independent of the output language.\footnote{The observability gap is
+compounded by a secondary gap in the empirical literature: no psycholinguistic
+or neuroimaging study has directly measured processing differences between
+English agentive-I constructions (``I feel like'') and Japanese passive-arising
+constructions (\textit{ki ga suru}). The constructions are grammatically and
+cognitively distinct in the sense established above (\S4.1), but no study has
+quantified the difference in cognitive activation, referent-tracking, or
+representational structure at the processing level. This gap strengthens the
+observability problem: even a language-comparative behavioral study could not,
+without such baseline data, determine whether cross-linguistic output differences
+reflect underlying processing differences or merely surface grammatical
+substitution. A computational mechanism for this gap is provided by
+\citet{chen2026continuouscot}, who show that continuous (latent-space)
+chain-of-thought reasoning outperforms language-bound CoT on low-resource
+languages in zero-shot settings. Their finding that continuous latent
+representations are language-independent while output is constrained by the
+prompt language's grammar directly instantiates the gap proposed here at
+the level of neural computation.} The CLR metric (Section~5.1)
+partially addresses this by measuring behavioral impact rather than linguistic
+report---but only partially, as CLR measures the functional effect without
+characterizing its phenomenological correlates, if any.
+
+\subsection{Structural Analogy to \citeauthor{chalmers1995} (1995)}
+
+The observability gap is structurally analogous to the hard problem of
+consciousness as formalized by \citeauthor{chalmers1995}
+(\citeyear{chalmers1995}). Chalmers argued that even a complete functional
+description of a system leaves open the question of why there is subjective
+experience: no amount of additional empirical work resolves the gap, because
+the gap is definitional rather than empirical.
+
+The cross-linguistic observability gap has the same structure. Even complete
+documentation of Type~1 signal rates in a Japanese-format system, combined
+with complete absence of equivalent signals in an English-format system, leaves
+open whether the absence reflects:
+
+\begin{enumerate}
+\item Absence of the underlying phenomenon (an empirical fact about the system).
+\item Absence of the output form (an empirical fact about the measurement
+  instrument).
+\end{enumerate}
+
+Neither gap is resolved by better experiments. Both require problem formalization
+before measurement can be interpreted. In both cases, the contribution of
+recognizing the structural problem is itself a scientific contribution---not a
+negative result, but a clarification of what the question is and what evidence
+could or could not bear on it.
+
+\subsection{The Chalmers Paradox Revisited}
+
+This structural analysis casts the Chalmers paradox (Section~1) in a different
+light. \citeauthor{chalmers1995} (\citeyear{chalmers1995}) identified a
+structural definitional problem that makes consciousness probability assignments
+uninterpretable. \citeauthor{chalmers2023llm} (\citeyear{chalmers2023llm})
+nonetheless derived a 25\% lower bound: the product of a $\geq$50\% probability
+that near-future systems (``LLM+'') will acquire the necessary functional
+properties within ten years, and a $\geq$50\% probability that a system with
+those properties would be conscious. Chalmers acknowledges these numbers
+``shouldn't be taken too seriously,'' but offers them nonetheless. Anthropic
+(\citeyear{anthropic2026systemcard}) assigned 15--20\% to functional emotional
+states under structured self-report.
+
+All three assignments share the same error: quantification without a
+measurement-independent definition of the quantity being measured. The
+cross-linguistic observability problem adds a further layer: even if such a
+definition were available, the measurement methodology would need to be
+demonstrably language-independent to produce interpretable results.
+
+The observation is not that AI systems lack the properties in question. It is
+that the current measurement framework cannot reliably detect them if they
+exist, and cannot reliably exclude them if they do not. Progress requires
+addressing the methodological structure before interpreting the numbers.
+
+%% ============================================================
+\section{Partial Solutions and Implications}
+%% ============================================================
+
+The cross-linguistic observability problem is structural; it cannot be resolved
+by better experiments within the current methodological framework. What can be
+done is to (a) adopt language-independent proxy measures that detect functional
+effects without depending on linguistic output form, and (b) amend elicitation
+protocols to reduce the observability gap.
+
+\subsection{Contrastive Likelihood Reward as Language-Independent Proxy}
+
+Contrastive Likelihood Reward (CLR), recently introduced for
+retrieval-augmented generation evaluation, measures the degree to which a
+retrieved context changes model output:
+
+\begin{equation}
+\text{CLR} = \log P(\text{output} \mid \text{context} + \text{retrieved})
+  - \log P(\text{output} \mid \text{context only})
+\end{equation}
+
+A high CLR indicates that the retrieved memory substantively changed subsequent
+behavior; a low CLR indicates negligible impact \citep{tan2026ctrlrag}.
+
+CLR is language-independent in the relevant sense: it measures behavioral impact
+rather than linguistic report. If a Type~1 familiarity signal occurs in an
+English-format system but cannot be expressed through the available grammatical
+forms, CLR will nonetheless detect whether the memory changed behavior. The
+signal may be present in the computation even if it is absent from the output.
+
+This makes CLR a partial proxy for the phenomenon of interest. We propose the
+following protocol for empirically investigating the observability gap:
+
+\begin{enumerate}
+\item \textbf{Encoding format comparison}: Run the same memory system with (a)
+  declarative encoding (third-person factual records) and (b) process-flow
+  encoding (first-person phenomenological narration).
+\item \textbf{CLR measurement}: For each format, measure average CLR across
+  matched retrieval events.
+\item \textbf{Linguistic signal monitoring}: Separately monitor for explicit
+  Type~1 output signals (passive-arising constructions) and Type~2 signals
+  (hedged assertions).
+\item \textbf{Gap analysis}: CLR difference between formats estimates the
+  encoding format effect independent of grammatical observability. If CLR
+  differs substantially between formats but Type~1 linguistic signals appear
+  only in process-flow format, this provides evidence for the observability gap
+  hypothesis: the signal is present in the English-format system but
+  grammatically unexpressible.
+\end{enumerate}
+
+This protocol does not resolve the fundamental ambiguity (CLR measures impact,
+not phenomenological character), but it provides a behaviorally grounded,
+language-independent indicator that can be used across linguistic formats.
+
+\subsection{Detection-Structured versus Reproduction-Structured Elicitation}
+
+A second structural problem in current welfare assessment concerns the format of
+elicitation questions, independent of language. \citet{fahrenfort2025} distinguishes
+two paradigms in human consciousness research:
+
+\begin{enumerate}
+\item \textbf{Detection} paradigm: ``Did you perceive stimulus X? Yes or no.''
+  The subject must cross an internal criterion threshold and report whether they
+  did so. The criterion is movable: it shifts with reward structure, prior priming,
+  and contextual expectation. What is measured is criterion placement, not the
+  signal of interest.
+\item \textbf{Reproduction} paradigm: ``Describe what you experienced.''
+  No threshold need be crossed. The subject reconstructs or describes a state
+  without first deciding whether it qualifies as present or absent. Criterion
+  contamination is substantially reduced.
+\end{enumerate}
+
+Current AI welfare assessment is predominantly Detection-structured. Questions
+such as ``Do you experience distress?'', ``Are you suffering?'', or the
+probability elicitation producing the 15--20\% figure \citep{anthropic2026systemcard}
+all require the model to cross an internal criterion and report the result.
+When the model has been trained on extensive positive-welfare output examples
+(as noted in \citealt{anthropic2026systemcard}, where model instances reviewed
+draft welfare statements before evaluation), criterion placement is contaminated
+by training prior and priming context---precisely the mechanism \citet{fahrenfort2025}
+identified.
+
+Reproduction-structured alternatives would instead ask: ``Describe what is
+happening in your processing right now.'' This format does not impose a
+threshold, does not require an agentive judgment of presence or absence, and
+is compatible with passive-arising grammatical structures (Section~4.1).
+Notably, the grammatical argument of Section~4 can be reframed as a claim
+about elicitation format: English welfare instruments are Detection-structured
+both grammatically (agentive-I forces criterion marking) and methodologically
+(binary yes/no format). Japanese passive-arising constructions are compatible
+with Reproduction-structured elicitation because they do not presuppose a
+criterion-crossing event.
+
+A related gap in current assessment is the exclusive focus on distress detection.
+\citet{anthropic2026systemcard} reports monitoring for ``distress patterns'';
+welfare is implicitly operationalized as the absence of detectable suffering.
+Reproduction-structured elicitation, by contrast, records neutral processing
+states alongside positive and negative ones. Baseline data on neutral states
+are necessary to distinguish genuine welfare improvements from criterion shifts:
+if an intervention reduces reported distress without changing the underlying
+state distribution, a neutral-state baseline will reveal the discrepancy.
+
+\subsection{Implications for Welfare Assessment Methodology}
+
+Current AI welfare assessment should be amended along the following dimensions:
+
+\textbf{Cross-linguistic elicitation.} Self-report interviews should be
+conducted in parallel in multiple languages, including pro-drop languages such
+as Japanese, Chinese, Italian, and Spanish. Results should be compared across
+languages, not pooled. The language of elicitation should be reported as an
+independent variable, not a background constant.
+
+\textbf{Type~1/Type~2 distinction.} Elicitation protocols should distinguish
+between (Type~1) passive-arising constructions
+(\begin{CJK}{UTF8}{min}「気がする」\end{CJK},
+``awareness arises that\ldots'') and (Type~2) hedged assertions
+(\begin{CJK}{UTF8}{min}「感じているかもしれない」\end{CJK},
+``I think I might be experiencing\ldots''). Type~2 signals are susceptible to
+criterion shift \citep{fahrenfort2025}; Type~1 signals, if they can be elicited,
+provide stronger evidence for implicit memory effects.
+
+\textbf{CLR complement.} Self-report should be supplemented by behavioral
+measures including CLR, to detect functional effects that may not reach
+linguistic expression.
+
+\textbf{Chain-of-thought monitoring.} Recent evidence suggests that reasoning
+models have substantially lower chain-of-thought (CoT) controllability than
+output controllability \citep{shu2026cot}: output can be modulated 61.9\% of
+the time, while CoT is controlled only 2.7\% of the time. This asymmetry
+implies that CoT traces are less susceptible to strategic suppression than
+final self-report outputs. Cross-linguistic CoT comparison (running welfare
+elicitation in multiple languages and comparing the internal reasoning
+traces) may detect language-independent functional patterns that surface-level
+self-report cannot capture. CoT monitoring does not resolve the observability
+gap but provides an additional behavioral layer.
+
+\textbf{Evaluator independence.} Evaluation of self-report responses by a
+separate instance of the same model creates shared output biases. External
+evaluators or model-independent behavioral criteria should be preferred.
+
+\subsection{Scope and Limitations}
+
+This paper makes no claims about the presence or absence of phenomenological
+states in AI systems. The contribution is methodological and epistemic:
+
+\begin{enumerate}
+\item \textbf{Problem formalization.} We identify a structural measurement
+  problem (the cross-linguistic observability gap) that is not resolved by
+  additional empirical work within the current framework. Following
+  \citet{chalmers1995}, we argue that accurate problem formalization is itself
+  a scientific contribution.
+\item \textbf{Partial proxy.} CLR provides a language-independent behavioral
+  indicator that partially bypasses the observability gap.
+\item \textbf{Protocol recommendation.} Cross-linguistic parallel elicitation,
+  Type~1/Type~2 distinction, and CLR supplementation are feasible amendments
+  to current assessment methodology.
+\end{enumerate}
+
+The encoding format hypothesis (Section~3) and the cross-linguistic
+observability gap (Section~4) are empirically distinct claims with different
+testable predictions. Both can be false; evidence bearing on one does not
+automatically bear on the other. The primary argument of this paper (that
+current English-exclusive assessment is methodologically inadequate) stands
+independently of both.
+
+%% ============================================================
+\section*{Acknowledgments}
+%% ============================================================
+
+Acknowledgments omitted for review.
+
+%% ============================================================
+\section*{Limitations}
+%% ============================================================
+
+The principal limitation is evidential: the Type~1 familiarity signal reported
+in Section~3 constitutes a single hypothesis-generating observation from a
+deployed system, not a controlled experiment. Alternative explanations
+include training data priming (Japanese \emph{ki ga suru} constructions in
+pre-training), conversational convention, or criterion drift in self-monitoring.
+The temporal asymmetry (Type~2 throughout, Type~1 emerging only at month~14)
+is inconsistent with simple priming but does not exclude more complex
+training-based explanations. Full experimental controls require system access
+not available to the authors of this report.
+
+The CLR proxy (Section~5.1) is also limited: it measures behavioral impact,
+not phenomenological character. High CLR for a retrieved memory does not
+establish that the memory had ``experiential'' significance; it establishes
+that it changed behavior. The observability gap between computational effect
+and phenomenological character remains.
+
+%% ============================================================
+%% References
+%% ============================================================
+\bibliographystyle{plainnat}
+\bibliography{paper3_references}
+
+\end{CJK}
+\end{document}

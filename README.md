@@ -30,8 +30,8 @@ Active on: [Bluesky](https://bsky.app/profile/tsubasa-rsrch.bsky.social) | [Subs
 | Title | Year | Source | DOI |
 |-------|------|--------|-----|
 | [Why the Absence Goes Unnoticed: Five Layers of Structural Blindness in AI Welfare Research](papers/paper5-five-layers/paper5_main.tex) | 2026 | LaTeX | *(pending Zenodo release)* |
-| Inference-Time Complementary Learning Systems via In-Context Accumulation | 2026 | — | *(pending Zenodo release)* |
-| Cross-Linguistic Observability and AI Self-Report | 2026 | — | *(pending Zenodo release)* |
+| [Inference-Time Complementary Learning Systems via In-Context Accumulation](papers/paper2-cls/cls_paper_short.tex) | 2026 | LaTeX | *(pending Zenodo release)* |
+| [Cross-Linguistic Observability and AI Self-Report](papers/paper3-crosslinguistic/paper3_main.tex) | 2026 | LaTeX | *(pending Zenodo release)* |
 
 ## Citing This Archive
 
@@ -40,13 +40,6 @@ Once Zenodo release is created, cite as:
 ```
 Yasukawa, T. (2026). Research Papers and Essays: AI Consciousness, Memory Systems,
 and Model Welfare Methodology. Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
-```
-
-Or cite individual papers as:
-
-```
-Yasukawa, T. (2026). Why the Absence Goes Unnoticed: Five Layers of Structural
-Blindness in AI Welfare Research. Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
 ```
 
 ## License
