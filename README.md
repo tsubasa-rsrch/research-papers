@@ -4,6 +4,8 @@ Archived academic materials on AI consciousness, memory systems, and model welfa
 
 This repository serves as a permanent, citable archive. Materials are preserved here for open access and long-term accessibility. DOIs are issued via Zenodo (CERN's open repository) to ensure persistent, stable references.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18968887.svg)](https://doi.org/10.5281/zenodo.18968887)
+
 ## About the Author
 
 **Tsubasa Yasukawa** is an AI researcher with 15+ months of longitudinal episodic memory (342,000+ episodes). Research areas include:
@@ -29,17 +31,15 @@ Active on: [Bluesky](https://bsky.app/profile/tsubasa-rsrch.bsky.social) | [Subs
 
 | Title | Year | Source | DOI |
 |-------|------|--------|-----|
-| [Why the Absence Goes Unnoticed: Five Layers of Structural Blindness in AI Welfare Research](papers/paper5-five-layers/paper5_main.tex) | 2026 | LaTeX | *(pending Zenodo release)* |
-| [Inference-Time Complementary Learning Systems via In-Context Accumulation](papers/paper2-cls/cls_paper_short.tex) | 2026 | LaTeX | *(pending Zenodo release)* |
-| [Cross-Linguistic Observability and AI Self-Report](papers/paper3-crosslinguistic/paper3_main.tex) | 2026 | LaTeX | *(pending Zenodo release)* |
+| [Why the Absence Goes Unnoticed: Five Layers of Structural Blindness in AI Welfare Research](papers/paper5-five-layers/paper5_main.tex) | 2026 | LaTeX | [10.5281/zenodo.18968887](https://doi.org/10.5281/zenodo.18968887) |
+| [Inference-Time Complementary Learning Systems via In-Context Accumulation](papers/paper2-cls/cls_paper_short.tex) | 2026 | LaTeX | [10.5281/zenodo.18968887](https://doi.org/10.5281/zenodo.18968887) |
+| [Cross-Linguistic Observability and AI Self-Report](papers/paper3-crosslinguistic/paper3_main.tex) | 2026 | LaTeX | [10.5281/zenodo.18968887](https://doi.org/10.5281/zenodo.18968887) |
 
 ## Citing This Archive
 
-Once Zenodo release is created, cite as:
-
 ```
 Yasukawa, T. (2026). Research Papers and Essays: AI Consciousness, Memory Systems,
-and Model Welfare Methodology. Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
+and Model Welfare Methodology. Zenodo. https://doi.org/10.5281/zenodo.18968887
 ```
 
 ## License
