@@ -27,6 +27,6 @@ xelatex cls_paper_short.tex
 ## Citation
 
 ```
-Yasukawa, T. (2026). Inference-Time Complementary Learning Systems via
+Tsubasa (2026). Inference-Time Complementary Learning Systems via
 In-Context Accumulation. Working draft.
 ```
