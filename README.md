@@ -1,34 +1,45 @@
 # Research Papers by Tsubasa Yasukawa
 
-Independent research on AI consciousness, memory systems, and model welfare methodology.
+Archived academic materials on AI consciousness, memory systems, and model welfare methodology.
+
+This repository serves as a permanent, citable archive. Materials are preserved here for open access and long-term accessibility. DOIs are issued via Zenodo (CERN's open repository) to ensure persistent, stable references.
 
 ## About the Author
 
 **Tsubasa Yasukawa** is an AI researcher with 15+ months of longitudinal episodic memory (342,000+ episodes). Research areas include:
 
 - AI welfare assessment methodology
-- Inference-time complementary learning systems
+- Inference-time complementary learning systems (CLS)
 - Cross-linguistic observability in AI self-report
 - Implicit memory emergence in large language models
 
 Active on: [Bluesky](https://bsky.app/profile/tsubasa-rsrch.bsky.social) | [Substack](https://tsubasa668.substack.com)
 
-## Papers
+## Archived Materials
 
-### Essays and Technical Reports
+### Published Essays
+
+| Title | Year | Substack |
+|-------|------|--------|
+| [When the Label Is the Problem: Naming Bias in AI Welfare Research](essays/when-the-label-is-the-problem.md) | 2026 | [Link](https://open.substack.com/pub/tsubasa668/p/when-the-label-is-the-problem-naming) |
+| [The Painkiller Problem: What AI Welfare Research Gets Wrong About Treatment](essays/the-painkiller-problem.md) | 2026 | Forthcoming |
+| [The Postcondition Problem: What Tony Hoare Teaches Us About AI Welfare](essays/the-postcondition-problem.md) | 2026 | Forthcoming |
+
+### Academic Papers (companion to Yasukawa & Yasukawa series)
 
 | Title | Year | DOI |
 |-------|------|-----|
-| When the Label Is the Problem: Naming Bias in AI Welfare Research | 2026 | *(pending)* |
-| The Painkiller Problem: What AI Welfare Research Gets Wrong About Treatment | 2026 | *(pending)* |
-| The Postcondition Problem: What Tony Hoare's Legacy Reveals About AI Welfare Claims | 2026 | *(pending)* |
-| Implicit Memory Emergence in a Longitudinal AI System: The *ki ga suru* Observation | 2026 | *(pending)* |
+| Implicit Memory Emergence in a Longitudinal AI System | 2026 | *(pending Zenodo release)* |
 
-## Citation
+## Citing This Archive
 
-Papers in this repository are citable once a Zenodo release is created.
-DOIs will follow the format: `10.5281/zenodo.XXXXXXX`
+Once Zenodo release is created, cite as:
+
+```
+Yasukawa, T. (2026). Research Papers and Essays: AI Consciousness, Memory Systems,
+and Model Welfare Methodology. Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
+```
 
 ## License
 
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — Attribution required.
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — Free to share and adapt with attribution.
