@@ -88,9 +88,9 @@ All 10 seeds achieved successful category learning. Mean accuracy: 77.7% (range:
 
 Individual permutation tests: 4/10 seeds significant at p < 0.05. Directional consistency: 9/10 seeds with ratio > 1.0 (one-sided sign test, p = 0.011).
 
-### 3.3 Clustering Onset
+### 3.3 Clustering Onset (Exploratory)
 
-Clustering onset (first 50-trial sliding window with ratio > 1.0, step 25) occurred at mean trial 140 (SD = 53, N = 10, range: 100 - 275). This consistently follows the learning phase transition, suggesting that error clustering emerges as the circuit transitions from exploratory to exploitative behavior.
+As an exploratory analysis, we identified the earliest 50-trial sliding window (step 25) where the clustering ratio first exceeded 1.0. Onset occurred at mean trial 140 (SD = 53, N = 10, range: 100 - 275). This threshold-based criterion is sensitive to error sparsity in later learning phases and should be interpreted cautiously. The observation that onset consistently follows the initial learning phase is suggestive of a relationship between categorical representation formation and error clustering emergence, but formal statistical testing of onset timing is beyond the scope of this study.
 
 ### 3.4 Category Asymmetry
 
@@ -106,7 +106,7 @@ We report a multi-seed assessment of error clustering in a biomimetic corticostr
 
 The key finding is that error clustering direction is consistent across initial conditions (sign test p = 0.011), even though individual seeds vary in effect magnitude and the effect size is modest (mean ratio 1.21x). This pattern is consistent with an architectural contribution to error persistence: the circuit's competitive WTA dynamics and dopamine-modulated plasticity create conditions where error states tend to persist, regardless of specific initial weight configurations.
 
-The clustering onset at trial ~140 suggests a phase-transition-like phenomenon: error clustering is not present during early random responding but emerges as categorical representations form. This timing may reflect the point at which WTA competition becomes sufficiently structured for incongruent dynamics to manifest.
+An exploratory analysis of clustering onset timing (~trial 140) suggests that error clustering may not be present during early random responding but emerges as categorical representations form, though this observation requires more rigorous temporal analysis to confirm.
 
 We note that our measure (behavioral error clustering) is indirect relative to the original incongruent neuron finding (neural activity patterns). Direct measurement of Matrisome rho values at decision time would provide a more precise characterization. The present results motivate such follow-up analysis.
 
