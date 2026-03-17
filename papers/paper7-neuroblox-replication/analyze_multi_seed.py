@@ -19,6 +19,23 @@ stable_start = 400
 
 print(f"=== Multi-Seed Neville Analysis ({len(seeds)} seeds × {N_trials} trials) ===\n")
 
+def permutation_test_clustering(correct_arr, n_perms=1000, rng=None):
+    """Permutation test for error clustering significance."""
+    if rng is None:
+        rng = np.random.default_rng(42)
+    errors = np.where(~correct_arr)[0]
+    observed = sum(1 for i in range(len(errors)-1) if errors[i+1] == errors[i]+1)
+
+    null_dist = []
+    for _ in range(n_perms):
+        shuffled = rng.permutation(correct_arr)
+        shuf_errors = np.where(~shuffled)[0]
+        null_pairs = sum(1 for i in range(len(shuf_errors)-1) if shuf_errors[i+1] == shuf_errors[i]+1)
+        null_dist.append(null_pairs)
+
+    p_value = np.mean([n >= observed for n in null_dist])
+    return observed, np.mean(null_dist), p_value
+
 # === Per-seed summary ===
 print("=== Per-Seed Accuracy ===")
 for seed in seeds:
@@ -29,21 +46,37 @@ for seed in seeds:
     print(f"  Seed {seed}: {acc:.1f}% (first50: {first50:.0f}% → last50: {last50:.0f}%)")
 
 # === Error clustering across seeds ===
-print("\n=== Error Clustering (Neville persistence) ===")
+print("\n=== Error Clustering with Permutation Test ===")
 cluster_ratios = []
+p_values = []
 for seed in seeds:
     sd = df[df['seed'] == seed]
-    errors = np.where(~sd['correct'].values)[0]
+    correct = sd['correct'].values
+    errors = np.where(~correct)[0]
     pairs = sum(1 for i in range(len(errors)-1) if errors[i+1] == errors[i]+1)
     expected = len(errors)**2 / N_trials
     ratio = pairs / max(expected, 0.1)
     cluster_ratios.append(ratio)
-    print(f"  Seed {seed}: {pairs} pairs / {expected:.1f} expected = {ratio:.2f}x")
+
+    obs, null_mean, p = permutation_test_clustering(correct, n_perms=1000, rng=np.random.default_rng(seed))
+    p_values.append(p)
+    sig = "*" if p < 0.05 else ""
+    print(f"  Seed {seed}: {pairs} pairs / {expected:.1f} expected = {ratio:.2f}x  (p={p:.3f}{sig})")
 
 mean_ratio = np.mean(cluster_ratios)
 above_1 = sum(1 for r in cluster_ratios if r > 1.0)
+sig_seeds = sum(1 for p in p_values if p < 0.05)
 print(f"\n  Mean clustering ratio: {mean_ratio:.2f}x")
 print(f"  Seeds with ratio > 1.0: {above_1}/{len(seeds)}")
+print(f"  Seeds with p < 0.05 (permutation): {sig_seeds}/{len(seeds)}")
+# Sign test: under H0, P(ratio>1) = 0.5. P(9+ out of 10) = binom(10,9)*0.5^10 + 0.5^10
+from scipy.stats import binom_test
+try:
+    from scipy.stats import binomtest
+    sign_p = binomtest(above_1, len(seeds), 0.5, alternative='greater').pvalue
+except:
+    sign_p = sum(binom_test(k, len(seeds), 0.5) for k in range(above_1, len(seeds)+1)) if above_1 > 5 else 1.0
+print(f"  Sign test (9/10 > 1.0): p = {sign_p:.4f}")
 if above_1 >= len(seeds) * 0.8:
     print("  → 🧙 NEVILLE CONFIRMED across seeds! Error clustering is a circuit property!")
 elif above_1 >= len(seeds) * 0.5:
