@@ -6,7 +6,7 @@
 
 ## Abstract
 
-Pathak et al. (2026) reported that a biomimetic corticostriatal circuit model, constructed from biological first principles, spontaneously produces learning curves matching animal data and reveals incongruent neurons whose activity predicts errors. However, the robustness of these emergent properties across different initial conditions was not examined. We replicate the small corticostriatal circuit using Neuroblox v0.8.0 on consumer hardware (Apple M4 Max) and evaluate 10 independent random seeds, each producing 700 learning trials. We measure error clustering (consecutive error pairs relative to independence expectation) as a behavioral signature that may reflect, but does not directly measure, the incongruent neural activity reported in the original study. Clustering ratio exceeds 1.0 in 9 of 10 seeds (median: 1.21x). The directional consistency across seeds is significant (one-sided sign test, p = 0.011). Individual permutation tests (1000 shuffles per seed) show significance in 4 of 10 seeds (p < 0.05, uncorrected). These results provide the first multi-seed assessment of error clustering in biomimetic neural circuits, suggesting that the tendency toward error persistence is a property of the circuit architecture rather than specific initial weight configurations.
+Pathak et al. (2026) reported that a biomimetic corticostriatal circuit model, constructed from biological first principles, spontaneously produces learning curves matching animal data and reveals incongruent neurons whose activity predicts errors. However, the robustness of these emergent properties across different initial conditions was not examined. We replicate the small corticostriatal circuit using Neuroblox v0.8.0 on consumer hardware (Apple M4 Max) and evaluate 10 independent random seeds, each producing 700 learning trials. We measure error clustering (consecutive error pairs relative to independence expectation) as a behavioral signature that may reflect, but does not directly measure, the incongruent neural activity reported in the original study. Clustering ratio exceeds 1.0 in 9 of 10 seeds (median: 1.21x). The directional consistency across seeds is significant (one-sided sign test, p = 0.011). Global permutation tests (1000 shuffles per seed) show significance in 4 of 10 seeds (p < 0.05, uncorrected); however, blockwise permutation preserving learning-phase error rate gradients yields 0 of 10 seeds significant, indicating that global permutation significance is primarily driven by learning curve nonstationarity. These results provide the first multi-seed assessment of error clustering in biomimetic neural circuits, demonstrating a consistent directional tendency while revealing that within-phase local clustering does not exceed baseline nonstationarity expectations.
 
 ## 1. Introduction
 
@@ -55,7 +55,9 @@ E[pairs] = (N - 1) * p^2
 
 The clustering ratio = observed_pairs / E[pairs]. This analytic expectation serves as a descriptive baseline; formal inference relies on the permutation test below.
 
-**Permutation test**: For each seed, we shuffle the trial-level correctness vector 1000 times (preserving the total number of errors but randomizing their positions) and recompute consecutive pairs. The p-value is the proportion of permutations yielding pairs >= observed. The permutation null is exact (conditioned on total error count) and does not rely on the analytic approximation above.
+**Global permutation test**: For each seed, we shuffle the trial-level correctness vector 1000 times (preserving the total number of errors but randomizing their positions) and recompute consecutive pairs. The p-value is the proportion of permutations yielding pairs >= observed. The permutation null is exact (conditioned on total error count) and does not rely on the analytic approximation above.
+
+**Blockwise permutation test**: Because learning produces nonstationary error rates (higher early, lower late), global shuffling destroys the temporal structure of learning and may inflate clustering significance. To control for this, we additionally perform blockwise permutation: each 700-trial sequence is divided into 14 non-overlapping blocks of 50 trials, and shuffling is performed within each block independently. This preserves the learning-phase error rate gradient while randomizing local trial order. Under this more conservative null, significance indicates clustering beyond what the nonstationary error rate alone would predict.
 
 **Sign test**: To assess overall directional consistency, we test whether the proportion of seeds with ratio > 1.0 exceeds the null expectation of 0.5 using a one-sided exact binomial test. The one-sided test is justified as an a priori directional hypothesis: Pathak et al. (2026) demonstrated that incongruent neural activity produces temporally correlated errors in the same circuit architecture, predicting clustering ratios > 1.0. There is no known mechanism in this circuit that would systematically produce anti-clustering (ratio < 1.0).
 
@@ -88,7 +90,11 @@ All 10 seeds achieved successful category learning. Mean accuracy: 77.7% (range:
 | 50 | 78.6% | 1.31x | 0.022* |
 | 51 | 86.6% | 1.43x | 0.062 |
 
-Individual permutation tests: 4/10 seeds significant at p < 0.05 (uncorrected; see Section 2.5 for multiple testing note). Directional consistency: 9/10 seeds with ratio > 1.0 (one-sided sign test, p = 0.011).
+**Global permutation tests**: 4/10 seeds significant at p < 0.05 (uncorrected; see Section 2.5 for multiple testing note).
+
+**Blockwise permutation tests**: When permutation is restricted to within 50-trial blocks (preserving the learning-phase error rate gradient), 0/10 seeds reach significance at p < 0.05. This indicates that the clustering detected by global permutation is largely attributable to the nonstationary error rate across learning phases rather than local trial-to-trial dependencies within learning phases.
+
+**Directional consistency**: 9/10 seeds with ratio > 1.0 (one-sided sign test, p = 0.011). This directional effect is robust to the permutation method, as the sign test evaluates the consistency of ratio direction across seeds rather than within-seed significance.
 
 ### 3.3 Clustering Onset (Exploratory)
 
@@ -108,7 +114,7 @@ We report a multi-seed assessment of error clustering in a biomimetic corticostr
 
 **Relationship to incongruent activity.** Error clustering is consistent with, but does not uniquely identify, incongruent neural activity. Pathak et al. showed that incongruent neurons produce correlated errors; our behavioral finding is compatible with this mechanism but could also arise from other sources of error autocorrelation, such as slow weight drift or stimulus-specific difficulty patterns. Neural-level analysis (e.g., Matrisome rho values at decision time) would be needed to confirm whether incongruent activity underlies the behavioral clustering we observe.
 
-**Robustness across initial conditions.** The key finding is that error clustering direction is consistent across initial conditions (sign test p = 0.011), even though individual seeds vary in effect magnitude and the effect size is modest (mean ratio 1.21x). This pattern is consistent with an architectural contribution to error persistence: the circuit's competitive WTA dynamics and dopamine-modulated plasticity create conditions where error states tend to persist, regardless of specific initial weight configurations.
+**Robustness across initial conditions.** The directional consistency of error clustering across initial conditions (sign test p = 0.011) is the primary finding. Individual seeds vary in effect magnitude and the effect size is modest (mean ratio 1.21x). However, blockwise permutation analysis (0/10 seeds significant) reveals that within-phase local clustering is not detectable above the baseline created by nonstationary learning dynamics. The global permutation significance (4/10 seeds) is primarily driven by the learning curve itself: early phases have high error rates and late phases have low error rates, producing temporal clustering as an artifact of nonstationarity. The directional consistency across seeds (sign test) remains informative because it tests whether the circuit architecture systematically produces error clustering ratios above 1.0, regardless of within-seed statistical significance.
 
 **Exploratory observations.** The clustering onset timing (~trial 140) suggests that error clustering may not be present during early random responding but emerges as categorical representations form, though this observation requires more rigorous temporal analysis to confirm.
 
@@ -118,7 +124,7 @@ We report a multi-seed assessment of error clustering in a biomimetic corticostr
 
 - Error clustering is an indirect behavioral metric; neural-level incongruent activity was not directly measured. The inferential gap between behavioral clustering and neural mechanism remains open.
 - N = 10 seeds with fixed stimulus order; stimulus-order randomization needed to separate item difficulty from learning dynamics.
-- Individual permutation p-values are uncorrected for multiple comparisons; the 4/10 significant seeds should be interpreted descriptively.
+- Global permutation p-values are uncorrected for multiple comparisons; the 4/10 significant seeds should be interpreted descriptively. Blockwise permutation (0/10 significant) provides a more conservative but appropriate null for learning contexts.
 - The clustering onset analysis uses a threshold-based criterion that may be sensitive to sparse errors in later learning phases.
 - Small circuit configuration; the full Picower circuit may show different dynamics.
 - Consumer hardware replication; numerical precision differences relative to the original study are possible.
@@ -126,7 +132,7 @@ We report a multi-seed assessment of error clustering in a biomimetic corticostr
 
 ## 5. Conclusion
 
-Error clustering in a biomimetic corticostriatal circuit shows a reliable directional tendency across initial condition variation. Directional consistency across 9 of 10 independent seeds (sign test p = 0.011), combined with individually significant clustering in 4 seeds (uncorrected), shows that the tendency toward error persistence within this circuit architecture is robust to initial weight variation. Whether this behavioral pattern reflects the same incongruent neural mechanism reported by Pathak et al. (2026) remains an open question that requires neural-level analysis. These results complement the original model-to-animal validation with a model-to-model robustness assessment.
+Error clustering in a biomimetic corticostriatal circuit shows a reliable directional tendency across initial condition variation (9/10 seeds with ratio > 1.0; sign test p = 0.011). However, blockwise permutation analysis indicates that within-phase local clustering does not exceed what nonstationary learning dynamics alone would produce (0/10 seeds significant under blockwise permutation). The global permutation significance (4/10 seeds) is primarily attributable to the error rate gradient across learning phases. The directional consistency across seeds suggests an architectural tendency toward error persistence, but the effect is confounded with learning-phase nonstationarity and cannot be attributed to trial-to-trial error dependencies. Whether this behavioral pattern reflects the incongruent neural mechanism reported by Pathak et al. (2026) remains open and requires neural-level analysis. These results complement the original model-to-animal validation with a model-to-model robustness assessment, while highlighting the importance of permutation design in learning-context analyses.
 
 ## References
 
