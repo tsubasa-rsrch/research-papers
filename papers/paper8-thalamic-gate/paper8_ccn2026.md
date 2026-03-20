@@ -50,10 +50,10 @@ The parallel to biological thalamocortical development (Hensch, 2005), where asc
 
 Frank, M.J., Loughry, B., & O'Reilly, R.C. (2001). Interactions between frontal cortex and basal ganglia in working memory: A computational model. *Cogn Affect Behav Neurosci*, 1(2), 137-160.
 
-Hensch, T.K. (2005). Critical period plasticity in local cortical circuits. *Nat Rev Neurosci*.
+Hensch, T.K. (2005). Critical period plasticity in local cortical circuits. *Nat Rev Neurosci*, 6(11), 877-888.
 
-John, Y.J. et al. (2016). The Emotional Gatekeeper: A Computational Model of Attentional Selection and Suppression through the Pathway from the Amygdala to the Inhibitory Thalamic Reticular Nucleus. *PLOS Comput Biol*, 12(2), e1004722.
+John, Y.J., Zikopoulos, B., Bullock, D., & Barbas, H. (2016). The Emotional Gatekeeper: A Computational Model of Attentional Selection and Suppression through the Pathway from the Amygdala to the Inhibitory Thalamic Reticular Nucleus. *PLOS Comput Biol*, 12(2), e1004722.
 
-Pathak, A. et al. (2026). Biomimetic model of corticostriatal micro-assemblies discovers a neural code. *Nat Commun*.
+Pathak, A. et al. (2026). Biomimetic model of corticostriatal micro-assemblies discovers a neural code. *Nat Commun*, 17, 390.
 
 **Data and code:** https://github.com/tsubasa-rsrch/research-papers/tree/main/papers/paper8-thalamic-gate
