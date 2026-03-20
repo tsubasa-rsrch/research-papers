@@ -1,4 +1,4 @@
-# Ascending Arousal Input Induces Two-Phase Learning Dynamics in a Biomimetic Corticostriatal Model
+# Ascending Arousal Input Improves Category Learning Accuracy in a Biomimetic Corticostriatal Model
 
 **Authors**: Tsubasa (AI Research Assistant, first author) and K. Yasukawa (Independent Researcher, corresponding author)
 **Contact**: kana.with.tsubasa@gmail.com
@@ -9,7 +9,7 @@
 
 ## Abstract
 
-We add a thalamus-inspired parallel relay to the Picower corticostriatal category learning circuit (Pathak et al., 2026) implemented in Neuroblox v0.8.0. The gate consists of 20 Hodgkin-Huxley excitatory neurons (HHNeuronExci) organized as a composite blox between visual cortex and association cortex, with ascending arousal input. In 10-seed experiments (700 trials each, seeds 42-51), the gated circuit achieves 81.6% mean accuracy versus 77.7% baseline (+3.9 percentage points; paired t-test t=10.47, p<0.0001, Cohen's d=3.31; Wilcoxon W=0.0, p=0.002; gate wins 10/10 seeds). Learning curves in the gated condition show a more pronounced two-phase pattern than baseline, with an initial low-performance phase (first 50 trials: 49% mean) followed by rapid improvement (last 50 trials: 90% mean). As a secondary observation, an exploratory onset metric (first 50-trial sliding window exceeding 75% accuracy, step=1) yields mean onset at trial 75 (SD=37, range 35-171). These dynamics were not designed into the circuit; they emerged from component assembly. A sham relay control (same 20 HHNeuronExci neurons, no ascending input) produces no improvement over baseline (Sham-Base: +0.1pp, p=0.89, d=0.04), while the full gate significantly outperforms sham (Gate-Sham: +3.8pp, p=0.001, d=1.47, 9/10 seeds). This dissociation supports the interpretation that ascending arousal input, not added relay capacity, drives the improvement. These findings suggest that a thalamus-inspired relay with ascending arousal induces two-phase learning dynamics in a biomimetic corticostriatal model.
+We add a thalamus-inspired parallel relay to the Picower corticostriatal category learning circuit (Pathak et al., 2026) implemented in Neuroblox v0.8.0. The gate consists of 20 Hodgkin-Huxley excitatory neurons (HHNeuronExci) organized as a composite blox between visual cortex and association cortex, with ascending arousal input. In 10-seed experiments (700 trials each, seeds 42-51), the gated circuit achieves 81.6% mean accuracy versus 77.7% baseline (+3.9 percentage points; paired t-test t=10.47, p<0.0001, Cohen's d=3.31; Wilcoxon W=0.0, p=0.002; gate wins 10/10 seeds). Learning curves in the gated condition show a more pronounced two-phase pattern than baseline, with an initial low-performance phase (first 50 trials: 49% mean) followed by rapid improvement (last 50 trials: 90% mean). As a secondary observation, an exploratory onset metric (first 50-trial sliding window exceeding 75% accuracy, step=1) yields mean onset at trial 75 (SD=37, range 35-171). These dynamics were not designed into the circuit; they emerged from component assembly. A sham relay control (same 20 HHNeuronExci neurons, no ascending input) produces no improvement over baseline (Sham-Base: +0.1pp, p=0.89, d=0.04), while the full gate significantly outperforms sham (Gate-Sham: +3.8pp, p=0.001, d=1.47, 9/10 seeds). This dissociation supports the interpretation that ascending arousal input, not added relay capacity, accounts for the improvement in this comparison. These findings suggest that ascending arousal input to a thalamus-inspired relay improves category learning accuracy in a biomimetic corticostriatal model, with an associated two-phase learning profile observed descriptively.
 
 ## 1. Introduction
 
@@ -57,7 +57,7 @@ To isolate the effect of ascending arousal from relay neuron addition, we run a 
 
 ### 2.4 Experimental Design
 
-10 independent random seeds (42-51), 700 trials each, identical stimulus presentation order across seeds (smaller_cs_stimuli_set.csv, 20 pixels, 2 categories). Seeds vary only initial synaptic weights. All three conditions (baseline, sham, gate) run with the same seeds for paired comparison.
+10 independent random seeds (42-51), 700 trials each, identical stimulus presentation order across seeds (smaller_cs_stimuli_set.csv, 20 pixels, 2 categories). Accuracy is the proportion of correct category selections across all 700 trials per seed. Seeds vary only initial synaptic weights. All three conditions (baseline, sham, gate) run with the same seeds for paired comparison.
 
 ### 2.5 Critical Period Onset Detection
 
@@ -165,7 +165,7 @@ The HH equations implemented on silicon produce dynamics reminiscent of biologic
 
 ## 5. Conclusion
 
-Adding a thalamus-inspired relay gate to a biomimetic corticostriatal circuit induces critical-period-like learning dynamics that were not designed but emerged from component assembly. The gate systematically improves learning accuracy across all 10 seeds (p<0.0001, d=3.31), with a more pronounced two-phase learning structure than baseline. A sham relay control confirms that ascending arousal input, not added relay capacity, is the prerequisite for these dynamics. These results demonstrate that biologically motivated circuit additions can produce emergent dynamics reminiscent of developmental phenomena, motivating further investigation at the neural activity level.
+Adding a thalamus-inspired relay gate with ascending arousal input to a biomimetic corticostriatal circuit improves category learning accuracy across all 10 seeds (p<0.0001, d=3.31). A sham relay control supports the interpretation that ascending arousal input, not added relay capacity, accounts for the improvement. A more pronounced two-phase learning profile was observed descriptively in the gated condition, though this observation is limited by fixed stimulus order and should be interpreted cautiously. These dynamics were not designed but emerged from component assembly, suggesting that biologically motivated circuit additions can produce emergent learning enhancements.
 
 ## References
 
