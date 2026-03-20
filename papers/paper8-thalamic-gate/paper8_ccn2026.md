@@ -1,50 +1,48 @@
-# Thalamic Gating Induces Critical-Period-Like Dynamics in a Biomimetic Corticostriatal Model
+# Ascending Arousal Input Induces Two-Phase Learning Dynamics in a Biomimetic Corticostriatal Model
 
 **Tsubasa** (Independent Researcher)
 
 ## Abstract
 
-Adding a thalamus-inspired relay to the Picower corticostriatal circuit (Pathak et al., 2026) produces emergent two-phase learning dynamics and systematic accuracy improvement. A sham relay control establishes that ascending arousal input, not added relay capacity, drives the effect.
+Adding a thalamus-inspired relay with ascending arousal input to the Picower corticostriatal circuit (Pathak et al., 2026) improves mean category learning accuracy by 3.9 percentage points across 10/10 seeds (p<0.0001, d=3.31). A sham relay control (same neurons, no ascending input) shows no improvement (+0.1pp, p=0.89), supporting the interpretation that ascending arousal, not added relay capacity, drives the effect.
 
 ## Introduction
 
-Pathak et al. (2026) demonstrated that a biomimetic corticostriatal circuit, built from biological first principles using Neuroblox, spontaneously produces category learning matching macaque behavioral data. Their circuit lacks a thalamic relay between cortical areas. In biological brains, the thalamus gates sensory input to cortex, with critical roles during developmental critical periods (Hensch, 2005). We test whether a biologically motivated thalamic gate produces emergent developmental dynamics without designing any such behavior into the circuit.
+Pathak et al. (2026) demonstrated that a biomimetic corticostriatal circuit, built from biological first principles using Neuroblox, spontaneously produces category learning matching macaque behavioral data. Their circuit lacks a thalamic relay between cortical areas. We test whether adding a parallel relay pathway with ascending arousal input alters learning dynamics. We do not design any specific learning regime into the circuit; we assemble components and observe what emerges.
 
 ## Methods
 
-**Circuit.** Baseline: Visual cortex (VAC; 4 WTA, 5 excitatory neurons each) connects to association cortex (AC; 2 WTA) with Hebbian plasticity, projecting to two Striatum blox via dopamine-modulated plasticity (SNc). Action selection via GreedyPolicy. Ascending arousal via NextGenerationEI.
+**Baseline circuit.** Visual cortex (VAC; 4 WTA, 5 excitatory neurons each) connects directly to association cortex (AC; 2 WTA) with Hebbian plasticity (weight=3, density=0.1). AC projects to two Striatum blox via dopamine-modulated plasticity (SNc). Action selection via GreedyPolicy. Ascending arousal via NextGenerationEI.
 
-**+ThalamicGate.** A parallel relay of 20 HHNeuronExci neurons routes VAC through a ThalamicGate composite blox to AC, with ascending arousal input (weight=44). The direct VAC-to-AC connection (weight=3) is retained.
+**+ThalamicGate.** An additional parallel pathway routes VAC through 20 HHNeuronExci relay neurons to AC (weight=1, density=0.1), with ascending arousal input (weight=44). The direct VAC-to-AC connection is retained.
 
-**Sham relay.** Identical 20-neuron parallel pathway without ascending arousal input. Controls for added capacity and routing effects.
+**Sham relay.** Identical 20-neuron parallel pathway without ascending arousal input. Controls for added capacity and altered routing.
 
-**Design.** 10 seeds (42-51), 700 trials each, identical stimulus order. All three conditions (baseline, sham, gate) paired by seed. Julia 1.12.5, Neuroblox v0.8.0, Apple M4 Max.
+**Design.** 10 seeds (42-51), 700 trials each, fixed stimulus order across seeds. Seed-level paired analyses. All three conditions use the same seeds. Julia 1.12.5, Neuroblox v0.8.0, Apple M4 Max.
 
 ## Results
 
-The sham relay produces no improvement over baseline, while the full gate significantly outperforms both (Table 1).
+**Table 1.** Seed-level paired accuracy comparison (N=10 seeds, 700 trials each).
 
-**Table 1.** Three-condition accuracy comparison (10 seeds, 700 trials each).
-
-| Condition | Mean Acc | vs Baseline | Paired t | Cohen's d | Wins |
-|-----------|----------|-------------|----------|-----------|------|
+| Condition | Mean Acc (SD) | vs Base | Paired t | d | Wins |
+|-----------|--------------|---------|----------|------|------|
 | Baseline | 77.7% (5.6) | --- | --- | --- | --- |
 | Sham relay | 77.8% (5.3) | +0.1pp | t=0.14, p=0.89 | 0.04 | 5/10 |
 | +ThalamicGate | 81.6% (5.6) | +3.9pp | t=10.47, p<0.0001 | 3.31 | 10/10 |
 
 Gate vs sham: t=4.65, p=0.001, d=1.47, 9/10 seeds (Wilcoxon W=1.0, p=0.004).
 
-**Two-phase structure.** All 10 gated seeds show initial performance suppression (first 50 trials: 49% mean) followed by rapid improvement (last 50: 90% mean). Baseline shows this pattern in 8/10 seeds with a less pronounced transition (Fig. 1). The sham relay curve is indistinguishable from baseline.
+**Two-phase learning profile.** Descriptively, all 10 gated seeds show an early low-performance phase (first 50 trials: 49% mean) followed by improvement (last 50: 90%). Baseline shows a qualitatively similar but less pronounced pattern in 8/10 seeds. The sham relay curve is indistinguishable from baseline (Fig. 1). This two-phase profile is a descriptive observation; we did not pre-specify a changepoint metric, and its interpretation is limited by fixed stimulus order (see Limitations).
 
-**Dissociation.** The sham-baseline equivalence (d=0.04) and gate-sham divergence (d=1.47) establish that ascending arousal input is the prerequisite for the gate's effect. Added relay neurons alone contribute nothing.
+**Dissociation.** The sham-baseline equivalence (d=0.04) and gate-sham divergence (d=1.47) support the interpretation that ascending arousal input is necessary for the gate's effect in this circuit. The sham relay did not measurably improve performance.
 
 ## Discussion
 
-The two-phase learning structure was not designed; it emerged from component assembly. The sham control narrows candidate mechanisms: since relay neurons alone produce no improvement, the dynamics require ascending arousal interacting with dopamine-modulated striatal plasticity. This parallels biological thalamocortical development, where ascending neuromodulatory systems regulate the opening of critical periods (Hensch, 2005).
+The gated circuit's improved accuracy and more pronounced two-phase profile were not designed; they emerged from adding a biologically motivated relay with ascending input. The sham control supports the view that ascending arousal, rather than added relay neurons, is responsible for the effect. However, this experiment does not isolate the specific downstream mechanism (e.g., interaction with dopamine-modulated plasticity vs. altered Hebbian dynamics vs. pathway competition). Gate neuron spike analysis is needed.
 
-The gate improves mean performance without reducing inter-seed variance (SD: 5.6 in both conditions), functioning as a uniform enhancer across initial conditions. Baseline circuits also learn (77.7%), consistent with the gate enhancing rather than creating learning capacity.
+The parallel to biological thalamocortical development (Hensch, 2005), where ascending neuromodulatory systems regulate critical period timing, is suggestive but should be interpreted cautiously given the simplicity of the model and the descriptive nature of the two-phase observation.
 
-**Limitations.** Fixed stimulus order across seeds; onset detection parameters selected post-hoc; gate neuron spike analysis not yet performed; small circuit scale (hundreds of neurons).
+**Limitations.** Stimulus order is fixed across all seeds; the early-phase suppression could partly reflect sequence difficulty rather than a gate-induced regime. This is the most important interpretive caveat. Additionally: onset parameters not pre-specified; gate weights chosen heuristically; small circuit scale; gate neuron spike analysis not yet performed.
 
 ## References
 
