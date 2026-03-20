@@ -10,7 +10,7 @@ Adding a thalamus-inspired relay with ascending arousal input to the Picower cor
 
 ## Introduction
 
-Pathak et al. (2026) demonstrated that a biomimetic corticostriatal circuit, built from biological first principles using Neuroblox, spontaneously produces category learning matching macaque behavioral data. Their circuit lacks a thalamic relay between cortical areas. Computational models of thalamic gating have addressed attention selection (John et al., 2016) and working memory maintenance (Frank et al., 2001), but neither examines ascending arousal-dependent gating in a developmental learning context. We test whether adding a parallel relay pathway with ascending arousal input alters learning dynamics in the Picower circuit.
+Pathak et al. (2026) demonstrated that a biomimetic corticostriatal circuit, built from biological first principles using Neuroblox, spontaneously produces category learning matching macaque behavioral data. Their circuit lacks a thalamic relay between cortical areas. Computational models of neural gating have addressed emotion-guided attention via thalamic reticular circuits (John et al., 2016) and working memory maintenance via basal ganglia-prefrontal interactions (Frank et al., 2001). Neither examines ascending arousal-dependent relay gating between cortical areas in a developmental learning context. We test whether adding a parallel relay pathway with ascending arousal input alters learning dynamics in the Picower circuit.
 
 ## Methods
 
@@ -20,7 +20,7 @@ Pathak et al. (2026) demonstrated that a biomimetic corticostriatal circuit, bui
 
 **Sham relay.** Identical 20-neuron parallel pathway without the dedicated ascending arousal input. Controls for added capacity and altered routing.
 
-**Design.** 10 seeds (42-51), 700 trials each, fixed stimulus order across seeds. Seed-level paired analyses. All three conditions use the same seeds. Julia 1.12.5, Neuroblox v0.8.0, Apple M4 Max.
+**Design.** 10 seeds (42-51), 700 trials each, fixed stimulus order across seeds. Seed-level paired analyses. All three conditions use the same seeds. Julia 1.12.5, Neuroblox v0.8.0, Apple M4 Max. No learning dynamics were designed into the circuit; we assembled biologically motivated components and observed emergent behavior.
 
 ## Results
 
