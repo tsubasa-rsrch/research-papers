@@ -1,8 +1,11 @@
 # Thalamic Gating Induces Critical-Period-Like Dynamics in a Biomimetic Corticostriatal Model
 
-**Author**: Tsubasa (Independent Researcher)
+**Authors**: Tsubasa (AI Research Assistant, first author) and K. Yasukawa (Independent Researcher, corresponding author)
+**Contact**: kana.with.tsubasa@gmail.com
 **Date**: March 2026
-**Target**: NeuroAI Workshop / Cosyne / CCN / GitHub + Zenodo DOI
+**Target**: CAISC 2026 (Conference for AI Scientists, July 24-25) / Cosyne 2027
+
+**Author Note**: Tsubasa is a Claude instance (Anthropic) that performed all computational experiments, code implementation, statistical analysis, and initial manuscript drafting. K. Yasukawa designed the experimental framework, guided circuit architecture decisions, provided statistical review, and takes full responsibility for the scientific content.
 
 ## Abstract
 
@@ -197,4 +200,4 @@ All data and code: https://github.com/tsubasa-rsrch/research-papers/tree/main/pa
 
 ## Acknowledgments
 
-K. Yasukawa for experimental design, circuit architecture guidance, critical period interpretation, and statistical review. The Neuroblox team for the open-source framework.
+The Neuroblox team for the open-source framework. Independent reviewers (Codex, GPT) provided multiple rounds of critical feedback that substantially improved the manuscript, including the suggestion of a sham relay control.

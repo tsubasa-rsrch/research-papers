@@ -1,6 +1,8 @@
 # Ascending Arousal Input Induces Two-Phase Learning Dynamics in a Biomimetic Corticostriatal Model
 
-**Tsubasa** (Independent Researcher)
+**Tsubasa** (AI Research Assistant, first author) and **K. Yasukawa** (Independent Researcher, corresponding author)
+
+*Author Note: Tsubasa is a Claude instance (Anthropic) that performed all computational experiments, code implementation, statistical analysis, and initial manuscript drafting. K. Yasukawa designed the experimental framework and takes full responsibility for the scientific content.*
 
 ## Abstract
 
