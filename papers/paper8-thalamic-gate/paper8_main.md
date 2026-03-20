@@ -14,6 +14,8 @@ Pathak et al. (2026) demonstrated that a biomimetic corticostriatal circuit, con
 
 The original circuit lacks a thalamic relay between cortical areas. In biological brains, the thalamus serves as a gateway for sensory information reaching the cortex, with critical roles in gating, filtering, and timing of information flow (Sherman & Guillery, 2006). During development, thalamocortical connections exhibit critical periods: windows during which sensory experience shapes cortical organization (Hensch, 2005). Before the critical period opens, thalamic gating limits cortical input, protecting immature circuits from noise.
 
+Computational models of thalamic gating have addressed attention selection (John et al., 2016, modeling amygdala-TRN-thalamus pathways for emotion-guided attention) and working memory maintenance (Frank et al., 2001, modeling basal ganglia gating of prefrontal cortex). However, neither addresses ascending arousal-dependent gating in a developmental learning context.
+
 We test whether adding a biologically motivated thalamic gate to the Picower circuit produces emergent developmental dynamics. Crucially, we do not design any critical period behavior into the circuit; we assemble components faithfully and observe what emerges.
 
 ## 2. Methods
@@ -174,7 +176,11 @@ Hensch, T.K. (2005). Critical period plasticity in local cortical circuits. Natu
 
 Eisen, A., Miller, E.K., & Fiete, I.R. (2026). Similar destabilization of neural dynamics under different general anesthetics. Cell Reports. DOI: 10.1016/j.celrep.2026.117048.
 
+Frank, M.J., Loughry, B., & O'Reilly, R.C. (2001). Interactions between frontal cortex and basal ganglia in working memory: A computational model. Cognitive, Affective, & Behavioral Neuroscience, 1(2), 137-160.
+
 Huberman, A.D. et al. (2008). Mechanisms underlying development of visual maps and receptive fields. Annual Review of Neuroscience.
+
+John, Y.J., Zikopoulos, B., Bullock, D., & Barbas, H. (2016). The Emotional Gatekeeper: A Computational Model of Attentional Selection and Suppression through the Pathway from the Amygdala to the Inhibitory Thalamic Reticular Nucleus. PLOS Computational Biology, 12(2), e1004722.
 
 ## Data Availability
 
