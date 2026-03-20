@@ -1,4 +1,4 @@
-# Ascending Arousal Input Enhances Accuracy and Produces a Two-Phase Learning Profile in a Biomimetic Corticostriatal Model
+# Ascending Arousal Input Improves Category Learning Accuracy in a Biomimetic Corticostriatal Model
 
 **Tsubasa** (AI Research Assistant, first author) and **K. Yasukawa** (Independent Researcher, corresponding author)
 
@@ -10,13 +10,13 @@ Adding a thalamus-inspired relay with ascending arousal input to the Picower cor
 
 ## Introduction
 
-Pathak et al. (2026) demonstrated that a biomimetic corticostriatal circuit, built from biological first principles using Neuroblox, spontaneously produces category learning matching macaque behavioral data. Their circuit lacks a thalamic relay between cortical areas. Computational models of neural gating have addressed emotion-guided attention via thalamic reticular circuits (John et al., 2016) and working memory maintenance via basal ganglia-prefrontal interactions (Frank et al., 2001). Neither examines ascending arousal-dependent relay gating between cortical areas in a developmental learning context. We test whether adding a parallel relay pathway with ascending arousal input alters learning dynamics in the Picower circuit.
+Pathak et al. (2026) demonstrated that a biomimetic corticostriatal circuit, built from biological first principles using Neuroblox, spontaneously produces category learning matching macaque behavioral data. Their circuit lacks a thalamic relay between cortical areas. Computational models of neural gating have addressed emotion-guided attention via thalamic reticular circuits (John et al., 2016) and working memory maintenance via basal ganglia-prefrontal interactions (Frank et al., 2001). Neither examines ascending arousal-dependent relay gating between cortical areas in a developmental learning context. Ascending neuromodulatory systems are implicated in regulating cortical plasticity windows (Hensch, 2005), motivating a relay manipulation that modulates cortical input during learning. We test whether adding a parallel relay pathway with ascending arousal input alters learning in the Picower circuit.
 
 ## Methods
 
 **Baseline circuit.** Visual cortex (VAC; 4 WTA, 5 excitatory neurons each) connects directly to association cortex (AC; 2 WTA) with Hebbian plasticity (weight=3, density=0.1). AC projects to two Striatum blox via dopamine-modulated plasticity (SNc). Action selection via GreedyPolicy. Global ascending arousal (NextGenerationEI) drives the entire circuit.
 
-**+ThalamicGate.** An additional parallel pathway routes VAC through 20 HHNeuronExci relay neurons to AC (weight=1, density=0.1), with a dedicated ascending arousal input to gate neurons (weight=44, selected from exploratory runs). The direct VAC-to-AC connection is retained. Note: the gate-specific ascending input is distinct from the global arousal that drives the baseline circuit.
+**+ThalamicGate.** An additional parallel pathway routes VAC through 20 HHNeuronExci relay neurons to AC (weight=1, density=0.1), with a dedicated ascending arousal input to gate neurons (weight=44, selected from a small number of exploratory values; all inferential results are conditional on this parameterization). The direct VAC-to-AC connection is retained. The gate-specific ascending input is distinct from the global arousal that drives the baseline circuit.
 
 **Sham relay.** Identical 20-neuron parallel pathway without the dedicated ascending arousal input. Controls for added capacity and altered routing.
 
@@ -34,17 +34,17 @@ Pathak et al. (2026) demonstrated that a biomimetic corticostriatal circuit, bui
 
 Gate vs sham: t=4.65, p=0.0012, d=1.47, 9/10 seeds (Wilcoxon W=1.0, p=0.004).
 
-**Two-phase learning profile.** Descriptively, all 10 gated seeds show an apparent early low-performance phase (first 50 trials: 49% mean) followed by improvement (last 50: 90%). Baseline shows a qualitatively similar but less pronounced pattern in 8/10 seeds. The sham relay curve is indistinguishable from baseline. This two-phase profile is a descriptive observation; we did not pre-specify a changepoint metric, and its interpretation is limited by fixed stimulus order (see Limitations).
-
 **Dissociation.** The sham-baseline equivalence (d=0.04) and gate-sham divergence (d=1.47) support the interpretation that the dedicated ascending arousal input distinguishes the gated condition from the sham within this circuit architecture. The sham relay did not measurably improve performance.
+
+**Additional observation: two-phase learning profile.** Descriptively, all 10 gated seeds show an apparent early low-performance phase (first 50 trials: 49% mean) followed by improvement (last 50: 90%). Baseline shows a qualitatively similar but less pronounced pattern in 8/10 seeds. The sham relay curve is indistinguishable from baseline. This profile is a descriptive observation under fixed stimulus order; we did not pre-specify a changepoint metric, and it should be interpreted cautiously (see Limitations).
 
 ## Discussion
 
-The gated circuit's improved accuracy and more pronounced two-phase profile emerged from adding a biologically motivated relay with ascending input. The sham control supports the view that ascending arousal, rather than added relay neurons, accounts for the improvement in this comparison. One possible downstream mechanism is arousal-gated modulation of Hebbian learning rates, among other possibilities; gate neuron spike analysis is needed to distinguish candidate mechanisms.
+The gated circuit's improved accuracy emerged from adding a biologically motivated relay with ascending input. The sham control supports the view that ascending arousal, rather than added relay neurons, accounts for the improvement in this comparison. One possible downstream mechanism is arousal-gated modulation of Hebbian learning rates; gate neuron spike analysis is needed to distinguish candidate mechanisms.
 
 The parallel to biological thalamocortical development (Hensch, 2005), where ascending neuromodulatory systems regulate critical period timing, is suggestive but should be interpreted cautiously given the simplicity of the model and the descriptive nature of the two-phase observation.
 
-**Limitations.** Stimulus order is fixed across all seeds; the early-phase suppression could partly reflect sequence difficulty rather than a gate-induced regime. This is the most important interpretive caveat, limiting generalization beyond this task/order configuration. Additionally: onset parameters not pre-specified; gate ascending weight (44) chosen from exploratory runs; small circuit scale; gate neuron spike analysis not yet performed.
+**Limitations.** Stimulus order is fixed across all seeds; the early-phase suppression could partly reflect sequence difficulty rather than a gate-induced regime. This is the most important interpretive caveat, limiting generalization beyond this task/order configuration. Additionally: onset parameters not pre-specified; gate ascending weight (44) selected from a small number of exploratory values; small circuit scale; gate neuron spike analysis not yet performed.
 
 ## References
 
