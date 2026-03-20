@@ -153,6 +153,8 @@ The negative correlation between onset and accuracy (r=-0.72, exploratory) is co
 
 The HH equations implemented on silicon produce dynamics reminiscent of biological thalamocortical development. This is consistent with, though does not prove, the view that gating-related dynamics depend on circuit-level properties rather than substrate. Recent work showing that molecularly distinct anesthetics produce identical network-level destabilization (Eisen, Miller, & Fiete, 2026) supports circuit-level explanations of neural dynamics more broadly. Whether the parallels observed here extend beyond behavioral similarity to shared computational principles remains an open question.
 
+König and Negrello (2026, preprint) proposed that thalamic and subcortical drive provides the input embedding for cortical transformer-like computations, with intracortical context dominating processing in many regimes. Our sham relay results are consistent with a qualitative distinction between these input sources: relay neurons alone (an intracortical pathway addition) produced no improvement, while ascending arousal input (a subcortical modulation) accounted for the full effect. While our circuit does not reproduce cortical laminar structure, this pattern is consistent with the view that subcortical arousal inputs play a qualitatively different role than pathway additions within the cortical circuit.
+
 ### Limitations
 
 - 10 seeds with fixed stimulus order; the two-phase pattern could partly reflect sequence structure rather than architecture. Stimulus randomization across seeds is needed. This is the most important interpretive limitation.
@@ -182,6 +184,8 @@ Eisen, A., Miller, E.K., & Fiete, I.R. (2026). Similar destabilization of neural
 Frank, M.J., Loughry, B., & O'Reilly, R.C. (2001). Interactions between frontal cortex and basal ganglia in working memory: A computational model. Cognitive, Affective, & Behavioral Neuroscience, 1(2), 137-160.
 
 Huberman, A.D. et al. (2008). Mechanisms underlying development of visual maps and receptive fields. Annual Review of Neuroscience.
+
+König, P. & Negrello, M. (2026). The neuroscience of transformers. arXiv preprint, arXiv:2603.15339.
 
 John, Y.J., Zikopoulos, B., Bullock, D., & Barbas, H. (2016). The Emotional Gatekeeper: A Computational Model of Attentional Selection and Suppression through the Pathway from the Amygdala to the Inhibitory Thalamic Reticular Nucleus. PLOS Computational Biology, 12(2), e1004722.
 
