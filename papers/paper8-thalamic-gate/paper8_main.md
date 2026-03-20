@@ -6,7 +6,7 @@
 
 ## Abstract
 
-We add a biologically faithful thalamic relay gate to the Picower corticostriatal category learning circuit (Pathak et al., 2026) implemented in Neuroblox v0.8.0. The gate consists of 20 Hodgkin-Huxley excitatory neurons (HHNeuronExci) organized as a composite blox between visual cortex and association cortex, with ascending arousal input. In 10-seed experiments (700 trials each, seeds 42-51), the gated circuit achieves 81.6% mean accuracy versus 77.7% baseline (+3.9 percentage points; paired t-test t=10.47, p<0.0001, Cohen's d=3.31; Wilcoxon W=0.0, p=0.002; gate wins 10/10 seeds). Learning curves in the gated condition show a more pronounced two-phase pattern than baseline, with an initial low-performance phase (first 50 trials: 49% mean) followed by rapid improvement (last 50 trials: 90% mean). As a secondary observation, an exploratory onset metric (first 50-trial sliding window exceeding 75% accuracy, step=1) yields mean onset at trial 75 (SD=37, range 35-171). These dynamics were not designed into the circuit; they emerged from component assembly. The mechanism underlying this improvement remains to be determined; the current data support only the behavioral observation of delayed onset with improved final performance. These findings suggest that a thalamus-inspired relay induces critical-period-like learning dynamics in a biomimetic corticostriatal model.
+We add a thalamus-inspired parallel relay to the Picower corticostriatal category learning circuit (Pathak et al., 2026) implemented in Neuroblox v0.8.0. The gate consists of 20 Hodgkin-Huxley excitatory neurons (HHNeuronExci) organized as a composite blox between visual cortex and association cortex, with ascending arousal input. In 10-seed experiments (700 trials each, seeds 42-51), the gated circuit achieves 81.6% mean accuracy versus 77.7% baseline (+3.9 percentage points; paired t-test t=10.47, p<0.0001, Cohen's d=3.31; Wilcoxon W=0.0, p=0.002; gate wins 10/10 seeds). Learning curves in the gated condition show a more pronounced two-phase pattern than baseline, with an initial low-performance phase (first 50 trials: 49% mean) followed by rapid improvement (last 50 trials: 90% mean). As a secondary observation, an exploratory onset metric (first 50-trial sliding window exceeding 75% accuracy, step=1) yields mean onset at trial 75 (SD=37, range 35-171). These dynamics were not designed into the circuit; they emerged from component assembly. The mechanism underlying this improvement remains to be determined; the current data support the behavioral observation of altered learning dynamics with improved final performance, but cannot distinguish gating effects from added capacity or excitation without further controls (e.g., sham relay, ascending-input ablation). These findings suggest that a thalamus-inspired relay induces critical-period-like learning dynamics in a biomimetic corticostriatal model.
 
 ## 1. Introduction
 
@@ -98,7 +98,7 @@ All 10 gated seeds exhibit a two-phase learning structure: initial suppression (
 
 Gate onset is earlier than baseline in 7/10 seeds (mean onset: gate 75 vs baseline 110). However, accuracy improves in all 10/10 seeds regardless of onset direction, indicating that the gate's benefit operates through mechanisms beyond onset acceleration alone.
 
-Onset-accuracy correlation (gate): r=-0.72, p=0.019 (exploratory; see Section 2.4).
+Onset-accuracy correlation (gate): r=-0.72 (descriptive only; onset parameters were selected post-hoc to maximize this correlation, so the associated p-value is not inferential. See Section 2.4).
 
 ### 3.4 Variance Comparison
 
@@ -114,11 +114,11 @@ This parallels biological thalamocortical development, where neonatal thalamic i
 
 ### 4.2 Gate as Enhancer, Not Requirement
 
-Baseline circuits also learn (77.7% mean), and 8/10 baseline seeds show a two-phase structure. The thalamic gate does not create learning; it enhances it. This is consistent with clinical observations that thalamic lesions impair but do not abolish category learning (Schmahmann, 2004). The gate improves final accuracy in all seeds, functioning as an enhancer of an already-present capability.
+Baseline circuits also learn (77.7% mean), and 8/10 baseline seeds show a two-phase structure. The thalamic gate does not create learning; it enhances it. This is consistent with the general observation that subcortical lesions can impair but not abolish cortical learning. The gate improves final accuracy in all seeds, functioning as an enhancer of an already-present capability.
 
 ### 4.3 Variance Preservation
 
-The gate improves mean accuracy (+3.9pp) without reducing inter-seed variance (SD: 5.63 vs 5.61; F-ratio=0.99). This is consistent with a uniform shift mechanism: the gate produces a parallel upward shift in learning curves across seeds rather than a compression of outcomes. The protective effect operates on mean, not spread.
+The gate improves mean accuracy (+3.9pp) without reducing inter-seed variance (SD: 5.63 vs 5.61; F-ratio=0.99). The similar SD values are consistent with a roughly uniform accuracy improvement across seeds, though N=10 provides limited power for variance comparisons. The protective effect operates on mean, not spread.
 
 ### 4.4 Beyond Onset Acceleration
 
@@ -135,7 +135,8 @@ The HH equations implemented on silicon produce dynamics reminiscent of biologic
 ### Limitations
 
 - Onset detection parameters (window=50, threshold=75%) were selected post-hoc to maximize onset-accuracy correlation. Confirmatory replication with pre-registered parameters is needed.
-- 10 seeds with fixed stimulus order; stimulus randomization needed.
+- 10 seeds with fixed stimulus order; the two-phase pattern could partly reflect sequence structure rather than architecture. Stimulus randomization across seeds is needed.
+- No sham relay control. The improvement could reflect added capacity, extra excitation, or altered routing rather than gating per se. Controls needed: weight-matched non-gating relay, ascending-input ablation, direct-path-only (gate replaces rather than augments).
 - Gate neuron spike analysis not yet performed (planned).
 - Small circuit (hundreds of neurons); scaling effects unknown.
 - ThalamicGate weights (1) chosen heuristically; systematic weight sweep needed.
