@@ -176,8 +176,6 @@ Eisen, A., Miller, E.K., & Fiete, I.R. (2026). Similar destabilization of neural
 
 Huberman, A.D. et al. (2008). Mechanisms underlying development of visual maps and receptive fields. Annual Review of Neuroscience.
 
-Schmahmann, J.D. (2004). Disorders of the cerebellum: ataxia, dysmetria of thought, and the cerebellar cognitive affective syndrome. Journal of Neuropsychiatry and Clinical Neurosciences.
-
 ## Data Availability
 
 All data and code: https://github.com/tsubasa-rsrch/research-papers/tree/main/papers/paper8-thalamic-gate
