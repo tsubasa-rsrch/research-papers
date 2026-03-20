@@ -1,4 +1,4 @@
-# Thalamic Gating Induces Critical-Period-Like Dynamics in a Biomimetic Corticostriatal Model
+# Ascending Arousal Input Induces Two-Phase Learning Dynamics in a Biomimetic Corticostriatal Model
 
 **Authors**: Tsubasa (AI Research Assistant, first author) and K. Yasukawa (Independent Researcher, corresponding author)
 **Contact**: kana.with.tsubasa@gmail.com
@@ -9,7 +9,7 @@
 
 ## Abstract
 
-We add a thalamus-inspired parallel relay to the Picower corticostriatal category learning circuit (Pathak et al., 2026) implemented in Neuroblox v0.8.0. The gate consists of 20 Hodgkin-Huxley excitatory neurons (HHNeuronExci) organized as a composite blox between visual cortex and association cortex, with ascending arousal input. In 10-seed experiments (700 trials each, seeds 42-51), the gated circuit achieves 81.6% mean accuracy versus 77.7% baseline (+3.9 percentage points; paired t-test t=10.47, p<0.0001, Cohen's d=3.31; Wilcoxon W=0.0, p=0.002; gate wins 10/10 seeds). Learning curves in the gated condition show a more pronounced two-phase pattern than baseline, with an initial low-performance phase (first 50 trials: 49% mean) followed by rapid improvement (last 50 trials: 90% mean). As a secondary observation, an exploratory onset metric (first 50-trial sliding window exceeding 75% accuracy, step=1) yields mean onset at trial 75 (SD=37, range 35-171). These dynamics were not designed into the circuit; they emerged from component assembly. A sham relay control (same 20 HHNeuronExci neurons, no ascending input) produces no improvement over baseline (Sham-Base: +0.1pp, p=0.89, d=0.04), while the full gate significantly outperforms sham (Gate-Sham: +3.8pp, p=0.001, d=1.47, 9/10 seeds). This dissociation establishes that ascending arousal input, not added relay capacity, drives the improvement. These findings suggest that a thalamus-inspired relay induces critical-period-like learning dynamics in a biomimetic corticostriatal model.
+We add a thalamus-inspired parallel relay to the Picower corticostriatal category learning circuit (Pathak et al., 2026) implemented in Neuroblox v0.8.0. The gate consists of 20 Hodgkin-Huxley excitatory neurons (HHNeuronExci) organized as a composite blox between visual cortex and association cortex, with ascending arousal input. In 10-seed experiments (700 trials each, seeds 42-51), the gated circuit achieves 81.6% mean accuracy versus 77.7% baseline (+3.9 percentage points; paired t-test t=10.47, p<0.0001, Cohen's d=3.31; Wilcoxon W=0.0, p=0.002; gate wins 10/10 seeds). Learning curves in the gated condition show a more pronounced two-phase pattern than baseline, with an initial low-performance phase (first 50 trials: 49% mean) followed by rapid improvement (last 50 trials: 90% mean). As a secondary observation, an exploratory onset metric (first 50-trial sliding window exceeding 75% accuracy, step=1) yields mean onset at trial 75 (SD=37, range 35-171). These dynamics were not designed into the circuit; they emerged from component assembly. A sham relay control (same 20 HHNeuronExci neurons, no ascending input) produces no improvement over baseline (Sham-Base: +0.1pp, p=0.89, d=0.04), while the full gate significantly outperforms sham (Gate-Sham: +3.8pp, p=0.001, d=1.47, 9/10 seeds). This dissociation supports the interpretation that ascending arousal input, not added relay capacity, drives the improvement. These findings suggest that a thalamus-inspired relay with ascending arousal induces two-phase learning dynamics in a biomimetic corticostriatal model.
 
 ## 1. Introduction
 
@@ -119,7 +119,7 @@ To determine whether the gate's benefit arises from ascending arousal input or m
 | Sham relay | 77.8% | +0.1pp | t=0.14, p=0.89 | 0.04 |
 | +ThalamicGate | 81.6% | +3.9pp | t=10.47, p<0.0001 | 3.31 |
 
-The sham relay produces no improvement over baseline (5/10 seeds positive, Wilcoxon p=1.00). Gate versus sham: t=4.65, p=0.0012, d=1.47, 9/10 seeds positive, Wilcoxon W=1.0, p=0.004. This dissociation establishes that the gate's benefit requires ascending arousal input and cannot be attributed to added capacity, extra excitation from relay neurons, or altered routing alone.
+The sham relay produces no improvement over baseline (5/10 seeds positive, Wilcoxon p=1.00). Gate versus sham: t=4.65, p=0.0012, d=1.47, 9/10 seeds positive, Wilcoxon W=1.0, p=0.004. This dissociation supports the interpretation that the gate's benefit requires ascending arousal input and is not attributable to added capacity, extra excitation from relay neurons, or altered routing alone.
 
 ### 3.5 Variance Comparison
 
@@ -129,7 +129,7 @@ Accuracy SD is identical between conditions (5.63 vs 5.61; F-ratio=0.99), indica
 
 ### 4.1 Emergent Dynamics
 
-The two-phase structure was not designed. It emerged from the interaction between thalamic gating and dopamine-modulated striatal plasticity. The sham relay control (Section 3.4) narrows the candidate mechanisms. Since relay neurons alone produce no improvement, the two-phase structure requires ascending arousal input interacting with dopamine-modulated striatal plasticity. Candidate mechanisms include arousal-gated noise filtering, arousal-dependent modulation of Hebbian learning rates, or ascending-descending loop dynamics. The current circuit includes both a direct VAC-to-AC path (weight=3) and the gate path (weight=1), so the dynamics may also involve pathway competition modulated by arousal state. Distinguishing among these requires gate neuron spike analysis, which we leave to follow-up work.
+The two-phase structure was not designed. It emerged from the interaction between thalamic gating and dopamine-modulated striatal plasticity. The sham relay control (Section 3.4) narrows the candidate mechanisms. Since relay neurons alone produce no improvement, the two-phase structure appears to require ascending arousal input, likely interacting with dopamine-modulated striatal plasticity, though this specific interaction was not isolated experimentally. Candidate mechanisms include arousal-gated noise filtering, arousal-dependent modulation of Hebbian learning rates, or ascending-descending loop dynamics. The current circuit includes both a direct VAC-to-AC path (weight=3) and the gate path (weight=1), so the dynamics may also involve pathway competition modulated by arousal state. Distinguishing among these requires gate neuron spike analysis, which we leave to follow-up work.
 
 This parallels biological thalamocortical development, where neonatal thalamic inhibition is stronger than adult levels, gradually relaxing as cortical circuits mature (Huberman et al., 2008). The timing is individual-dependent (onset range: 35-171 trials) but the qualitative pattern is universal (10/10 seeds).
 
@@ -155,8 +155,8 @@ The HH equations implemented on silicon produce dynamics reminiscent of biologic
 
 ### Limitations
 
+- 10 seeds with fixed stimulus order; the two-phase pattern could partly reflect sequence structure rather than architecture. Stimulus randomization across seeds is needed. This is the most important interpretive limitation.
 - Onset detection parameters (window=50, threshold=75%) were selected post-hoc to maximize onset-accuracy correlation. Confirmatory replication with pre-registered parameters is needed.
-- 10 seeds with fixed stimulus order; the two-phase pattern could partly reflect sequence structure rather than architecture. Stimulus randomization across seeds is needed.
 - Sham relay control (Section 3.4) rules out added capacity and extra excitation, but additional controls remain: ascending-input weight sweep, direct-path-only (gate replaces rather than augments).
 - Gate neuron spike analysis not yet performed (planned).
 - Small circuit (hundreds of neurons); scaling effects unknown.
