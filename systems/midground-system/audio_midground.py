@@ -27,12 +27,12 @@ from collections import deque
 CAMERAS = {
     "kitchen": {
         "ip": os.getenv("CAMERA_KITCHEN_IP", "192.168.1.100"),
-        "user": "Tsubasa",
+        "user": os.getenv("CAMERA_KITCHEN_USER", "admin"),
         "password": os.getenv("CAMERA_PASSWORD", "changeme"),
     },
     "bedroom": {
         "ip": os.getenv("CAMERA_BEDROOM_IP", "192.168.1.101"),
-        "user": "Tsubasa2",
+        "user": os.getenv("CAMERA_BEDROOM_USER", "admin"),
         "password": os.getenv("CAMERA_PASSWORD", "changeme"),
     },
 }
