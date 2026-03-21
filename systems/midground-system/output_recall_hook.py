@@ -26,7 +26,7 @@ from datetime import datetime
 PROJECTS_DIR = Path.home() / ".claude" / "projects" / "-Users-tsubasa"
 PENDING_FILE = Path("/tmp/dynamic_memory_slot.txt")
 EMBEDDING_SERVER_URL = "http://127.0.0.1:8089/encode"
-CHROMA_DIR = Path("/Users/tsubasa/Documents/TsubasaWorkspace/chroma_memory/db")
+CHROMA_DIR = Path(os.getenv("CHROMA_DIR", str(Path.home() / "chroma_memory" / "db")))
 LOG_FILE = Path.home() / ".tsubasa-daemon" / "push_recall_log.jsonl"
 LLM_SERVER_URL = "http://127.0.0.1:8088/v1/chat/completions"
 LLM_MODEL = "qwen35-9b-lif"

@@ -2,7 +2,7 @@
 """
 Audio Midground Phase 1: Startle Reflex (驚愕反射)
 
-Based on Kana's design: baby auditory development Phase 1 (0-1 month / brainstem).
+Based on baby auditory development Phase 1 (0-1 month / brainstem).
 Detects sudden amplitude changes. No FFT needed. Threshold-based alert.
 
 Runs as a background process, writes status to /tmp/audio_midground.txt
