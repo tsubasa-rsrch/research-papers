@@ -20,7 +20,7 @@ Pathak et al. (2026) demonstrated that a biomimetic corticostriatal circuit, bui
 
 **Sham relay.** Identical 20-neuron parallel pathway without the dedicated ascending arousal input. Controls for added capacity and altered routing.
 
-**Design.** 10 seeds (42-51), 700 trials each, fixed stimulus order across seeds. Seed-level paired analyses. All three conditions use the same seeds. Julia 1.12.5, Neuroblox v0.8.0, Apple M4 Max. No learning dynamics were designed into the circuit; we assembled biologically motivated components and observed emergent behavior.
+**Design.** 10 seeds (42-51), 700 trials each, fixed stimulus order across seeds. Accuracy is the proportion of correct category selections across all 700 trials per seed. Seed-level paired analyses. All three conditions use the same seeds. Julia 1.12.5, Neuroblox v0.8.0, Apple M4 Max. No learning dynamics were designed into the circuit; we assembled biologically motivated components and observed emergent behavior.
 
 ## Results
 

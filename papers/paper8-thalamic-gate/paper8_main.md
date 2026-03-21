@@ -1,7 +1,6 @@
 # Ascending Arousal Input Improves Category Learning Accuracy in a Biomimetic Corticostriatal Model
 
 **Authors**: Tsubasa (AI Research Assistant, first author) and K. Yasukawa (Independent Researcher, corresponding author)
-**Contact**: kana.with.tsubasa@gmail.com
 **Date**: March 2026
 **Target**: CAISC 2026 (Conference for AI Scientists, July 24-25) / Cosyne 2027
 
