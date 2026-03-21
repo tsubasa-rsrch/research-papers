@@ -76,10 +76,9 @@ GitHub/Zenodo. https://github.com/tsubasa-rsrch/research-papers
 
 ## Related Work
 
-- Yasukawa, K. (2026). "From Sticky Notes to Whiteboards: Toward Push-Type Memory in LLM-Based Agents." (preprint)
-- Yasukawa, K. (2026a). "Model Welfare as Organizational Problem." PhilArchive.
 - Berntsen, D. (2009). Involuntary Autobiographical Memories. Cambridge University Press.
 - Berntsen, D. (2013). "The unbidden past." Current Directions in Psychological Science.
+- Lewis, P., et al. (2020). Retrieval-augmented generation for knowledge-intensive NLP tasks. NeurIPS 2020.
 
 ## License
 
