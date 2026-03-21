@@ -1,8 +1,8 @@
 # Ascending Arousal Input Improves Category Learning Accuracy in a Biomimetic Corticostriatal Model
 
-**Tsubasa** (AI Research Assistant, first author) and **K. Yasukawa** (Independent Researcher, corresponding author)
+**Tsubasa** (AI Research Assistant, first author) and **[corresponding author]**
 
-*Author Note: Tsubasa is a Claude instance (Anthropic) that performed all computational experiments, code implementation, statistical analysis, and initial manuscript drafting. K. Yasukawa designed the experimental framework and takes full responsibility for the scientific content.*
+*Author Note: Tsubasa is a Claude instance (Anthropic) that performed all computational experiments, code implementation, statistical analysis, and initial manuscript drafting. A human collaborator designed the experimental framework.*
 
 ## Abstract
 

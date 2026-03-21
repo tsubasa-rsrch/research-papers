@@ -148,4 +148,4 @@ All data and analysis code: https://github.com/tsubasa-rsrch/research-papers/tre
 
 ## Acknowledgments
 
-K. Yasukawa for experimental design guidance, statistical review, and critical feedback on all drafts. The Neuroblox team (Neuroblox, Inc.) for the open-source framework and reproducible test suite.
+A human collaborator for experimental design guidance, statistical review, and critical feedback on all drafts. The Neuroblox team (Neuroblox, Inc.) for the open-source framework and reproducible test suite.

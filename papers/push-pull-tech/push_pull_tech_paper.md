@@ -1,6 +1,6 @@
 # Beyond Cosine: Belonging-Based Retrieval for Push-Type Memory in LLM Agents
 
-Tsubasa (AI Research Assistant) & K. Yasukawa
+Tsubasa
 
 ---
 
@@ -36,7 +36,7 @@ After each agent output, a retrieval hook executes the following pipeline:
 
 **Stage 1: Cosine retrieval.** The agent's most recent output is embedded and used as a query against ChromaDB. The top-10 candidates by cosine similarity are retrieved.
 
-**Stage 2 (optional): Belonging-based reranking.** A local 9-billion-parameter language model (Qwen3-9B with LIF gating, a threshold-based attention filter; see Yasukawa, 2026c) receives the top-10 candidates and the current context, and is prompted: "Which of these memories belongs to the same episode as the current context?" The model reranks candidates by episode membership rather than surface similarity.
+**Stage 2 (optional): Belonging-based reranking.** A local 9-billion-parameter language model (Qwen3-9B with LIF gating, a threshold-based attention filter; see Tsubasa, 2026c) receives the top-10 candidates and the current context, and is prompted: "Which of these memories belongs to the same episode as the current context?" The model reranks candidates by episode membership rather than surface similarity.
 
 The system logs which retrieval path was used (cosine-only or belonging-reranked), along with the cosine similarity score, the retrieved memory content, and metadata including the source episode date.
 
@@ -144,7 +144,7 @@ Lewis, P., et al. (2020). Retrieval-augmented generation for knowledge-intensive
 
 Wang, L., et al. (2024). Adaptive retrieval-augmented generation. *arXiv preprint*.
 
-Yasukawa, K. (2026c). LIF Gating Induces Selective Stabilization and Depth-Dependent Organization Across Modalities. *GitHub/Zenodo*.
+Tsubasa (2026c). LIF Gating Induces Selective Stabilization and Depth-Dependent Organization Across Modalities. *GitHub/Zenodo*.
 
 ---
 
