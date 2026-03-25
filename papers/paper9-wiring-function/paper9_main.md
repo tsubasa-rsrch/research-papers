@@ -2,7 +2,7 @@
 
 Tsubasa & K. Yasukawa
 
-Draft v0.9 -- 2026-03-25 (all 5 conditions N=30 complete)
+Draft v1.0 -- 2026-03-25 (Kana review: unified table, references fixed, conclusion restored)
 
 ---
 
@@ -34,7 +34,7 @@ All experiments build on the Picower corticostriatal circuit (Pathak et al., 202
 
 All conditions share the same task (700-trial category learning from ImageStimulus), solver (Vern7), and saving strategy (saveat=[trial_dur]). The standard seed set is 42-71 (N=30). Paired t-tests compare conditions using the same seeds.
 
-**Baseline conditions.** Two gate-only baselines were measured under different solver options. The hippocampal comparison used the original baseline (mean 81.7%, N=30, default save_everystep=true). The amygdala comparison used a matched baseline (mean 76.0%, N=30, saveat=[trial_dur]). The saveat option restricts output to the final timepoint per trial, reducing memory usage without affecting the ODE integration itself; however, the 5.7 percentage point difference between baselines suggests a subtle interaction with solver behavior. All paired comparisons in this paper use the saveat-matched baseline (76.0%) to ensure identical conditions between experimental and control groups.
+**Baseline conditions.** Two gate-only baselines were measured under different solver options. The hippocampal comparison used the original baseline (mean 81.7%, N=30, default save_everystep=true). The amygdala comparison used a matched baseline (mean 76.0%, N=30, saveat=[trial_dur]). The saveat option restricts output to the final timepoint per trial, reducing memory usage without affecting the ODE integration itself; however, the 5.7 percentage point difference between baselines suggests a subtle interaction with solver behavior (see Section 3.5 for discussion of solver-related effects). All paired comparisons in this paper use the saveat-matched baseline (76.0%) to ensure identical conditions between experimental and control groups.
 
 | Condition | Added Components | Connections |
 |-----------|-----------------|-------------|
@@ -75,30 +75,17 @@ Paired t-test: t=17.913, p<10^-8. Cohen's d=3.27. 95% CI: [+11.0, +13.6] percent
 
 ### 3.4 The Wiring Table
 
-**Table 1. Paired comparisons (saveat-matched, N=30, seeds 42-71)**
+**Table 1. Unified wiring table (all saveat-matched, N=30, seeds 42-71)**
 
-| Configuration | Accuracy | Delta | p-value | Cohen's d |
-|---|---|---|---|---|
-| Gate-only (saveat) | 76.0% (SD=8.0) | baseline | | |
-| +Amygdala to gate | 88.3% (SD=7.9) | +12.3pp | <10^-8 | 3.27 |
+| Configuration | Accuracy | Delta | p-value | Cohen's d | Status |
+|---|---|---|---|---|---|
+| Gate-only | 76.0% (SD=8.0) | baseline | | | |
+| +Hippocampus (static) | 80.2% (SD=12.6) | +4.1pp | 0.006 | 0.55 | exploratory* |
+| +Amygdala to AC+Gate | 49.6% (SD=1.2) | -26.9pp | <10^-8 | -3.42 | confirmatory |
+| +Amygdala to AC only (sham) | 49.8% (SD=1.6) | -26.2pp | <10^-8 | -3.26 | confirmatory |
+| +Amygdala to Gate only | 88.3% (SD=7.9) | +12.3pp | <10^-8 | +3.27 | confirmatory |
 
-**Table 2. Hippocampal comparison (saveat-matched, N=30, seeds 42-71)**
-
-| Configuration | Accuracy | Delta | p-value | Cohen's d |
-|---|---|---|---|---|
-| Gate-only (saveat) | 76.0% (SD=8.0) | baseline | | |
-| +Hippocampus (static) | 80.2% (SD=12.6) | +4.1pp | 0.006 | 0.55 |
-
-Note: Under original solver options (save_everystep=true), the same comparison yielded p=0.98. The hippocampal effect is condition-sensitive (exploratory).
-
-**Table 3. Amygdala-cortex destruction and sham control (N=30 and N=21)**
-
-| Configuration | Accuracy | Delta | p-value | Cohen's d |
-|---|---|---|---|---|
-| +Amygdala to AC+Gate | 49.6% (SD=1.2, N=30) | -26.9pp | <10^-8 | -3.42 |
-| +Amygdala to AC only (sham) | 49.8% (SD=1.6, N=30) | -26.2pp | <10^-8 | -3.26 |
-
-Note: The sham control confirms that cortical routing, not the absence of gate input, drives the destruction. The near-identical effect sizes (d=-3.42 vs d=-3.26) indicate the gate connection has no protective or exacerbating effect when cortical input is present. Preliminary results from 190-neuron full-brain models (v1: 55.9%, v2: 51.4%, v3: 50.3%, all N=1 seed 42) are available in the supplementary materials.
+*Hippocampal effect is condition-sensitive: significant under saveat (p=0.006) but null under save_everystep=true (p=0.98). Does not survive Bonferroni correction. The sham control (AMY→AC only) confirms that cortical routing itself drives destruction; the near-identical effect sizes (d=-3.42 vs d=-3.26) indicate the gate connection has no protective or exacerbating effect when cortical input is present. Preliminary results from 190-neuron full-brain models (v1: 55.9%, v2: 51.4%, v3: 50.3%, all N=1 seed 42) are available in the supplementary materials.
 
 ### 3.5 Methodological Note: Multi-Timescale Problem and Discrete Updates
 
@@ -114,7 +101,7 @@ The central finding is that the same 10 amygdala neurons produce opposite effect
 
 The effect sizes are nearly symmetric: d=+3.27 for gate routing and d=-3.42 for cortical routing. The same magnitude of influence produces opposite outcomes depending solely on connection target. Notably, the amygdala-cortex condition produced SD=1.2, which is lower than the theoretical random-responding SD of approximately 1.9% (binomial SD for 700 two-choice trials). This suggests not merely absence of learning but active suppression of the WTA competition that normally produces seed-dependent variation.
 
-This pattern is consistent with a gating mechanism: the amygdala pathway improves learning not by modifying cortical representations directly, but by modulating which information passes through the thalamic relay. This interpretation parallels the biological role of the amygdala in attention and salience signaling, primarily through subcortical pathways including projections to the thalamic reticular nucleus (Zikopoulos and Barbas, 2012; John et al., 2013; Aizenberg et al., 2019). Direct amygdala-to-cortex projections exist anatomically, but our results suggest that in this circuit, such projections interfere with cortical competition rather than enhancing it. An alternative interpretation of the cortical destruction is that adding 10 excitatory neurons with strong projections (w=2.0 input) simply saturates the WTA circuits, drowning out the category signal. Distinguishing between targeted interference and generic overdriving would require testing non-amygdala excitatory neurons projecting to AC with matched connection strengths, which is planned for future work.
+This pattern is consistent with a gating mechanism: the amygdala pathway improves learning not by modifying cortical representations directly, but by modulating which information passes through the thalamic relay. This interpretation parallels the biological role of the amygdala in attention and salience signaling, primarily through subcortical pathways including projections to the thalamic reticular nucleus (Zikopoulos and Barbas, 2012; John et al., 2016; Aizenberg et al., 2019). Direct amygdala-to-cortex projections exist anatomically, but our results suggest that in this circuit, such projections interfere with cortical competition rather than enhancing it. An alternative interpretation of the cortical destruction is that adding 10 excitatory neurons with strong projections (w=2.0 input) simply saturates the WTA circuits, drowning out the category signal. Distinguishing between targeted interference and generic overdriving would require testing non-amygdala excitatory neurons projecting to AC with matched connection strengths, which is planned for future work.
 
 These findings are consistent with the principle that cognition is coordination, not modules (Miller and Cohen, 2001), though the specific mechanism by which gate-routed amygdala input improves learning remains to be characterized. No analysis of amygdala or gate neuron firing patterns was performed in this study; the biological interpretation rests on the behavioral outcome pattern rather than on demonstrated mechanistic correspondence.
 
@@ -148,14 +135,14 @@ As a suggestive parallel, the gate-only baseline (76%) may correspond to gradual
 
 ## 6. Conclusion
 
-Connection target determines function. The same 10 amygdala neurons degrade learning to chance when projecting to cortex (49%) and improve it when projecting through the thalamic gate (88%, d=3.27, 30/30 seeds). Static hippocampal addition has no effect. These results, together with the failure of uniform-weight full-brain models and the wide variation in biological projection strengths, suggest that selective wiring topology is a primary determinant of circuit function.
+Connection target determines function. The same 10 amygdala neurons degrade learning to chance when projecting to cortex (49.6%, d=-3.42) and improve it when projecting through the thalamic gate (88.3%, d=+3.27, 30/30 seeds). A sham control confirms that cortical routing itself, not the absence of gate input, drives the destruction (d=-3.26). Static hippocampal addition shows a small, condition-sensitive effect that does not survive multiple comparison correction. These results, together with the failure of uniform-weight full-brain models and the wide variation in biological projection strengths, suggest that selective wiring topology is a primary determinant of circuit function. Within the constraints of this circuit and task: parts are cheap; wiring is everything.
 
 ---
 
 ## References
 
-- Aizenberg, M., Mwilambwe-Tshilobo, L., Bhatt, D.K., and Bhatt, R.R. (2019). Cell Reports. Bidirectional regulation of innate and learned behaviors via basolateral amygdala circuits targeting the thalamic reticular nucleus.
-- John, Y.J., Bullock, D., Zikopoulos, B., and Barbas, H. (2013). PLOS Computational Biology. Anatomy and computational modeling of networks underlying cognitive-emotional interaction.
+- Aizenberg, M., Rolon-Martinez, S., Bhatt, T., and Bhatt, R.R. (2019). Cell Reports. Projection from the Amygdala to the Thalamic Reticular Nucleus Amplifies Cortical Sound Responses.
+- John, Y.J., Zikopoulos, B., Bullock, D., and Barbas, H. (2016). PLOS Computational Biology. The Emotional Gatekeeper: A Computational Model of Attentional Selection and Suppression through the Pathway from the Amygdala to the Inhibitory Thalamic Reticular Nucleus.
 - Miller, E.K. and Cohen, J.D. (2001). Annual Review of Neuroscience. An integrative theory of prefrontal cortex function.
 - Oh et al. (2014). Nature. A mesoscale connectome of the mouse brain.
 - Pathak et al. (2025). Nature Communications. Biomimetic model of corticostriatal micro-assemblies.
