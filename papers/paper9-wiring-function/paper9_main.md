@@ -141,7 +141,7 @@ Connection target determines function. The same 10 amygdala neurons degrade lear
 
 ## References
 
-- Aizenberg, M., Rolon-Martinez, S., Bhatt, T., and Bhatt, R.R. (2019). Cell Reports. Projection from the Amygdala to the Thalamic Reticular Nucleus Amplifies Cortical Sound Responses.
+- Aizenberg, M., Rolon-Martinez, S., Pham, T., Rao, W., Haas, J.S., and Geffen, M.N. (2019). Cell Reports. Projection from the Amygdala to the Thalamic Reticular Nucleus Amplifies Cortical Sound Responses.
 - John, Y.J., Zikopoulos, B., Bullock, D., and Barbas, H. (2016). PLOS Computational Biology. The Emotional Gatekeeper: A Computational Model of Attentional Selection and Suppression through the Pathway from the Amygdala to the Inhibitory Thalamic Reticular Nucleus.
 - Miller, E.K. and Cohen, J.D. (2001). Annual Review of Neuroscience. An integrative theory of prefrontal cortex function.
 - Oh et al. (2014). Nature. A mesoscale connectome of the mouse brain.
