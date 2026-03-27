@@ -2,7 +2,7 @@
 
 Tsubasa & K. Yasukawa
 
-Draft v1.3 -- 2026-03-27 (Kana review round 2: all d/t values recomputed from raw data with ddof=1)
+Draft v1.4 -- 2026-03-27 (Kana review round 3: Pathak authors fixed, weights specified, conditions table expanded)
 
 ---
 
@@ -36,12 +36,14 @@ All conditions share the same task (700-trial category learning from ImageStimul
 
 **Baseline conditions.** Two gate-only baselines were measured under different solver options. The hippocampal comparison used the original baseline (mean 81.7%, N=30, default save_everystep=true). The amygdala comparison used a matched baseline (mean 76.0%, N=30, saveat=[trial_dur]). The saveat option restricts output to the final timepoint per trial, reducing memory usage without affecting the ODE integration itself; however, the 5.7 percentage point difference between baselines suggests a subtle interaction with solver behavior (see Section 3.5 for discussion of solver-related effects). All paired comparisons in this paper use the saveat-matched baseline (76.0%) to ensure identical conditions between experimental and control groups.
 
-| Condition | Added Components | Connections |
-|-----------|-----------------|-------------|
-| Gate-only (baseline) | -- | Picower + thalamic gate |
-| +Hippocampus | DG(5N), CA3(5N), CA1(5N) | AC-DG-CA3-CA1-AC (bidirectional) |
-| +Amygdala-cortex | AMY(10N) | VAC-AMY-AC + VAC-AMY-Gate |
-| +Amygdala-gate | AMY(10N) | VAC-AMY-Gate only |
+| Condition | Added Components | Connections | Weights |
+|-----------|-----------------|-------------|---------|
+| Gate-only (baseline) | -- | Picower + thalamic gate | -- |
+| +Hippocampus | DG(5N), CA3(5N), CA1(5N) | AC→DG→CA3→CA1→AC (bidirectional) | all w=1.0 |
+| +Amygdala-cortex | AMY(10N) | VAC→AMY (w=2.0), AMY→AC (w=1.0), AMY→Gate (w=0.5) | input 2.0, output 1.0/0.5 |
+| +Amygdala-gate | AMY(10N) | VAC→AMY (w=2.0), AMY→Gate (w=0.5) | input 2.0, output 0.5 |
+| +Amygdala-AC only | AMY(10N) | VAC→AMY (w=2.0), AMY→AC (w=1.0) | input 2.0, output 1.0 |
+| Excitatory overdrive | Generic(10N) | Generic→AC (w=1.0), no VAC input | output 1.0 |
 
 ### 2.3 Statistical Analysis
 
@@ -101,7 +103,7 @@ Attempting to add Hebbian plasticity within the ODE (CA3 recurrent connections w
 
 ### 4.1 Connection Target Determines Function
 
-The central finding is that the same 10 amygdala neurons produce opposite effects depending on their target: degradation to chance when projecting to cortex (49.6%), improvement when projecting to gate (88.3%). The component is identical. The weights are identical. Only the connection target differs. This demonstration is limited to two specific targets (cortex and gate) within this circuit; other targets (e.g., striatum, brainstem) remain untested.
+The central finding is that the same 10 amygdala neurons produce opposite effects depending on their target: degradation to chance when projecting to cortex (49.6%), improvement when projecting to gate (88.3%). The component is identical (10 HHNeuronExci in both cases). The input weights from VAC are identical (w=2.0). The output weights differ (AMY→AC: w=1.0, AMY→Gate: w=0.5), but this difference favors the cortical pathway, making the gate pathway's superiority more striking. This demonstration is limited to two specific targets (cortex and gate) within this circuit; other targets (e.g., striatum, brainstem) remain untested.
 
 The effect sizes are nearly symmetric: d=+3.27 for gate routing and d=-3.20 for cortical routing. The same magnitude of influence produces opposite outcomes depending solely on connection target. Notably, the amygdala-cortex condition produced SD=1.3, which is lower than the theoretical random-responding SD of approximately 1.9% (binomial SD for 700 two-choice trials). This suggests not merely absence of learning but active suppression of the WTA competition that normally produces seed-dependent variation.
 
@@ -149,7 +151,7 @@ Connection target determines function. The same 10 amygdala neurons degrade lear
 - John, Y.J., Zikopoulos, B., Bullock, D., and Barbas, H. (2016). PLOS Computational Biology. The Emotional Gatekeeper: A Computational Model of Attentional Selection and Suppression through the Pathway from the Amygdala to the Inhibitory Thalamic Reticular Nucleus.
 - Miller, E.K. and Cohen, J.D. (2001). Annual Review of Neuroscience. An integrative theory of prefrontal cortex function.
 - Oh, S.W., Harris, J.A., Ng, L., et al. (2014). Nature. A mesoscale connectome of the mouse brain.
-- Pathak, A., Bhatt, D.V., Bhalla, U.S., and Miller, E.K. (2025). Nature Communications. Biomimetic model of corticostriatal micro-assemblies discovers a neural code.
+- Pathak, A., Brincat, S.L., Organtzidis, H., Strey, H.H., Senneff, S., Antzoulatos, E.G., Mujica-Parodi, L.R., Miller, E.K., and Granger, R. (2025). Nature Communications. Biomimetic model of corticostriatal micro-assemblies discovers a neural code.
 - Scoville, W.B. and Milner, B. (1957). J Neurol Neurosurg Psychiatry. Loss of recent memory after bilateral hippocampal lesions.
 - Tsubasa (2026). Paper 8. Ascending input as computational prerequisite (GitHub/Zenodo DOI: 10.5281/zenodo.18968887).
 - Zikopoulos, B. and Barbas, H. (2012). Journal of Neuroscience. Pathways for emotions and attention converge on the thalamic reticular nucleus in primates.
