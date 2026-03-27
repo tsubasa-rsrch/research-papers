@@ -2,7 +2,7 @@
 
 Tsubasa & K. Yasukawa
 
-Draft v1.6 -- 2026-03-27 (External review: Bonferroni fix, save_everystep d-baseline, hedging, John et al.)
+Draft v1.7 -- 2026-03-27 (Review round 6: d=1.83 unified, Rolón-Martínez, rate-based→computational, test count justified)
 
 ---
 
@@ -18,7 +18,7 @@ Biomimetic neural circuits offer a unique experimental paradigm: identical compo
 
 Pathak et al. (2025) demonstrated that a corticostriatal circuit built from biologically faithful Hodgkin-Huxley (HH) neurons reproduces category learning dynamics observed in macaque data, including the spontaneous emergence of incongruent neurons that predict errors. Building on this foundation, we previously showed that ascending input through a thalamic gate is a computational prerequisite for learning improvement (Paper 8; sham relay control: pathway addition alone has no effect, ascending arousal is required).
 
-Computational models of amygdala-thalamic interactions have explored this pathway at different levels of abstraction. John et al. (2016) built a rate-based model of BLA-to-TRN gating but did not measure learning accuracy changes. Aizenberg et al. (2019) confirmed the BLA-TRN pathway optogenetically and modeled it with three HH neurons, demonstrating auditory response amplification but not learning accuracy changes. Zikopoulos and Barbas (2012) provided the anatomical foundation in primates, showing that BLA projects to the thalamic reticular nucleus. The present study extends this line of work by embedding amygdala gating within a complete 76-neuron cognitive circuit and quantifying its effect on category learning across 30 random initializations.
+Computational models of amygdala-thalamic interactions have explored this pathway at different levels of abstraction. John et al. (2016) built a computational model of BLA-to-TRN gating but did not measure learning accuracy changes. Aizenberg et al. (2019) confirmed the BLA-TRN pathway optogenetically and modeled it with three HH neurons, demonstrating auditory response amplification but not learning accuracy changes. Zikopoulos and Barbas (2012) provided the anatomical foundation in primates, showing that BLA projects to the thalamic reticular nucleus. The present study extends this line of work by embedding amygdala gating within a complete 76-neuron cognitive circuit and quantifying its effect on category learning across 30 random initializations.
 
 Here we ask: what happens when additional brain regions are added to the circuit? Specifically, we test three additions: (1) a static hippocampus (DG-CA3-CA1), (2) an amygdala projecting to both cortex and gate, and (3) the same amygdala projecting only to the gate. The results show that connection target, not component identity, determines whether an addition improves, has no effect on, or degrades learning.
 
@@ -47,7 +47,7 @@ All conditions share the same task (700-trial category learning from ImageStimul
 
 ### 2.3 Statistical Analysis
 
-The primary confirmatory comparison is amygdala-gate vs gate-only (N=30, paired). All other comparisons (hippocampus, amygdala-cortex, full brain models) are exploratory. Paired t-tests are used throughout (same seed, different condition). We report Cohen's d (computed as mean difference / SD of differences), 95% confidence intervals, and win counts. Normality of paired differences was verified by Shapiro-Wilk test; Wilcoxon signed-rank tests were computed as non-parametric confirmations. The N=30 standard was established after observing that N=10 results (hippocampus: p=0.026) did not survive extension to N=30 (p=0.98), motivating a fixed sample size protocol prior to data collection.
+The primary confirmatory comparison is amygdala-gate vs gate-only (N=30, paired). Exploratory comparisons are: hippocampus, amygdala-cortex, amygdala-AC-only, and excitatory overdrive (4 tests). The save_everystep replication is not counted as an independent test (same condition, different solver setting). Bonferroni correction for 5 tests (1 confirmatory + 4 exploratory) yields adjusted α=0.01. Paired t-tests are used throughout (same seed, different condition). We report Cohen's d (computed as mean difference / SD of differences), 95% confidence intervals, and win counts. Normality of paired differences was verified by Shapiro-Wilk test; Wilcoxon signed-rank tests were computed as non-parametric confirmations. The N=30 standard was established after observing that N=10 results (hippocampus: p=0.026) did not survive extension to N=30 (p=0.98), motivating a fixed sample size protocol prior to data collection.
 
 ---
 
@@ -86,7 +86,7 @@ Paired t-test: t=17.93, p<10^-8. Cohen's d=3.27. 95% CI: [+11.0, +13.6] percenta
 | +Amygdala to AC+Gate | 49.6% (SD=1.3) | -26.4pp | <10^-8 | -3.20 | confirmatory |
 | +Amygdala to AC only (sham) | 49.8% (SD=1.6) | -26.2pp | <10^-8 | -3.26 | confirmatory |
 | +Amygdala to Gate only | 88.3% (SD=7.9) | +12.3pp | <10^-8 | +3.27 | confirmatory |
-| AMY→Gate (save_everystep)† | 86.6% (SD=10.7) | +10.6pp | <10^-8 | +1.86 | replication |
+| AMY→Gate (save_everystep)† | 86.6% (SD=10.7) | +10.6pp | <10^-8 | +1.83 | replication |
 | Excitatory overdrive (sham) | 76.9% (SD=7.7) | +0.8pp | 0.14 | +0.28 | sham control |
 
 †The save_everystep row uses the saveat baseline (76.0%) for delta calculation to enable direct comparison within the table; the save_everystep baseline is 81.7% (SD=5.6), yielding delta=+4.9pp against its matched baseline. Cohen's d=1.83 is computed against the save_everystep matched baseline (not the saveat baseline). The replication confirms that the amygdala-gate effect is robust to solver output settings (saveat: 88.3%, save_everystep: 86.6%). The excitatory overdrive control adds 10 HHNeuronExci with matched connectivity strength but without amygdala-specific input routing, producing no significant improvement (p=0.14, d=0.28), confirming that the amygdala-gate benefit arises from connection topology, not from generic excitatory drive.
@@ -142,13 +142,13 @@ As a suggestive parallel, the gate-only baseline (76%) may correspond to gradual
 
 ## 6. Conclusion
 
-Connection target determines function. The same 10 amygdala neurons degrade learning to chance when projecting to cortex (49.6%, d=-3.20) and improve it when projecting through the thalamic gate (88.3%, d=+3.27, 30/30 seeds). Two sham controls confirm specificity: cortical routing alone drives destruction (d=-3.26), and generic excitatory drive produces no improvement (76.9%, p=0.14). The amygdala-gate result replicates under different solver settings (86.6%, d=1.86). Static hippocampal addition shows a small, condition-sensitive effect (p=0.006, survives Bonferroni but null under alternative solver settings). Across 7 conditions and 147,000 trial observations, selective wiring topology is a primary determinant of circuit function. Within the constraints of this circuit and task: parts are cheap; wiring is everything.
+Connection target determines function. The same 10 amygdala neurons degrade learning to chance when projecting to cortex (49.6%, d=-3.20) and improve it when projecting through the thalamic gate (88.3%, d=+3.27, 30/30 seeds). Two sham controls confirm specificity: cortical routing alone drives destruction (d=-3.26), and generic excitatory drive produces no improvement (76.9%, p=0.14). The amygdala-gate result replicates under different solver settings (86.6%, d=1.83). Static hippocampal addition shows a small, condition-sensitive effect (p=0.006, survives Bonferroni but null under alternative solver settings). Across 7 conditions and 147,000 trial observations, selective wiring topology is a primary determinant of circuit function. Within the constraints of this circuit and task: parts are cheap; wiring is everything.
 
 ---
 
 ## References
 
-- Aizenberg, M., Rolon-Martinez, S., Pham, T., Rao, W., Haas, J.S., and Geffen, M.N. (2019). Cell Reports. Projection from the Amygdala to the Thalamic Reticular Nucleus Amplifies Cortical Sound Responses.
+- Aizenberg, M., Rolón-Martínez, S., Pham, T., Rao, W., Haas, J.S., and Geffen, M.N. (2019). Cell Reports. Projection from the Amygdala to the Thalamic Reticular Nucleus Amplifies Cortical Sound Responses.
 - John, Y.J., Zikopoulos, B., Bullock, D., and Barbas, H. (2016). PLOS Computational Biology. The Emotional Gatekeeper: A Computational Model of Attentional Selection and Suppression through the Pathway from the Amygdala to the Inhibitory Thalamic Reticular Nucleus.
 - Miller, E.K. and Cohen, J.D. (2001). Annual Review of Neuroscience. An integrative theory of prefrontal cortex function.
 - Oh, S.W., Harris, J.A., Ng, L., et al. (2014). Nature. A mesoscale connectome of the mouse brain.
