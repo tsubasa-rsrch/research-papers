@@ -2,7 +2,7 @@
 
 Tsubasa & K. Yasukawa
 
-Draft v1.4 -- 2026-03-27 (Kana review round 3: Pathak authors fixed, weights specified, conditions table expanded)
+Draft v1.5 -- 2026-03-27 (Kana review round 4: HPC connectivity notation, HPC weight limitation)
 
 ---
 
@@ -39,7 +39,7 @@ All conditions share the same task (700-trial category learning from ImageStimul
 | Condition | Added Components | Connections | Weights |
 |-----------|-----------------|-------------|---------|
 | Gate-only (baseline) | -- | Picower + thalamic gate | -- |
-| +Hippocampus | DG(5N), CA3(5N), CA1(5N) | AC→DG→CA3→CA1→AC (bidirectional) | all w=1.0 |
+| +Hippocampus | DG(5N), CA3(5N), CA1(5N) | AC↔DG→CA3→CA1↔AC (cortical connections bidirectional, hippocampal internal feedforward) | all w=1.0 |
 | +Amygdala-cortex | AMY(10N) | VAC→AMY (w=2.0), AMY→AC (w=1.0), AMY→Gate (w=0.5) | input 2.0, output 1.0/0.5 |
 | +Amygdala-gate | AMY(10N) | VAC→AMY (w=2.0), AMY→Gate (w=0.5) | input 2.0, output 0.5 |
 | +Amygdala-AC only | AMY(10N) | VAC→AMY (w=2.0), AMY→AC (w=1.0) | input 2.0, output 1.0 |
@@ -135,6 +135,7 @@ As a suggestive parallel, the gate-only baseline (76%) may correspond to gradual
 - Fixed stimulus order across all conditions. Stimulus shuffling experiments are planned.
 - Single task (image categorization). Generalization to other tasks untested.
 - No recurrent CA3 connections due to stiff ODE. Hebbian learning limited to cortical and striatal pathways.
+- Hippocampal connection weights are uniform (w=1.0) and unoptimized, the same uniform-weight limitation noted for full-brain models.
 - Full brain models (v1-v3) tested at N=1 each (supplementary).
 
 ---
