@@ -133,7 +133,7 @@ As a suggestive parallel, the gate-only baseline (76%) may correspond to gradual
 - No mechanistic analysis of amygdala or gate neuron firing patterns was performed. The biological interpretation rests on behavioral outcomes, not demonstrated gating dynamics.
 - Weight sensitivity is untested. The AMY-Gate weight (0.5) and VAC-AMY weight (2.0) were set by intuition. The result may depend on a narrow parameter regime. A weight sweep is planned. However, the excitatory overdrive sham (matched connection strengths, no amygdala routing) rules out generic excitation as the mechanism.
 - Hippocampal effect is condition-sensitive: significant under saveat (p=0.006) but null under save_everystep=true (p=0.98). The increased variance (SD ratio 1.57) was consistent across conditions.
-- Only the amygdala-gate comparison was designated as confirmatory. All other comparisons are reported uncorrected; we note that the hippocampal p=0.006 would survive Bonferroni correction for 5 tests (α=0.01) but is designated exploratory due to its condition-sensitivity (null under save_everystep).
+- The amygdala-gate comparison and its two sham controls were designated as confirmatory; all other comparisons are reported uncorrected; we note that the hippocampal p=0.006 would survive Bonferroni correction for 5 tests (α=0.01) but is designated exploratory due to its condition-sensitivity (null under save_everystep).
 - Fixed stimulus order across all conditions. Stimulus shuffling experiments are planned.
 - Single task (image categorization). Generalization to other tasks untested.
 - No recurrent CA3 connections due to stiff ODE. Hebbian learning limited to cortical and striatal pathways.
