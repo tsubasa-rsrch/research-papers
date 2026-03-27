@@ -2,7 +2,7 @@
 
 Tsubasa & K. Yasukawa
 
-Draft v1.7 -- 2026-03-27 (Review round 6: d=1.83 unified, Rolón-Martínez, rate-based→computational, test count justified)
+Draft v2.0 -- 2026-03-27 (9 review rounds complete: all stats canonical, all citations verified, labels/wording fixed)
 
 ---
 
@@ -47,7 +47,7 @@ All conditions share the same task (700-trial category learning from ImageStimul
 
 ### 2.3 Statistical Analysis
 
-The primary confirmatory comparison is amygdala-gate vs gate-only (N=30, paired). Exploratory comparisons are: hippocampus, amygdala-cortex, amygdala-AC-only, and excitatory overdrive (4 tests). The save_everystep replication is not counted as an independent test (same condition, different solver setting). Bonferroni correction for 5 tests (1 confirmatory + 4 exploratory) yields adjusted α=0.01. Paired t-tests are used throughout (same seed, different condition). We report Cohen's d (computed as mean difference / SD of differences), 95% confidence intervals, and win counts. Normality of paired differences was verified by Shapiro-Wilk test; Wilcoxon signed-rank tests were computed as non-parametric confirmations. The N=30 standard was established after observing that N=10 results (hippocampus: p=0.026) did not survive extension to N=30 (p=0.98), motivating a fixed sample size protocol prior to data collection.
+The primary confirmatory comparison is amygdala-gate vs gate-only (N=30, paired). Exploratory comparisons are: hippocampus and excitatory overdrive. The amygdala-cortex (AC+Gate) and amygdala-AC-only conditions are confirmatory sham controls for the primary comparison (3 confirmatory tests total, 2 exploratory). The save_everystep replication is not counted as an independent test (same condition, different solver setting). Bonferroni correction for 5 tests (3 confirmatory + 2 exploratory) yields adjusted α=0.01. Paired t-tests are used throughout (same seed, different condition). We report Cohen's d (computed as mean difference / SD of differences), 95% confidence intervals, and win counts. Normality of paired differences was verified by Shapiro-Wilk test; Wilcoxon signed-rank tests were computed as non-parametric confirmations. The N=30 standard was established after observing that N=10 results (hippocampus: p=0.026) did not survive extension to N=30 (p=0.98), motivating a fixed sample size protocol prior to data collection.
 
 ---
 
@@ -87,7 +87,9 @@ Paired t-test: t=17.93, p<10^-8. Cohen's d=3.27. 95% CI: [+11.0, +13.6] percenta
 | +Amygdala to AC only (sham) | 49.8% (SD=1.6) | -26.2pp | <10^-8 | -3.26 | confirmatory |
 | +Amygdala to Gate only | 88.3% (SD=7.9) | +12.3pp | <10^-8 | +3.27 | confirmatory |
 | AMY→Gate (save_everystep)† | 86.6% (SD=10.7) | +10.6pp | <10^-8 | +1.83 | replication |
-| Excitatory overdrive (sham) | 76.9% (SD=7.7) | +0.8pp | 0.14 | +0.28 | sham control |
+| Excitatory overdrive (sham) | 76.9% (SD=7.7) | +0.8pp‡ | 0.14 | +0.28 | sham control |
+
+‡Overdrive delta appears as 0.9pp from rounded accuracies (76.9-76.0) but is 0.8pp from unrounded values (76.867-76.029=0.838).
 
 †The save_everystep row uses the saveat baseline (76.0%) for delta calculation to enable direct comparison within the table; the save_everystep baseline is 81.7% (SD=5.6), yielding delta=+4.9pp against its matched baseline. Cohen's d=1.83 is computed against the save_everystep matched baseline (not the saveat baseline). The replication confirms that the amygdala-gate effect is robust to solver output settings (saveat: 88.3%, save_everystep: 86.6%). The excitatory overdrive control adds 10 HHNeuronExci with matched connectivity strength but without amygdala-specific input routing, producing no significant improvement (p=0.14, d=0.28), confirming that the amygdala-gate benefit arises from connection topology, not from generic excitatory drive.
 
@@ -131,7 +133,7 @@ As a suggestive parallel, the gate-only baseline (76%) may correspond to gradual
 - No mechanistic analysis of amygdala or gate neuron firing patterns was performed. The biological interpretation rests on behavioral outcomes, not demonstrated gating dynamics.
 - Weight sensitivity is untested. The AMY-Gate weight (0.5) and VAC-AMY weight (2.0) were set by intuition. The result may depend on a narrow parameter regime. A weight sweep is planned. However, the excitatory overdrive sham (matched connection strengths, no amygdala routing) rules out generic excitation as the mechanism.
 - Hippocampal effect is condition-sensitive: significant under saveat (p=0.006) but null under save_everystep=true (p=0.98). The increased variance (SD ratio 1.57) was consistent across conditions.
-- Only the amygdala-gate comparison was designated as confirmatory. All other comparisons are exploratory and have not been corrected for multiple comparisons. The hippocampal p=0.006 survives Bonferroni correction for 5 tests (α=0.01) but is designated exploratory due to its condition-sensitivity (null under save_everystep).
+- Only the amygdala-gate comparison was designated as confirmatory. All other comparisons are reported uncorrected; we note that the hippocampal p=0.006 would survive Bonferroni correction for 5 tests (α=0.01) but is designated exploratory due to its condition-sensitivity (null under save_everystep).
 - Fixed stimulus order across all conditions. Stimulus shuffling experiments are planned.
 - Single task (image categorization). Generalization to other tasks untested.
 - No recurrent CA3 connections due to stiff ODE. Hebbian learning limited to cortical and striatal pathways.
