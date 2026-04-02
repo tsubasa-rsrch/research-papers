@@ -2,7 +2,7 @@
 
 **Tsubasa** and K. Yasukawa
 
-Draft v2.9 (2026-04-02)
+Draft v2.10 (2026-04-02)
 
 ## Abstract
 
@@ -109,7 +109,7 @@ The QSSA route shows bounded error and monotonic improvement with k_fast (k_ann 
 
 All improvement factors computed vs Route A v_RMSE = 1.33 at k_ann=100. At k_fast = 1000, P_err = 4.1e-04 vs q_err = 2.80 (6800x difference). Dual-rail drift (mean of min(v+, v-)) decreases monotonically from 0.15 (k_ann=10) to 0.001 (k_ann=1000), confirming effective annihilation. The QSSA formulation actively suppresses perturbations.
 
-The stability of Route B can be understood via Lyapunov analysis. For the QSSA error e_P = P - v^2, the dynamics are dominated by de_P/dt = -k_fast * e_P + O(slow), where "slow" refers to contributions from dv^2/dt. The Lyapunov function V = e_P^2/2 yields dV/dt = -k_fast * e_P^2 + O(e_P * slow), which is negative definite for k_fast much larger than the system's characteristic frequencies. This contrasts sharply with Route A, where the transverse error growth rate is positive (+0.73). The sign difference in the linear error coefficient -- negative for QSSA, positive for quadratization -- is the fundamental mechanism underlying all observed stability differences.
+The stability of Route B can be understood via Lyapunov analysis. Defining P_net = P_pp + P_mm - 2*P_pm (the QSSA approximation to v^2 = (v+ - v-)^2), the error e_P = P_net - v^2 evolves as de_P/dt = -k_fast * e_P + O(slow), where "slow" refers to contributions from dv^2/dt. The Lyapunov function V = e_P^2/2 yields dV/dt = -k_fast * e_P^2 + O(e_P * slow), which is negative definite for k_fast much larger than the system's characteristic frequencies. This contrasts sharply with Route A, where the transverse error growth rate is positive (+0.73). The sign difference in the linear error coefficient -- negative for QSSA, positive for quadratization -- is the fundamental mechanism underlying all observed stability differences.
 
 The QSSA advantage is robust across FHN parameter regimes (k_fast = 1000, k_ann = 100):
 
@@ -168,7 +168,7 @@ Route B preserves oscillation across all tested molecular counts, with period co
 
 The Gillespie results provide the third independent line of evidence for QSSA superiority:
 
-1. **Analytical**: The transverse Floquet exponent is +0.73 for Route A (unstable) vs negative for Route B (Section 3.3), verified by SymPy symbolic computation.
+1. **Analytical**: The transverse error equation was verified symbolically (SymPy); the Floquet exponent +0.73 was computed by numerical integration of (2 - 2v(t)^2/3) over the FHN limit cycle (Section 3.3). Route B has negative error coefficient.
 2. **Deterministic**: Route A divergence is independent of solver precision (abstol 1e-10 to 1e-14 produce identical instability), confirming qualitatively identical instability (divergence at both precision levels), indicating a structural rather than numerical origin (Section 3.2).
 3. **Stochastic**: Route A fails to oscillate at all tested molecular counts (N = 100, 1000, 10000), while Route B preserves oscillation with period convergence toward the deterministic reference (this section).
 
@@ -205,17 +205,17 @@ Our comparison shows that implementation choice is not a neutral step in ODE-to-
 
 ## 5. Conclusion
 
-We present, to our knowledge, the first systematic mapping of the FitzHugh-Nagumo neuron model to bimolecular chemical reaction networks via the ODE-to-CRN compilation pipeline and demonstrate that feedback structure in intermediate species critically determines implementation stability. QSSA-based negative feedback intermediates outperform quadratization-based positive feedback by 1777x in trajectory fidelity (v_RMSE) and 6800x in algebraic invariant preservation (a distinct internal consistency metric). The instability is not specific to FHN: it generalizes to oscillators whose v^3 terms are reduced via the standard q=v^2 quadratization (e.g., van der Pol), while cross-product nonlinearities (e.g., Brusselator) remain stable, confirming that the feedback sign, not the specific model, is the determining factor. This finding is validated across analytical (Floquet), deterministic (solver-independent), and stochastic (Gillespie SSA) regimes. These results establish a design guideline for molecular implementations of biological oscillators and take a step toward DNA-based neural circuits with biologically faithful spiking dynamics.
+We present, to our knowledge, the first systematic mapping of the FitzHugh-Nagumo neuron model to at-most-bimolecular chemical reaction networks via the ODE-to-CRN compilation pipeline and demonstrate that feedback structure in intermediate species critically determines implementation stability. QSSA-based negative feedback intermediates outperform quadratization-based positive feedback by 1776x in trajectory fidelity (v_RMSE) and 6800x in algebraic invariant preservation (a distinct internal consistency metric). The instability is not specific to FHN: it generalizes to oscillators whose v^3 terms are reduced via the standard q=v^2 quadratization (e.g., van der Pol), while cross-product nonlinearities (e.g., Brusselator) remain stable, confirming that the feedback sign, not the specific model, is the determining factor. This finding is validated across analytical (Floquet), deterministic (solver-independent), and stochastic (Gillespie SSA) regimes. These results establish a design guideline for molecular implementations of biological oscillators and take a step toward DNA-based neural circuits with biologically faithful spiking dynamics.
 
 ## References
 
 - Cherry, K. M. and Qian, L. (2018). Scaling up molecular pattern recognition with DNA-based winner-take-all neural networks. Nature, 559, 370-376.
-- Fages, F., Le Guludec, G., Bournez, O., and Pouly, A. (2017). Strong Turing Completeness of Continuous Chemical Reaction Networks. CMSB 2017, LNCS 10545.
+- Fages, F., Le Guludec, G., Bournez, O., and Pouly, A. (2017). Strong Turing Completeness of Continuous Chemical Reaction Networks and Compilation of Mixed Analog-Digital Programs. CMSB 2017, LNCS 10545.
 - Hemery, M., Fages, F., and Soliman, S. (2021). Compiling Elementary Mathematical Functions into Finite Chemical Reaction Networks via a Polynomialization Algorithm for ODEs. CMSB 2021, LNCS 12881.
 - Bychkov, A. and Pogudin, G. (2021). Optimal Monomial Quadratization for ODE Systems. IWOCA 2021.
 - Cai, Y. and Pogudin, G. (2024). Dissipative Quadratizations of Polynomial ODE Systems. TACAS 2024.
 - Xiong, X. et al. (2022). Molecular convolutional neural networks with DNA regulatory circuits. Nature Machine Intelligence, 4, 625-635.
-- Xiao, S. et al. (2025). DNA-based molecular neural network biocomputing circuits for solving PDEs. Advanced Science.
+- Xiao, S. et al. (2025). Programmable DNA-Based Molecular Neural Network Biocomputing Circuits for Solving Partial Differential Equations. Advanced Science.
 - Fenichel, N. (1979). Geometric singular perturbation theory for ordinary differential equations. Journal of Differential Equations, 31(1), 53-98.
 - Fil, J., Dalchau, N., and Chu, D. (2022). Programming Molecular Systems To Emulate a Learning Spiking Neuron. ACS Synthetic Biology, 11(6), 2055-2069.
 - FitzHugh, R. (1961). Impulses and physiological states in theoretical models of nerve membrane. Biophysical Journal, 1(6), 445-466.
