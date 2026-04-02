@@ -118,7 +118,7 @@ To determine whether the relay's benefit arises from ascending arousal input or 
 | Sham relay | 77.8% | +0.1pp | t=0.14, p=0.89 | 0.04 |
 | +ThalamicGate | 81.6% | +3.9pp | t=10.47, p<0.0001 | 3.31 |
 
-The sham relay produces no improvement over baseline (5/10 seeds positive, Wilcoxon p=1.00). Gate versus sham: t=4.65, p=0.0012, d=1.47, 9/10 seeds positive, Wilcoxon W=1.0, p=0.004. This dissociation supports the interpretation that the relay's benefit requires ascending arousal input and is not attributable to added capacity, extra excitation from relay neurons, or altered routing alone.
+The sham relay produces no improvement over baseline (5/10 seeds positive, Wilcoxon p=1.00). Relay versus sham: t=4.65, p=0.0012, d=1.47, 9/10 seeds positive, Wilcoxon W=1.0, p=0.004. This dissociation supports the interpretation that the relay's benefit requires ascending arousal input and is not attributable to added capacity, extra excitation from relay neurons, or altered routing alone.
 
 ### 3.5 Variance Comparison
 
@@ -158,8 +158,8 @@ König and Negrello (2026, preprint) proposed that thalamic and subcortical driv
 
 - 10 seeds with fixed stimulus order; the two-phase pattern could partly reflect sequence structure rather than architecture. Stimulus randomization across seeds is needed. This is the most important interpretive limitation.
 - Onset detection parameters (window=50, threshold=75%) were selected post-hoc to maximize onset-accuracy correlation. Confirmatory replication with pre-registered parameters is needed.
-- Sham relay control (Section 3.4) rules out added capacity and extra excitation, but additional controls remain: ascending-input weight sweep, direct-path-only (gate replaces rather than augments).
-- Gate neuron spike analysis not yet performed (planned).
+- Sham relay control (Section 3.4) rules out added capacity and extra excitation, but additional controls remain: ascending-input weight sweep, direct-path-only (relay replaces rather than augments).
+- Relay neuron spike analysis not yet performed (planned).
 - Small circuit (hundreds of neurons); scaling effects unknown.
 - ThalamicGate weights (1) chosen heuristically; systematic weight sweep needed.
 - Ascending input strength fixed; parametric exploration (Phase 3a) planned.
