@@ -315,3 +315,13 @@ Following Hemery, Fages, Soliman (2021) pipeline with q = v^2 quadratization and
 
 Total: 28 reactions. 6 chemical species + 1 external supply.
 Note: R17 and R23 (q+ -> 2q+, q- -> 2q-) are the self-catalytic reactions responsible for the exponential error amplification documented in Section 3.1.
+
+## Appendix C: Generality Analysis (van der Pol and Brusselator)
+
+### Van der Pol oscillator
+
+The van der Pol oscillator: dv/dt = mu*(v - v^3/3 - w), dw/dt = v/mu. Quadratizing with q = v^2: the v equation becomes dv/dt = mu*(v - qv/3 - w). The error e = q - v^2 evolves as de/dt = 2mu*(1 - v^2/3)*e - 2mu*e^2/3. The linearized growth rate is 2mu*(1 - v^2/3), which is positive whenever |v| < sqrt(3), identical in structure to FHN (Section 3.3) with scaling factor mu. For mu=1, the period-averaged Floquet exponent is positive, confirming transverse instability of the q = v^2 manifold.
+
+### Brusselator
+
+The Brusselator: dx/dt = a - (b+1)*x + x^2*y, dy/dt = b*x - x^2*y. The nonlinear term x^2*y is a cross-product (not self-cubic). Quadratizing with q = x^2: dq/dt = 2x*dx/dt = 2x*[a - (b+1)*x + qy]. The error e = q - x^2 evolves as de/dt = 2*[(q*y - x^2*y)*x_terms]. Substituting q = x^2 + e and linearizing: de/dt = -2*(b+1)*e (exact to first order, with no higher-order e terms contributing at linear level). This is globally stable for all b > 0, because the cross-product structure x^2*y does not create self-referential feedback between the error and the tracked variable. The quadratization invariant manifold is linearly stable, in contrast to the self-cubic case.
