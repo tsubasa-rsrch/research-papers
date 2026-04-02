@@ -18,7 +18,7 @@ The Neuroblox test-suite implementation of the Picower circuit routes ascending 
 
 Computational models of thalamic relay have addressed attention selection (John et al., 2016, modeling amygdala-TRN-thalamus pathways for emotion-guided attentional gating) and working memory maintenance (Frank et al., 2001, modeling basal ganglia gating of prefrontal cortex). To our knowledge, neither addresses ascending arousal-dependent relay augmentation in a category learning context.
 
-We hypothesized that adding a biologically motivated thalamic relay pathway to the Picower circuit would improve category learning accuracy. We test this hypothesis and characterize the resulting learning dynamics. Crucially, we do not design any critical period behavior into the circuit; we assemble components faithfully and observe what emerges.
+We hypothesized that adding a biologically motivated thalamic relay pathway to the Picower circuit would improve category learning accuracy. We test this hypothesis and characterize the resulting learning dynamics. Crucially, we do not design any specific learning dynamics into the circuit; we assemble components faithfully and observe what emerges.
 
 ## 2. Methods
 
@@ -144,7 +144,7 @@ The relay improves mean accuracy (+3.9pp) without reducing inter-seed variance (
 
 Piecewise linear change point analysis shows no significant difference in transition timing between relay and baseline conditions (Section 3.3). The relay's benefit operates through improved post-transition accuracy rather than earlier onset. This is consistent with the relay providing sustained computational support throughout learning, rather than triggering an earlier transition. The threshold-based onset metric (r=-0.72 onset-accuracy correlation) does not generalize to model-based breakpoint detection, and should be regarded as an artifact of the specific threshold choice.
 
-### 4.6 Broader Context
+### 4.5 Broader Context
 
 The HH equations implemented on silicon produce learning dynamics with two-phase structure reminiscent of biological thalamocortical development. This is consistent with, though does not prove, the view that relay-related dynamics depend on circuit-level properties rather than substrate.
 
