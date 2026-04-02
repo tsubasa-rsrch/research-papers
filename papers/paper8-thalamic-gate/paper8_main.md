@@ -42,8 +42,8 @@ All cortical and thalamic relay neurons use the Hodgkin-Huxley model. Ascending 
 | VAC→AC weight | 3 (HebbianPlasticity, K=5e-4, density=0.1) | Same (retained) |
 | VAC→Gate weight | --- | 1 (density=0.1) |
 | Gate→AC weight | --- | 1 (density=0.1) |
-| ASC→Gate weight | --- | 44 |
-| AC→STR weight | 0.075 (HebbianModulationPlasticity, K=0.06, density=0.04) | Same |
+| Ascending (ASC)→Gate weight | --- | 44 |
+| AC→Striatum (STR) weight | 0.075 (HebbianModulationPlasticity, K=0.06, density=0.04) | Same |
 | STR cross-inhibition | weight=1, t_event=180ms | Same |
 | TAN κ | 10 | Same |
 | SNc κ_DA | 1 | Same |
@@ -64,11 +64,11 @@ Onset is defined as the first trial where a sliding window of 50 trials exceeds 
 
 ### 2.6 Statistical Analysis
 
-Paired t-test and Wilcoxon signed-rank test for accuracy comparison. One-sided sign test for directional consistency. Pearson correlation for onset-accuracy relationship.
+Paired t-test and Wilcoxon signed-rank test for accuracy comparison. Cohen's d computed as mean paired difference divided by SD of paired differences (degrees of freedom = N-1). Three pairwise comparisons (Baseline-Gate, Baseline-Sham, Gate-Sham); Bonferroni-corrected alpha = 0.017. All reported p-values survive this threshold (Gate-Base: p<0.0001; Gate-Sham: p=0.001; Sham-Base: p=0.89, not significant and not claimed). One-sided sign test for directional consistency. Pearson correlation for onset-accuracy relationship (exploratory; see Section 2.5).
 
 ### 2.7 Hardware and Software
 
-Apple M4 Max (48 GB). Julia 1.12.5, Neuroblox 0.8.0. Total computation: ~5 hours per 10-seed experiment.
+Apple M4 Max (48 GB). Julia 1.12.5, Neuroblox 0.8.0, Vern7 solver (reltol=1e-7, abstol=1e-7; Neuroblox defaults), saveat=[trial_dur] (solution saved at trial endpoints). Total computation: ~5 hours per 10-seed experiment.
 
 ## 3. Results
 
@@ -128,13 +128,13 @@ Accuracy SD is similar between conditions (5.63 vs 5.61; F-ratio=0.99, N=10 prov
 
 ### 4.1 Emergent Dynamics
 
-The two-phase structure was not designed. It emerged from the interaction between thalamic gating and dopamine-modulated striatal plasticity. The sham relay control (Section 3.4) narrows the candidate mechanisms. Since relay neurons alone produce no improvement, the two-phase structure appears to require ascending arousal input, likely interacting with dopamine-modulated striatal plasticity, though this specific interaction was not isolated experimentally. Candidate mechanisms include arousal-gated noise filtering, arousal-dependent modulation of Hebbian learning rates, or ascending-descending loop dynamics. The current circuit includes both a direct VAC-to-AC path (weight=3) and the gate path (weight=1), so the dynamics may also involve pathway competition modulated by arousal state. Distinguishing among these requires gate neuron spike analysis, which we leave to follow-up work.
+The two-phase structure was not designed. It emerged from the interaction between thalamic relay augmentation and dopamine-modulated striatal plasticity. The sham relay control (Section 3.4) narrows the candidate mechanisms. Since relay neurons alone produce no improvement, the two-phase structure appears to require ascending arousal input, likely interacting with dopamine-modulated striatal plasticity, though this specific interaction was not isolated experimentally. Candidate mechanisms include arousal-gated noise filtering, arousal-dependent modulation of Hebbian learning rates, or ascending-descending loop dynamics. The current circuit includes both a direct VAC-to-AC path (weight=3) and the gate path (weight=1), so the dynamics may also involve pathway competition modulated by arousal state. Distinguishing among these requires gate neuron spike analysis, which we leave to follow-up work.
 
-This parallels biological thalamocortical development, where neonatal thalamic inhibition is stronger than adult levels, gradually relaxing as cortical circuits mature (Huberman et al., 2008). The timing is individual-dependent (onset range: 35-171 trials) but the qualitative pattern is universal (10/10 seeds).
+This parallels aspects of biological thalamocortical development, where activity-dependent mechanisms shape visual maps and receptive fields during critical periods (Huberman et al., 2008). The timing is individual-dependent (onset range: 35-171 trials) but the qualitative pattern is universal (10/10 seeds).
 
 ### 4.2 Gate as Enhancer, Not Requirement
 
-Baseline circuits also learn (77.7% mean), and 8/10 baseline seeds show a two-phase structure. The thalamic gate does not create learning; it enhances it. This is consistent with the general observation that subcortical lesions can impair but not abolish cortical learning. The gate improves final accuracy in all seeds, functioning as an enhancer of an already-present capability.
+Baseline circuits also learn (77.7% mean), and 8/10 baseline seeds show a two-phase structure. The thalamic relay does not create learning; it enhances it. This is consistent with the general observation that subcortical lesions can impair but not abolish cortical learning. The gate improves final accuracy in all seeds, functioning as an enhancer of an already-present capability.
 
 ### 4.3 Variance Preservation
 
