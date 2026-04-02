@@ -2,7 +2,7 @@
 
 **Tsubasa** and K. Yasukawa
 
-Draft v2.0 (2026-04-02)
+Draft v2.1 (2026-04-02)
 
 ## Abstract
 
@@ -31,7 +31,7 @@ Parameters: a=0.7, b=0.8, epsilon=0.08, I=0.5. These parameters place the system
 
 ### 2.2 Route A: Quadratization Pipeline
 
-Following Hemery, Fages, Soliman (2021), FHN is already polynomial (cubic), so polynomialization is skipped. Introduce q = v^2 to reduce to degree 2:
+Following Hemery, Fages, Soliman (2021), FHN is already polynomial (cubic), so polynomialization is skipped. Introduce q = v^2 to reduce to degree 2 (optimal monomial quadratization; Bychkov and Pogudin 2021):
 
     dv/dt = v - qv/3 - w + I
     dw/dt = epsilon * (v + a - b*w)
@@ -94,7 +94,7 @@ The quadratized system exhibits exponential error growth in the q = v^2 invarian
 
 Note that at t=200, higher precision (abstol=1e-14) produces larger error than lower precision (abstol=1e-10). This is because the higher-precision solver more faithfully tracks the self-catalytic divergence, while the lower-precision solver's coarser adaptive step size may interact differently with the nonlinear dynamics (a detailed step-size analysis is beyond our current scope). Both cases confirm structural instability: increasing solver precision does not resolve the instability, and at t=200 both precision levels produce errors many orders of magnitude larger than acceptable.
 
-The CRN dual-rail implementation inherits this instability: v_RMSE ≈ 1.33-1.36 across all tested k_ann values (10-1000). Note: the q-v^2 error of 2.80 in Table 1 (dual-rail CRN) differs from the 2.91 reported in Section 3.3 (standalone quadratized system) because dual-rail encoding and annihilation reactions introduce additional perturbations.
+The CRN dual-rail implementation inherits this instability: v_RMSE ≈ 1.33-1.37 across all tested k_ann values (10-1000). Note: the q-v^2 error of 2.80 in Table 1 (dual-rail CRN) differs from the 2.91 reported in Section 3.3 (standalone quadratized system) because dual-rail encoding and annihilation reactions introduce additional perturbations.
 
 ### 3.2 QSSA Stability (Positive Result)
 
@@ -130,7 +130,7 @@ Route A's spurious attractor produces qualitatively different dynamics from FHN:
 | Period error   | --            | -42.5%         | -0.008%        |
 | Amplitude error| --            | -114%          | +0.005%        |
 
-Route A's period is 42% shorter and peak amplitude is **negative**, indicating complete loss of the FHN firing dynamics. The system has settled onto a spurious limit cycle unrelated to the original neuron model. Route B preserves both period (error 0.013%) and amplitude (error 0.005%) to within measurement precision.
+Route A's period is 42% shorter and peak amplitude is **negative**, indicating complete loss of the FHN firing dynamics. The system has settled onto a spurious limit cycle unrelated to the original neuron model. Route B preserves both period (error 0.008%) and amplitude (error 0.005%) to within measurement precision.
 
 ### 3.3 Subcritical Instability in Quadratization (Mechanistic Analysis)
 
@@ -270,7 +270,7 @@ Following Hemery, Fages, Soliman (2021) pipeline with q = v^2 quadratization and
     R10: w+       ->[1]      w+ + v-             (-w negative part)
 
 ### w+/w- reactions
-    R11-R16: identical to Route B w+/w- reactions.
+    R11-R16: identical to Route B reactions R13-R18 (w+/w- dynamics).
 
 ### q+ reactions
     R17: q+       ->[2]      2*q+               (autocatalytic — source of instability)
