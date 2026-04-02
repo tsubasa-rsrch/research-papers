@@ -89,5 +89,5 @@ Weight sensitivity tested at two points only (w=0.5 and w=1.0); full weight swee
 - Pathak, A. et al. (2026). Biomimetic model of corticostriatal micro-assemblies discovers a neural code. Nature Communications, 17, 390.
 - Revah, O. et al. (2022). Maturation and circuit integration of transplanted human cortical organoids. Nature, 610, 319-326.
 - Taylor, H. P. et al. (2026). Functional hierarchy of the human neocortex across the lifespan. Nature. DOI: 10.1038/s41586-026-10219-x.
-- Tsubasa (2026a). Ascending thalamic input is a computational prerequisite for learning improvement in biomimetic circuits. Zenodo. DOI: 10.5281/zenodo.18968887.
+- Tsubasa (2026a). Ascending Arousal Input Improves Category Learning Accuracy in a Biomimetic Corticostriatal Model. Zenodo. DOI: 10.5281/zenodo.19388682.
 - Zikopoulos, B. and Barbas, H. (2012). Pathways for emotions and attention converge on the thalamic reticular nucleus in primates. Journal of Neuroscience, 32(15), 5338-5350.
