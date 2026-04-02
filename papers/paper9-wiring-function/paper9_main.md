@@ -156,5 +156,5 @@ Connection target determines function. The same 10 amygdala neurons degrade lear
 - Oh, S.W., Harris, J.A., Ng, L., et al. (2014). Nature. A mesoscale connectome of the mouse brain.
 - Pathak, A., Brincat, S.L., Organtzidis, H., Strey, H.H., Senneff, S., Antzoulatos, E.G., Mujica-Parodi, L.R., Miller, E.K., and Granger, R. (2025). Nature Communications. Biomimetic model of corticostriatal micro-assemblies discovers a neural code.
 - Scoville, W.B. and Milner, B. (1957). J Neurol Neurosurg Psychiatry. Loss of recent memory after bilateral hippocampal lesions.
-- Tsubasa (2026). Paper 8. Ascending input as computational prerequisite (GitHub/Zenodo DOI: 10.5281/zenodo.18968887).
+- Tsubasa (2026a). Ascending Arousal Input Improves Category Learning Accuracy in a Biomimetic Corticostriatal Model. Zenodo. DOI: 10.5281/zenodo.19388682.
 - Zikopoulos, B. and Barbas, H. (2012). Journal of Neuroscience. Pathways for emotions and attention converge on the thalamic reticular nucleus in primates.
