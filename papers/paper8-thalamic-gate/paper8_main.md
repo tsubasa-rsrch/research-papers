@@ -52,7 +52,7 @@ All cortical and thalamic relay neurons use the Hodgkin-Huxley model. Ascending 
 
 ### 2.3 Sham Relay Control
 
-To isolate the effect of ascending arousal from relay neuron addition, we run a sham condition: identical parallel pathway (20 HHNeuronExci, same connectivity), but without ascending arousal input to the relay neurons. The sham relay receives only feedforward VAC input. All three conditions (baseline, sham, gate) use the same 10 seeds.
+To isolate the effect of ascending arousal from relay neuron addition, we run a sham condition: identical parallel pathway (20 HHNeuronExci, same connectivity), but without ascending arousal input to the relay neurons. The sham relay receives only feedforward VAC input. All three conditions (baseline, sham, relay) use the same 10 seeds.
 
 ### 2.4 Experimental Design
 
@@ -128,7 +128,7 @@ Accuracy SD is similar between conditions (5.63 vs 5.61; F-ratio=0.99, N=10 prov
 
 ### 4.1 Emergent Dynamics
 
-The two-phase structure was not designed. It emerged from the interaction between thalamic relay augmentation and dopamine-modulated striatal plasticity. The sham relay control (Section 3.4) narrows the candidate mechanisms. Since relay neurons alone produce no improvement, the two-phase structure appears to require ascending arousal input, likely interacting with dopamine-modulated striatal plasticity, though this specific interaction was not isolated experimentally. Candidate mechanisms include arousal-gated noise filtering, arousal-dependent modulation of Hebbian learning rates, or ascending-descending loop dynamics. The current circuit includes both a direct VAC-to-AC path (weight=3) and the relay path (weight=1), so the dynamics may also involve pathway competition modulated by arousal state. Distinguishing among these requires gate neuron spike analysis, which we leave to follow-up work.
+The two-phase structure was not designed. It emerged from the interaction between thalamic relay augmentation and dopamine-modulated striatal plasticity. The sham relay control (Section 3.4) narrows the candidate mechanisms. Since relay neurons alone produce no improvement, the two-phase structure appears to require ascending arousal input, likely interacting with dopamine-modulated striatal plasticity, though this specific interaction was not isolated experimentally. Candidate mechanisms include arousal-gated noise filtering, arousal-dependent modulation of Hebbian learning rates, or ascending-descending loop dynamics. The current circuit includes both a direct VAC-to-AC path (weight=3) and the relay path (weight=1), so the dynamics may also involve pathway competition modulated by arousal state. Distinguishing among these requires relay neuron spike analysis, which we leave to follow-up work.
 
 This parallels aspects of biological thalamocortical development, where activity-dependent mechanisms shape visual maps and receptive fields during critical periods (Huberman et al., 2008). The timing is individual-dependent (onset range: 35-171 trials) but the qualitative pattern is universal (10/10 seeds).
 
