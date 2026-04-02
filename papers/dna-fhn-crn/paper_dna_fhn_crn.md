@@ -164,7 +164,7 @@ To test whether the QSSA stability advantage persists in the stochastic regime r
 | 10000 | 10     | B     | 39.0       | 3      | Yes         |
 | 10000 | --     | A     | --         | 0      | No          |
 
-Route B preserves oscillation across all tested molecular counts, with period converging toward the deterministic FHN value (39.5s) as N increases (37.6 -> 39.3 -> 39.0 s, measured over 3 complete cycles each). Route A fails to oscillate at any molecular count, confirming that the quadratization instability (Section 3.3) persists and is amplified in the stochastic regime. The k_fast/N scaling maintains QSSA tracking while keeping computational cost tractable.
+Route B preserves oscillation across all tested molecular counts, with period converging toward the deterministic FHN value (39.5s) as N increases (37.6 -> 39.3 -> 39.0 s, measured over 3 complete cycles each). Cycle-to-cycle variability at N=100 (highest stochastic noise) was SD = 2.93 s (individual periods: 39.8, 34.3, 38.8 s), consistent with O(1/sqrt(N)) stochastic fluctuations. Route A fails to oscillate at any molecular count, confirming that the quadratization instability (Section 3.3) persists and is amplified in the stochastic regime. The k_fast/N scaling maintains QSSA tracking while keeping computational cost tractable.
 
 The Gillespie results provide the third independent line of evidence for QSSA superiority:
 
