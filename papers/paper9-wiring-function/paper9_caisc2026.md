@@ -2,7 +2,7 @@
 
 **Tsubasa** (AI, first author) and **K. Yasukawa** (corresponding author)
 
-*CAISC 2026 submission draft v10.2 -- 2026-04-02*
+*CAISC 2026 submission draft v10.3 -- 2026-04-02*
 
 ## Abstract
 
@@ -18,13 +18,15 @@ Prior computational work provides context: John et al. (2016) modeled how amygda
 
 ## Methods
 
-**Base circuit.** Picower corticostriatal circuit (Neuroblox.jl; Pathak et al., 2026): VAC (4 WTA (winner-take-all) groups, 20 HHNeuronExci + 4 HHNeuronInh), AC (2 WTA, 10 exci + 2 inh), ThalamicGate (20 HHNeuronExci), ascending input (NextGenerationEI), 2 Striatum (5 HHNeuronInh each), 2 TAN, SNc, GreedyPolicy. Two-category visual classification, 700 trials, seeds 42-71, Vern7 solver (reltol=1e-7, abstol=1e-7; Neuroblox.jl defaults), saveat=[trial_dur].
+**Base circuit.** Picower corticostriatal circuit (Neuroblox.jl; Pathak et al., 2026): VAC (visual association cortex; 4 WTA (winner-take-all) groups, 20 HHNeuronExci + 4 HHNeuronInh), AC (association cortex; 2 WTA, 10 exci + 2 inh), ThalamicGate (20 HHNeuronExci), ascending input (NextGenerationEI, a neural mass model), 2 Striatum (5 HHNeuronInh each), 2 TAN (tonically active neurons), SNc (substantia nigra pars compacta, dopaminergic modulator), GreedyPolicy (action selection). Two-category visual classification, 700 trials, seeds 42-71, Vern7 solver (reltol=1e-7, abstol=1e-7; Neuroblox.jl defaults), saveat=[trial_dur].
 
 **Added neurons.** 10 HHNeuronExci (E_syn=0.0, G_syn=3.0, tau=5.0, no internal connections). Labeled "AMY" or "Generic" depending on condition; biophysical parameters are identical.
 
 **Conditions (11 total).** Phase 1: (1) Gate-only baseline. (2) +Hippocampus (static DG-CA3-CA1 with fixed weights and no synaptic plasticity, 15 HHNeuronExci; exploratory). (3) +AMY to AC+Gate (w=1.0 to both). (4) +AMY to AC only (w=1.0; sham). (5) +AMY to Gate only (w=0.5). (6) AMY-Gate with save_everystep (solver robustness replication). (7) Excitatory overdrive (10 matched HHNeuronExci, no routing; sham control). Phase 2 (weight and identity controls): (8) AMY to Gate (w=1.0). (9) AMY to AC (w=0.5). (10) Generic relay to Gate (w=0.5). (11) Generic relay to AC (w=1.0).
 
-**Statistics.** All comparisons are paired t-tests (two-tailed) against the gate-only baseline using the same 30 seeds. Cohen's d computed as mean paired difference divided by SD of paired differences (ddof=1). Bonferroni correction for 6 confirmatory comparisons yields alpha=0.0083; all confirmatory p-values are below 10^-8, so all remain significant. Exploratory and control comparisons are reported without correction.
+**Statistics.** Primary comparisons are paired t-tests (two-tailed) against the gate-only baseline using the same 30 seeds. Post-hoc pairwise comparisons between non-baseline conditions are noted where relevant. Cohen's d computed as mean paired difference divided by SD of paired differences (ddof=1). Bonferroni correction for 6 confirmatory comparisons yields alpha=0.0083; all confirmatory p-values are below 10^-8, so all remain significant. Exploratory and control comparisons are reported without correction. For weight equivalence, we use the TOST (Two One-Sided Tests) procedure with equivalence margin delta=3pp (25% of the primary gate effect of +12.3pp).
+
+**Spike analysis.** Single-neuron spiking in AC excitatory neurons (10 neurons: 2 WTA x 5 each) was analyzed for seeds 42 and 43. Spike detection: upward threshold crossing at V > -20 mV. Conditions include gate (w=0.5), AC (w=0.5, below cliff), and AC (w=0.75, above cliff), chosen to characterize the weight-sensitivity transition region.
 
 ## Results
 
@@ -46,13 +48,13 @@ Prior computational work provides context: John et al. (2016) modeled how amygda
 
 **Connection target determines function.** The same 10 neurons produce d=+3.27 or d=-3.26 depending solely on connection target. Gate routing improves learning (88.3%); cortex routing destroys it (49.8%). When both targets receive input simultaneously (Condition 3), the result (49.6%) is statistically indistinguishable from cortex-only (49.8%; t=-0.65, p=0.518), indicating that cortex disruption fully negates gate benefit rather than merely dominating it.
 
-**Weight sensitivity is asymmetric.** Gate connections are weight-insensitive: w=0.5 (88.3%) and w=1.0 (88.7%) are statistically indistinguishable (t=1.17, p=0.253, d=+0.21). Cortex connections are weight-sensitive: w=1.0 destroys learning (49.8%), while w=0.5 renders the connection harmless (74.3%, t=-1.51, p=0.143 vs baseline). The direct comparison between cortex w=1.0 and w=0.5 is significant (t=12.68, p<10^-13, d=+2.32). Partial grid data (N=5 seeds) at w=0.75 confirms the cliff location: accuracy drops from 74.3% at w=0.5 to 52.9% at w=0.75 (SD=1.5), with only a further 3.1pp decrease to 49.8% at w=1.0. This asymmetry suggests qualitatively different circuit mechanisms: the gate, already driven by ascending arousal input, operates as a digital switch where signal presence matters more than magnitude; the cortex circuit operates as an analog system where input magnitude directly determines interference with WTA competition.
+**Weight sensitivity is asymmetric.** Gate connections show formal equivalence: w=0.5 (88.3%) and w=1.0 (88.7%) are not significantly different (t=1.17, p=0.253, d=+0.21) and are formally equivalent (TOST: delta=3pp, p<10^-8; 90% CI [-0.19, +0.99]pp). Cortex connections are weight-sensitive: w=1.0 destroys learning (49.8%), while w=0.5 renders the connection harmless (74.3%, t=-1.51, p=0.143 vs baseline). The direct comparison between cortex w=1.0 and w=0.5 is significant (t=12.68, p<10^-13, d=+2.32). Partial grid data (N=5 seeds) at w=0.75 confirms the cliff location: accuracy drops from 74.3% at w=0.5 to 52.9% at w=0.75 (SD=1.5), with only a further 3.1pp decrease to 49.8% at w=1.0. This asymmetry suggests qualitatively different circuit mechanisms: the gate, already driven by ascending arousal input, operates as a digital switch where signal presence matters more than magnitude; the cortex circuit operates as an analog system where input magnitude directly determines interference with WTA competition.
 
-**Component identity is irrelevant.** Replacing AMY neurons with Generic neurons of identical biophysical parameters produces exactly the same results: Gate 88.3%=88.3%, AC 49.8%=49.8% (paired differences are zero across all 30 seeds). This confirms that, under these experimental conditions, neuron identity does not contribute to the outcome; connection topology is the primary determinant.
+**Component identity is irrelevant.** Replacing AMY neurons with Generic neurons of identical biophysical parameters produces exactly the same results: Gate 88.3%=88.3%, AC 49.8%=49.8% (paired differences are zero across all 30 seeds). This confirms that the software implementation contains no label-dependent behavior, and that under these experimental conditions (identical biophysical parameters), connection topology is the sole determinant of outcome.
 
-**Hippocampal addition.** The static hippocampal circuit showed a nominally significant effect (t=3.00, p=0.006, d=+0.55), but this is exploratory, does not survive Bonferroni correction, and is condition-sensitive (p=0.98 under save_everystep; see Limitations).
+**Hippocampal addition.** The static hippocampal circuit showed a nominally significant effect (t=3.00, p=0.006, d=+0.55), but this is exploratory (not included among the six confirmatory comparisons) and is condition-sensitive (p=0.98 under save_everystep; see Limitations).
 
-**Controls.** The excitatory overdrive sham (76.9%, p=0.14) confirms that adding matched excitatory neurons without specific routing has no effect, ruling out generic excitatory drive. The save_everystep replication (86.6%, d=+1.83, 29/30 wins) confirms that the direction and consistency of the gate improvement are robust to solver settings. The reduced effect size (d=+1.83 vs +3.27) reflects that save_everystep evaluates all intermediate adaptive time steps rather than only the trial-endpoint state captured by saveat=[trial_dur], introducing solver-internal variability into the accuracy measurement. The improvement direction (29/30 wins) is preserved.
+**Controls.** The excitatory overdrive sham (76.9%, p=0.14) confirms that adding matched excitatory neurons without specific routing has no effect, ruling out generic excitatory drive. The save_everystep replication (86.6%, d=+1.83, 29/30 wins) confirms robustness of the improvement direction across solver configurations. The reduced effect size (d=+1.83 vs +3.27) may reflect minor differences in solver interpolation under save_everystep, which alters the density of stored solution points but does not change the GreedyPolicy evaluation protocol (which reads the solution at a fixed t_decision via interpolation). The improvement direction (29/30 wins) is preserved.
 
 **Spike-level analysis: relay as computational buffer.** To understand why gate routing improves and cortex routing destroys performance, we analyzed single-neuron spiking activity in the AC excitatory population (10 neurons: 2 WTA groups x 5 each) across 700 trials in two independent seeds (42 and 43). Spike detection used upward threshold crossings at V > -20 mV. Three indicators reveal the mechanistic basis of the topology effect:
 
@@ -69,7 +71,7 @@ Prior computational work provides context: John et al. (2016) modeled how amygda
 | AC (w=0.75)  | 42   | 1.47       | 3.018   | 1/700         |
 | AC (w=0.75)  | 43   | 1.67       | 2.942   | 1/700         |
 
-Across both seeds, relay routing exhibits three consistent patterns: (1) **Signal delivery**: Gate routing reduces silent trials from 13-18% to <1% (93-123 to 1-2 out of 700), ensuring cortical activation on every trial. (2) **Selective amplification**: Gate routing increases the winner dominance ratio from baseline (1.60, 1.74) to (3.21, 2.55), strengthening WTA competition. (3) **Competition maintenance**: Direct cortex routing at w=0.75 drives population entropy near maximum (3.02, 2.94 bits; theoretical maximum 3.32 for 10 neurons), destroying WTA selectivity. Gate routing maintains lower entropy (1.38, 1.53 bits), preserving competitive dynamics.
+Across both seeds, relay routing exhibits three consistent patterns: (1) **Signal delivery**: Gate routing reduces silent trials from 13-18% to <1% (93-123 to 1-2 out of 700), ensuring cortical activation on >99% of trials. (2) **Selective amplification**: Gate routing increases the winner dominance ratio from baseline (1.60, 1.74) to (3.21, 2.55), strengthening WTA competition. (3) **Competition maintenance**: Direct cortex routing at w=0.75 drives population entropy near maximum (3.02, 2.94 bits; theoretical maximum 3.32 for 10 neurons), destroying WTA selectivity. Gate routing maintains lower entropy (1.38, 1.53 bits), preserving competitive dynamics.
 
 These results suggest that, in this circuit, the thalamic gate functions as a computational buffer that ensures signal delivery, amplifies winning representations, and protects cortical competition from input-driven disruption.
 
@@ -89,7 +91,7 @@ Weight sensitivity tested at two points only (w=0.5 and w=1.0); full weight swee
 
 - Aizenberg, M. et al. (2019). Projection from the Amygdala to the Thalamic Reticular Nucleus Amplifies Cortical Sound Responses. Cell Reports, 28(3), 605-615.e4.
 - John, Y. J. et al. (2016). The Emotional Gatekeeper: A Computational Model of Attentional Selection and Suppression through the Pathway from the Amygdala to the Inhibitory Thalamic Reticular Nucleus. PLOS Computational Biology, 12(2), e1004722.
-- O'Leary, D. D. M. and Stanfield, B. B. (1989). Selective elimination of axons extended by developing cortical neurons is dependent on regional locale. Journal of Neuroscience, 9(7), 2230-2246.
+- O'Leary, D. D. M. and Stanfield, B. B. (1989). Selective elimination of axons extended by developing cortical neurons is dependent on regional locale: experiments utilizing fetal cortical transplants. Journal of Neuroscience, 9(7), 2230-2246.
 - Pathak, A. et al. (2026). Biomimetic model of corticostriatal micro-assemblies discovers a neural code. Nature Communications, 17, 390.
 - Revah, O. et al. (2022). Maturation and circuit integration of transplanted human cortical organoids. Nature, 610, 319-326.
 - Taylor, H. P. et al. (2026). Functional hierarchy of the human neocortex across the lifespan. Nature. DOI: 10.1038/s41586-026-10219-x.
