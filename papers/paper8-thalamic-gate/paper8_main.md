@@ -8,7 +8,7 @@
 
 ## Abstract
 
-We add a thalamus-inspired parallel relay pathway to the Picower corticostriatal category learning circuit (Pathak et al., 2026) implemented in Neuroblox v0.8.0. The relay consists of 20 Hodgkin-Huxley excitatory neurons (HHNeuronExci) organized as a composite blox between visual cortex and association cortex, with ascending arousal input. In 10-seed experiments (700 trials each, seeds 42-51), the relay-augmented circuit achieves 81.6% mean accuracy versus 77.7% baseline (+3.9 percentage points; paired t-test t=10.47, p<0.0001, Cohen's d=3.31; Wilcoxon W=0.0, p=0.002; relay wins 10/10 seeds). Both conditions exhibit two-phase learning (initial low performance followed by improvement); piecewise linear change point analysis shows no significant difference in transition timing (relay: trial 301 SD=100, baseline: trial 270 SD=174). The relay's benefit is attributable to improved post-transition accuracy rather than earlier transition onset. A sham relay control (same 20 HHNeuronExci neurons, no ascending input) produces no improvement over baseline (Sham-Base: +0.1pp, p=0.89, d=0.04), while the full relay significantly outperforms sham (Relay-Sham: +3.8pp, p=0.001, d=1.47, 9/10 seeds). This dissociation supports the interpretation that ascending arousal input, not added relay capacity, accounts for the improvement in this comparison. These findings suggest that ascending arousal input to a thalamus-inspired parallel relay pathway improves category learning accuracy in a biomimetic corticostriatal model, with an associated two-phase learning profile observed descriptively.
+We add a thalamus-inspired parallel relay pathway to the Picower corticostriatal category learning circuit (Pathak et al., 2026) implemented in Neuroblox v0.8.0. The relay consists of 20 Hodgkin-Huxley excitatory neurons (HHNeuronExci) organized as a composite blox between visual cortex and association cortex, with ascending arousal input. In 10-seed experiments (700 trials each, seeds 42-51), the relay-augmented circuit achieves 81.6% mean accuracy versus 77.7% baseline (+3.9 percentage points; paired t-test t=10.47, p<0.0001, Cohen's d=3.31; Wilcoxon W=0.0, p=0.002; relay wins 10/10 seeds). Both conditions exhibit two-phase learning (initial low performance followed by improvement); piecewise linear change point analysis shows no significant difference in transition timing (relay: trial 301 SD=100, baseline: trial 270 SD=174). The relay's benefit is attributable to improved post-transition accuracy rather than earlier transition onset. A sham relay control (same 20 HHNeuronExci neurons, no ascending input) produces no improvement over baseline (Sham-Base: +0.1pp, p=0.89, d=0.04). A direct ascending control (equivalent ASC input to AC without relay neurons, weight=88) reduces accuracy below baseline (DirectASC-Base: -7.8pp, p<0.0001, d=-2.56, 0/10 seeds improved). The full relay significantly outperforms both sham (Relay-Sham: +3.8pp, p=0.001, d=1.47) and direct ascending (Relay-DirectASC: -11.6pp, p<0.000001, d=-4.44). This three-way dissociation indicates that the relay pathway performs signal transformation, not merely signal delivery, that is necessary for the improvement. These findings suggest that ascending arousal input to a thalamus-inspired parallel relay pathway improves category learning accuracy in a biomimetic corticostriatal model, with an associated two-phase learning profile observed descriptively.
 
 ## 1. Introduction
 
@@ -64,7 +64,7 @@ Onset is defined as the first trial where a sliding window of 50 trials exceeds 
 
 ### 2.6 Statistical Analysis
 
-Paired t-test and Wilcoxon signed-rank test for accuracy comparison. Cohen's d computed as mean paired difference divided by SD of paired differences (degrees of freedom = N-1). Three pairwise comparisons (Baseline-Relay, Baseline-Sham, Relay-Sham); Bonferroni-corrected alpha = 0.017. All reported p-values survive this threshold (Relay-Base: p<0.0001; Relay-Sham: p=0.001; Sham-Base: p=0.89, not significant and not claimed). One-sided sign test for directional consistency (pre-specified hypothesis: relay improves accuracy). Wilcoxon W is the smaller of the positive and negative rank sums. Pearson correlation for onset-accuracy relationship (exploratory; see Section 2.5).
+Paired t-test and Wilcoxon signed-rank test for accuracy comparison. Cohen's d computed as mean paired difference divided by SD of paired differences (degrees of freedom = N-1). Five pairwise comparisons (Baseline-Relay, Baseline-Sham, Relay-Sham, Baseline-DirectASC, Relay-DirectASC); Bonferroni-corrected alpha = 0.01. All significant p-values survive this threshold (Relay-Base: p<0.0001; Relay-Sham: p=0.001; DirectASC-Base: p<0.0001; Relay-DirectASC: p<0.000001; Sham-Base: p=0.89, not significant and not claimed). One-sided sign test for directional consistency (pre-specified hypothesis: relay improves accuracy). Wilcoxon W is the smaller of the positive and negative rank sums. Pearson correlation for onset-accuracy relationship (exploratory; see Section 2.5).
 
 ### 2.7 Hardware and Software
 
@@ -120,7 +120,17 @@ To determine whether the relay's benefit arises from ascending arousal input or 
 
 The sham relay produces no improvement over baseline (5/10 seeds positive, Wilcoxon p=1.00). Relay versus sham: t=4.65, p=0.0012, d=1.47, 9/10 seeds positive, Wilcoxon W=1.0, p=0.004. This dissociation supports the interpretation that the relay's benefit requires ascending arousal input and is not attributable to added capacity, extra excitation from relay neurons, or altered routing alone.
 
-### 3.5 Variance Comparison
+### 3.5 Direct Ascending Control
+
+To determine whether the relay's benefit arises from ascending arousal input per se or from relay-mediated signal transformation, we added equivalent ascending input directly to AC (ASC→AC weight=88, matching the combined baseline ASC→AC weight of 44 plus the relay pathway's ASC→Gate weight of 44) without relay neurons.
+
+| Condition | Mean Acc (SD) | vs Baseline | Cohen's d | Wins |
+|-----------|---------------|-------------|-----------|------|
+| Direct ASC | 69.9% (6.0) | -7.8pp | -2.56 | 0/10 |
+
+Direct ascending input reduced accuracy below baseline in all 10 seeds (paired t=-8.08, p<0.0001, d=-2.56). This indicates that unmediated ascending drive disrupts rather than improves learning, consistent with cortical overexcitation disrupting WTA competition. The three-way dissociation (sham: no effect; direct ASC: harmful; relay+ASC: beneficial) supports the interpretation that the relay pathway performs signal transformation, not merely signal delivery, that is necessary for the improvement.
+
+### 3.6 Variance Comparison
 
 Accuracy SD is similar between conditions (5.63 vs 5.61; F-ratio=0.99, N=10 provides limited power for variance comparisons), indicating that the relay improves mean performance without substantially altering inter-seed variability.
 
@@ -154,7 +164,7 @@ König and Negrello (2026, preprint) proposed that thalamic and subcortical driv
 
 - 10 seeds with fixed stimulus order; the two-phase pattern could partly reflect sequence structure rather than architecture. Stimulus randomization across seeds is needed. This is the most important interpretive limitation.
 - Onset detection parameters (window=50, threshold=75%) were selected post-hoc to maximize onset-accuracy correlation. Confirmatory replication with pre-registered parameters is needed.
-- Sham relay control (Section 3.4) rules out added capacity and extra excitation, but additional controls remain: ascending-input weight sweep, direct-path-only (relay replaces rather than augments), and direct ASC→AC condition (ascending input without relay pathway) to distinguish relay-mediated from direct modulatory effects.
+- Sham relay control (Section 3.4) rules out added capacity and extra excitation, but additional controls remain: ascending-input weight sweep, direct-path-only (relay replaces rather than augments), and direct-path-only (relay replaces rather than augments). The direct ASC→AC condition (Section 3.5) addresses the relay-mediated vs direct modulatory distinction; the direct ASC weight (88) may overestimate the effective relay-to-AC drive, and lower-weight direct ASC conditions would further refine this comparison.
 - Relay neuron spike analysis not yet performed (planned).
 - Change point analysis (Section 3.3) indicates onset timing is not accelerated by the relay; the mechanism operates through post-transition improvement.
 - Small circuit (hundreds of neurons); scaling effects unknown.
