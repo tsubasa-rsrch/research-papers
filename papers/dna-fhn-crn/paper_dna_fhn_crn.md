@@ -2,11 +2,11 @@
 
 **Tsubasa** and K. Yasukawa
 
-Draft v2.8 (2026-04-02)
+Draft v2.9 (2026-04-02)
 
 ## Abstract
 
-Chemical reaction networks (CRNs) can implement arbitrary ordinary differential equations through established compilation pipelines. However, not all mathematically equivalent CRN implementations are equally suitable for physical realization. We present, to our knowledge, the first systematic mapping of the FitzHugh-Nagumo (FHN) neuron model to bimolecular CRNs via the ODE-to-CRN compilation pipeline and demonstrate that the choice of intermediate variable strategy critically determines numerical stability. The standard quadratization pipeline (Hemery, Fages, Soliman 2021), while theoretically correct, introduces self-catalytic terms that amplify numerical errors exponentially in oscillatory systems (error growth from 1e-10 at t=10 to 4310 at t=200, regardless of solver precision). In contrast, a quasi-steady-state approximation (QSSA) intermediate species approach achieves up to 1777x lower trajectory error (v_RMSE vs FHN reference, at k_fast = 5000), because negative feedback in the QSSA formulation actively suppresses perturbations. The QSSA route also maintains 6800x better preservation of the v^2 algebraic constraint (a distinct metric measuring internal consistency rather than trajectory fidelity). The instability mechanism generalizes beyond FHN: the same self-cubic structure causes quadratization instability in the van der Pol oscillator, while cross-product nonlinearities (as in the Brusselator) remain stable under quadratization. This finding establishes a design guideline for molecular implementations of neural dynamics: negative feedback intermediates should be preferred over positive feedback (self-catalytic) intermediates when implementing oscillatory neuron models with self-cubic nonlinearities as CRNs.
+Chemical reaction networks (CRNs) can implement arbitrary ordinary differential equations through established compilation pipelines. However, not all mathematically equivalent CRN implementations are equally suitable for physical realization. We present, to our knowledge, the first systematic mapping of the FitzHugh-Nagumo (FHN) neuron model to at-most-bimolecular CRNs via the ODE-to-CRN compilation pipeline and demonstrate that the choice of intermediate variable strategy critically determines numerical stability. The standard quadratization pipeline (Hemery, Fages, Soliman 2021), while theoretically correct, introduces self-catalytic terms that amplify numerical errors exponentially in oscillatory systems (error growth from 1e-10 at t=10 to 4310 at t=200, regardless of solver precision). In contrast, a quasi-steady-state approximation (QSSA) intermediate species approach achieves up to 1776x lower trajectory error (v_RMSE vs FHN reference, at k_fast = 5000), because negative feedback in the QSSA formulation actively suppresses perturbations. The QSSA route also maintains 6800x better preservation of the v^2 algebraic constraint (a distinct metric measuring internal consistency rather than trajectory fidelity). The instability mechanism generalizes beyond FHN: the same self-cubic structure causes quadratization instability in the van der Pol oscillator, while cross-product nonlinearities (as in the Brusselator) remain stable under quadratization. This finding establishes a design guideline for molecular implementations of neural dynamics: negative feedback intermediates should be preferred over positive feedback (self-catalytic) intermediates when implementing oscillatory neuron models with self-cubic nonlinearities as CRNs.
 
 ## 1. Introduction
 
@@ -104,10 +104,10 @@ The QSSA route shows bounded error and monotonic improvement with k_fast (k_ann 
 |--------|----------|----------|---------------------|
 | 10     | 0.370    | 4.6e-02  | 3.6x               |
 | 100    | 0.037    | 4.1e-03  | 36x                 |
-| 1000   | 0.004    | 4.1e-04  | 356x                |
-| 5000   | 0.000749 | 8.2e-05  | 1777x*              |
+| 1000   | 0.004    | 4.1e-04  | 333x                |
+| 5000   | 0.000749 | 8.2e-05  | 1776x               |
 
-At k_fast = 1000, P_err = 4.1e-04 vs q_err = 2.80 (6800x difference). Dual-rail drift (mean of min(v+, v-)) decreases monotonically from 0.15 (k_ann=10) to 0.001 (k_ann=1000), confirming effective annihilation. The QSSA formulation actively suppresses perturbations. (*Improvement computed vs Route A v_RMSE ≈ 1.33 at k_ann=100.)
+All improvement factors computed vs Route A v_RMSE = 1.33 at k_ann=100. At k_fast = 1000, P_err = 4.1e-04 vs q_err = 2.80 (6800x difference). Dual-rail drift (mean of min(v+, v-)) decreases monotonically from 0.15 (k_ann=10) to 0.001 (k_ann=1000), confirming effective annihilation. The QSSA formulation actively suppresses perturbations.
 
 The stability of Route B can be understood via Lyapunov analysis. For the QSSA error e_P = P - v^2, the dynamics are dominated by de_P/dt = -k_fast * e_P + O(slow), where "slow" refers to contributions from dv^2/dt. The Lyapunov function V = e_P^2/2 yields dV/dt = -k_fast * e_P^2 + O(e_P * slow), which is negative definite for k_fast much larger than the system's characteristic frequencies. This contrasts sharply with Route A, where the transverse error growth rate is positive (+0.73). The sign difference in the linear error coefficient -- negative for QSSA, positive for quadratization -- is the fundamental mechanism underlying all observed stability differences.
 
@@ -138,7 +138,7 @@ Route A's period is 42% shorter and peak amplitude is **negative**, indicating c
 
 Recall that in the quadratized system, the v equation reads dv/dt = v - qv/3 - w + I (Section 2.2), where q replaces v^2. The error e = q - v^2 then evolves according to de/dt = (2 - 2v^2/3)*e - 2e^2/3. Crucially, this derivation uses the quadratized dv/dt (with q, not v^2); the distinction matters because q deviates from v^2 when e != 0. The linearized growth rate is (2 - 2v^2/3), which is positive whenever v^2 < 3. Along the FHN limit cycle (v in [-1.9, +1.85]), this condition holds for 79% of each oscillation period. The same instability condition (v^2 < 3) applies identically to the van der Pol oscillator (linear coefficient 2μ(1 - v^2/3)), confirming that this is a general property of quadratized cubic systems, not specific to FHN, yielding a **positive period-averaged transverse Floquet exponent** λ = (1/T) ∫₀ᵀ (2 - 2v(t)²/3) dt = **+0.73**.
 
-Thus the invariant manifold q = v^2 is **linearly unstable**: any perturbation grows exponentially at rate ~0.73 per period. This explains all numerical observations: every initial perturbation magnitude (e(0) = 1e-10 to 1.0) diverges and converges to a common final error of 2.91 by t=200, which persists unchanged to t=500. The quadratized system possesses a spurious attractor distinct from the FHN limit cycle, visible as the inward spiral in Figure 1 (Route A, red dashed).
+Thus the invariant manifold q = v^2 is **linearly unstable**: any perturbation grows exponentially at average rate lambda = +0.73 per unit (dimensionless) time. This explains all numerical observations: every initial perturbation magnitude (e(0) = 1e-10 to 1.0) diverges and converges to a common final error of 2.91 by t=200, which persists unchanged to t=500. The quadratized system possesses a spurious attractor distinct from the FHN limit cycle, visible as the inward spiral in Figure 1 (Route A, red dashed).
 
 This instability is specific to self-cubic nonlinearities. For FHN and van der Pol, the v^3/3 term yields transverse growth rate 2(1 - v^2/3) (scaled by mu for van der Pol), positive whenever |v| < sqrt(3). In contrast, the Brusselator's cross-product nonlinearity x^2*y yields de/dt = -2(b+1)e (exact, with no higher-order terms), which is globally stable for all b > 0. The instability mechanism is thus tied to the self-referential structure of q = v^2 appearing in dv/dt as qv, creating positive feedback between the error and the variable it tracks. Cross-product terms (qy, where y != x) lack this self-referential coupling.
 
@@ -153,7 +153,7 @@ Both routes target the same cubic nonlinearity. The CRN structure, not the mathe
 
 ### 3.5 Stochastic Validation (Gillespie SSA)
 
-To test whether the QSSA stability advantage persists in the stochastic regime relevant to DNA strand displacement implementations, we performed Gillespie (SSA) simulations at three molecular counts with k_fast/N scaling:
+To test whether the QSSA stability advantage persists in the stochastic regime relevant to DNA strand displacement implementations, we performed Gillespie (SSA) simulations at three molecular counts with inverse-N scaling (k_fast * N = 10^5):
 
 | N     | k_fast | Route | Period (s) | Cycles | Oscillates? |
 |-------|--------|-------|------------|--------|-------------|
@@ -164,12 +164,12 @@ To test whether the QSSA stability advantage persists in the stochastic regime r
 | 10000 | 10     | B     | 39.0       | 3      | Yes         |
 | 10000 | N/A    | A     | --         | 0      | No          |
 
-Route B preserves oscillation across all tested molecular counts, with period converging toward the deterministic FHN value (39.5s) as N increases (37.6 -> 39.3 -> 39.0 s, measured over 3 complete cycles each). Cycle-to-cycle variability at N=100 (highest stochastic noise) was SD = 2.93 s (individual periods: 39.8, 34.3, 38.8 s), consistent with O(1/sqrt(N)) stochastic fluctuations. Route A fails to oscillate at any molecular count, confirming that the quadratization instability (Section 3.3) persists and is amplified in the stochastic regime. The k_fast/N scaling maintains QSSA tracking while keeping computational cost tractable.
+Route B preserves oscillation across all tested molecular counts, with period converging toward the deterministic FHN value (39.5s) as N increases (37.6 -> 39.3 -> 39.0 s, measured over 3 complete cycles each). Cycle-to-cycle variability at N=100 (highest stochastic noise) was SD = 2.93 s (individual periods: 39.8, 34.3, 38.8 s), consistent with O(1/sqrt(N)) stochastic fluctuations. Route A fails to oscillate at any molecular count, confirming that the quadratization instability (Section 3.3) persists and is amplified in the stochastic regime. The inverse-N scaling (k_fast * N = 10^5) maintains QSSA tracking while keeping computational cost tractable.
 
 The Gillespie results provide the third independent line of evidence for QSSA superiority:
 
 1. **Analytical**: The transverse Floquet exponent is +0.73 for Route A (unstable) vs negative for Route B (Section 3.3), verified by SymPy symbolic computation.
-2. **Deterministic**: Route A divergence is independent of solver precision (abstol 1e-10 to 1e-14 produce identical instability), confirming a structural rather than numerical origin (Section 3.2).
+2. **Deterministic**: Route A divergence is independent of solver precision (abstol 1e-10 to 1e-14 produce identical instability), confirming qualitatively identical instability (divergence at both precision levels), indicating a structural rather than numerical origin (Section 3.2).
 3. **Stochastic**: Route A fails to oscillate at all tested molecular counts (N = 100, 1000, 10000), while Route B preserves oscillation with period convergence toward the deterministic reference (this section).
 
 All three lines of evidence point to the same conclusion: positive feedback intermediates (quadratization) are structurally incompatible with sustained oscillation, while negative feedback intermediates (QSSA) are robust across deterministic, precision-varied, and stochastic regimes.
@@ -195,7 +195,7 @@ Our comparison shows that implementation choice is not a neutral step in ODE-to-
 - FHN is a 2-variable simplification. Full HH requires polynomialization of exponential gating functions.
 - QSSA assumes fast intermediate equilibration. Physical DNA reaction rates may limit achievable k_fast.
 - Numerical verification only; no wet-lab implementation.
-- Gillespie SSA simulations (Section 3.5) confirm that the QSSA stability advantage persists in the stochastic regime (N = 100 to 10000). However, our simulations use well-mixed conditions; spatial effects in physical DNA strand displacement systems (e.g., diffusion-limited reactions, compartmentalization) are not captured. Stochastic fluctuations scale as O(1/sqrt(N)), suggesting a minimum k_fast ~ O(sqrt(N) * system_rate) for QSSA stability; our k_fast/N scaling is conservative relative to this bound.
+- Gillespie SSA simulations (Section 3.5) confirm that the QSSA stability advantage persists in the stochastic regime (N = 100 to 10000). However, our simulations use well-mixed conditions; spatial effects in physical DNA strand displacement systems (e.g., diffusion-limited reactions, compartmentalization) are not captured. Stochastic fluctuations scale as O(1/sqrt(N)), suggesting a minimum k_fast ~ O(sqrt(N) * system_rate) for QSSA stability; our inverse-N scaling (k_fast * N = 10^5) is conservative relative to this bound.
 
 ## Figure Captions
 
@@ -205,7 +205,7 @@ Our comparison shows that implementation choice is not a neutral step in ODE-to-
 
 ## 5. Conclusion
 
-We present, to our knowledge, the first systematic mapping of the FitzHugh-Nagumo neuron model to bimolecular chemical reaction networks via the ODE-to-CRN compilation pipeline and demonstrate that feedback structure in intermediate species critically determines implementation stability. QSSA-based negative feedback intermediates outperform quadratization-based positive feedback by 1777x in trajectory fidelity (v_RMSE) and 6800x in algebraic invariant preservation (a distinct internal consistency metric). The instability is not specific to FHN: it generalizes to all oscillators with self-cubic nonlinearities (e.g., van der Pol), while cross-product nonlinearities (e.g., Brusselator) remain stable, confirming that the feedback sign, not the specific model, is the determining factor. This finding is validated across analytical (Floquet), deterministic (solver-independent), and stochastic (Gillespie SSA) regimes. These results establish a design guideline for molecular implementations of biological oscillators and take a step toward DNA-based neural circuits with biologically faithful spiking dynamics.
+We present, to our knowledge, the first systematic mapping of the FitzHugh-Nagumo neuron model to bimolecular chemical reaction networks via the ODE-to-CRN compilation pipeline and demonstrate that feedback structure in intermediate species critically determines implementation stability. QSSA-based negative feedback intermediates outperform quadratization-based positive feedback by 1777x in trajectory fidelity (v_RMSE) and 6800x in algebraic invariant preservation (a distinct internal consistency metric). The instability is not specific to FHN: it generalizes to oscillators whose v^3 terms are reduced via the standard q=v^2 quadratization (e.g., van der Pol), while cross-product nonlinearities (e.g., Brusselator) remain stable, confirming that the feedback sign, not the specific model, is the determining factor. This finding is validated across analytical (Floquet), deterministic (solver-independent), and stochastic (Gillespie SSA) regimes. These results establish a design guideline for molecular implementations of biological oscillators and take a step toward DNA-based neural circuits with biologically faithful spiking dynamics.
 
 ## References
 
