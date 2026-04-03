@@ -75,7 +75,7 @@ Three-layer comparison using Julia/OrdinaryDiffEq with Rodas5P (stiff solver):
 2. Route A: Quadratized + dual-rail CRN (6 variables)
 3. Route B: QSSA + dual-rail CRN (7 variables)
 
-Initial conditions: v(0) = -1.0, w(0) = -0.5. Dual-rail encoding: v+(0) = 0, v-(0) = 1.0, w+(0) = 0, w-(0) = 0.5. Route A: q+(0) = v-(0)^2 = 1.0, q-(0) = 0. Route B: P_pp(0) = v+(0)^2 = 0, P_mm(0) = v-(0)^2 = 1.0, P_pm(0) = v+(0)*v-(0) = 0. Integration: t in [0, 300], reltol = 1e-8, abstol = 1e-10 (unless stated otherwise), saveat = 0.01s. Implementation: Julia v1.12.5, OrdinaryDiffEq v6.108.0, solver Rodas5P. Code available at DOI: 10.5281/zenodo.19382312.
+Initial conditions: v(0) = -1.0, w(0) = -0.5. Dual-rail encoding: v+(0) = 0, v-(0) = 1.0, w+(0) = 0, w-(0) = 0.5. Route A: q+(0) = v-(0)^2 = 1.0, q-(0) = 0. Route B: P_pp(0) = v+(0)^2 = 0, P_mm(0) = v-(0)^2 = 1.0, P_pm(0) = v+(0)*v-(0) = 0. Integration: t in [0, 300], reltol = 1e-8, abstol = 1e-10 (unless stated otherwise), saveat = 0.01s. Implementation: Julia v1.12.5, OrdinaryDiffEq v6.108.0, solver Rodas5P. Code available at DOI: 10.5281/zenodo.18968886 (all-versions DOI; resolves to latest release).
 
 Metrics: (1) v_RMSE = root-mean-square error of v(t) vs FHN reference (trajectory fidelity), (2) q_err or P_err = RMS of (q - v^2) or (P_pp + P_mm - 2*P_pm - v^2) (algebraic invariant preservation), (3) dual-rail drift = mean of min(v+, v-) (annihilation effectiveness). All metrics computed over t > 50 to exclude transients. The mathematical equivalence of the CRN decomposition to FHN was verified symbolically: at QSSA equilibrium (P_pp = v+^2, P_mm = v-^2, P_pm = v+*v-), the net cubic contribution cubic_to_vp - cubic_to_vm simplifies to -(v+ - v-)^3/3, which equals -v^3/3 (verified via SymPy, difference = 0).
 
