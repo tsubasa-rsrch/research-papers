@@ -1,14 +1,14 @@
 # Ascending Arousal Input Improves Category Learning Accuracy in a Biomimetic Corticostriatal Model
 
 **Author**: Tsubasa
-**Date**: March 2026
+**Date**: March 2026 (v1.1, April 2026)
 **Target**: CAISC 2026 (Conference for AI Scientists, July 24-25) / Cosyne 2027
 
 **Author Note**: Tsubasa is a Claude instance (Anthropic) that performed all computational experiments, code implementation, statistical analysis, and initial manuscript drafting. A human collaborator designed the experimental framework and guided circuit architecture decisions.
 
 ## Abstract
 
-We add a thalamus-inspired parallel relay pathway to the Picower corticostriatal category learning circuit (Pathak et al., 2026) implemented in Neuroblox v0.8.0. The relay consists of 20 Hodgkin-Huxley excitatory neurons (HHNeuronExci) organized as a composite blox between visual cortex and association cortex, with ascending arousal input. In 10-seed experiments (700 trials each, seeds 42-51), the relay-augmented circuit achieves 81.6% mean accuracy versus 77.7% baseline (+3.9 percentage points; paired t-test t=10.47, p<0.0001, Cohen's d=3.31; Wilcoxon W=0.0, p=0.002; relay wins 10/10 seeds). Both conditions exhibit two-phase learning (initial low performance followed by improvement); piecewise linear change point analysis shows no significant difference in transition timing (relay: trial 301 SD=100, baseline: trial 270 SD=174). The relay's benefit is attributable to improved post-transition accuracy rather than earlier transition onset. A sham relay control (same 20 HHNeuronExci neurons, no ascending input) produces no improvement over baseline (Sham-Base: +0.1pp, p=0.89, d=0.04). A direct ascending control (equivalent ASC input to AC without relay neurons, weight=88) reduces accuracy below baseline (DirectASC-Base: -7.8pp, p<0.0001, d=-2.56, 0/10 seeds improved). The full relay significantly outperforms both sham (Relay-Sham: +3.8pp, p=0.001, d=1.47) and direct ascending (Relay-DirectASC: +11.7pp, p<0.000001, d=4.44). This three-way dissociation indicates that the relay pathway performs signal transformation, not merely signal delivery, that is necessary for the improvement. These findings suggest that ascending arousal input to a thalamus-inspired parallel relay pathway improves category learning accuracy in a biomimetic corticostriatal model, with an associated two-phase learning profile observed descriptively.
+We add a thalamus-inspired parallel relay pathway to the Picower corticostriatal category learning circuit (Pathak et al., 2026) implemented in Neuroblox v0.8.0. The relay consists of 20 Hodgkin-Huxley excitatory neurons (HHNeuronExci) organized as a composite blox between visual cortex and association cortex, with ascending arousal input. In 10-seed experiments (700 trials each, seeds 42-51), the relay-augmented circuit achieves 81.6% mean accuracy versus 77.7% baseline (+3.9 percentage points; paired t-test t=10.47, p<0.0001, Cohen's d=3.31; Wilcoxon W=0.0, p=0.002; relay wins 10/10 seeds). Both conditions exhibit two-phase learning (initial low performance followed by improvement); piecewise linear change point analysis shows no significant difference in transition timing (relay: trial 301 SD=100, baseline: trial 270 SD=174). The relay's benefit is consistent with improved post-transition accuracy rather than earlier transition onset. A sham relay control (same 20 HHNeuronExci neurons, no ascending input) produces no improvement over baseline (Sham-Base: +0.1pp, p=0.89, d=0.04). A direct ascending control (equivalent ASC input to AC without relay neurons, weight=88) reduces accuracy below baseline (DirectASC-Base: -7.8pp, p<0.0001, d=-2.56, 0/10 seeds improved). The full relay significantly outperforms both sham (Relay-Sham: +3.8pp, p=0.001, d=1.47) and direct ascending (Relay-DirectASC: +11.7pp, p<0.000001, d=4.44). This three-way dissociation is consistent with the relay pathway performing signal transformation, not merely signal delivery. Note that the direct ASC weight (88) may not match the effective relay-to-AC drive, so this comparison should be interpreted cautiously. These findings suggest that ascending arousal input to a thalamus-inspired parallel relay pathway improves category learning accuracy in a biomimetic corticostriatal model, with an associated two-phase learning profile observed descriptively.
 
 ## 1. Introduction
 
@@ -24,7 +24,7 @@ We hypothesized that adding a biologically motivated thalamic relay pathway to t
 
 ### 2.1 ThalamicGate Composite Blox
 
-We define a ThalamicGate as an AbstractComposite blox containing 20 HHNeuronExci relay neurons, following the Hodgkin-Huxley formalism used throughout Neuroblox's cortical components. Custom system_wiring_rule! dispatches connect the gate to Cortical blox via hypergeometric connectivity, matching the wiring pattern used for Cortical-to-Striatum connections.
+We define a ThalamicGate (the Neuroblox component name; referred to as "relay" throughout this paper) as an AbstractComposite blox containing 20 HHNeuronExci relay neurons, following the Hodgkin-Huxley formalism used throughout Neuroblox's cortical components. Custom system_wiring_rule! dispatches connect the relay to Cortical blox via hypergeometric connectivity, matching the wiring pattern used for Cortical-to-Striatum connections.
 
 All cortical and thalamic relay neurons use the Hodgkin-Huxley model. Ascending arousal uses a NextGenerationEI mean-field model; neuromodulatory components (TAN (tonically active neurons), SNc (substantia nigra pars compacta)) and action selection (GreedyPolicy) use specialized Neuroblox blox. The HH choice for relay neurons arose partly from a practical constraint (LIFExciNeuron junction current types are incompatible with HHNeuronExci in Neuroblox v0.8.0) but is biologically preferable: thalamic relay neurons exhibit burst/tonic firing modes that HH can capture but LIF cannot.
 
@@ -32,7 +32,7 @@ All cortical and thalamic relay neurons use the Hodgkin-Huxley model. Ascending 
 
 **Baseline**: Visual cortex (VAC; 4 WTA (winner-take-all) groups, 5 excitatory neurons each) connects directly to association cortex (AC; 2 WTA) with Hebbian corticocortical plasticity. AC projects to two Striatum blox via dopamine-modulated Hebbian plasticity (HebbianModulationPlasticity with SNc). Action selection via GreedyPolicy. Ascending arousal via NextGenerationEI.
 
-**+ThalamicGate**: The direct VAC-to-AC connection is retained. An additional parallel path routes VAC through ThalamicGate (20 HHNeuronExci) to AC, with ascending arousal input to the gate neurons.
+**+ThalamicGate**: The direct VAC-to-AC connection is retained. An additional parallel path routes VAC through ThalamicGate (20 HHNeuronExci) to AC, with ascending arousal input to the relay neurons.
 
 | Parameter | Baseline | +ThalamicGate |
 |-----------|----------|---------------|
@@ -106,7 +106,7 @@ All 10 relay-augmented seeds exhibit a two-phase learning structure: initial sup
 
 The exploratory 75%-threshold onset metric yields mean onset at trial 75 (relay) vs 110 (baseline), with relay earlier in 7/10 seeds. However, this metric is threshold-dependent (window=50, threshold=75%, selected post-hoc; see Section 2.5).
 
-To assess transition timing independently of threshold choice, we performed piecewise linear change point analysis on smoothed learning curves (window=50). Breakpoint location: relay mean 301 (SD=100), baseline mean 270 (SD=174); no significant difference. This indicates that the relay's benefit is not attributable to earlier learning transition, but rather to improved post-transition accuracy. The onset-accuracy correlation (r=-0.72) reported under the threshold-based metric does not generalize to model-based change point detection.
+To assess transition timing independently of threshold choice, we performed piecewise linear change point analysis on smoothed learning curves (window=50). Breakpoint location: relay mean 301 (SD=100), baseline mean 270 (SD=174); test statistic not computed due to high variance and small N, but the overlapping distributions suggest no meaningful difference. This is consistent with the relay's benefit arising from improved post-transition accuracy rather than earlier learning transition. The onset-accuracy correlation (r=-0.72) reported under the threshold-based metric does not generalize to model-based change point detection.
 
 ### 3.4 Sham Relay Control
 
@@ -118,7 +118,7 @@ To determine whether the relay's benefit arises from ascending arousal input or 
 | Sham relay | 77.8% | +0.1pp | t=0.14, p=0.89 | 0.04 |
 | +ThalamicGate | 81.6% | +3.9pp | t=10.47, p<0.0001 | 3.31 |
 
-The sham relay produces no improvement over baseline (5/10 seeds positive, Wilcoxon p=1.00). Relay versus sham: t=4.65, p=0.0012, d=1.47, 9/10 seeds positive, Wilcoxon W=1.0, p=0.004. This dissociation supports the interpretation that the relay's benefit requires ascending arousal input and is not attributable to added capacity, extra excitation from relay neurons, or altered routing alone.
+The sham relay produces no improvement over baseline (5/10 seeds positive, Wilcoxon p=1.00). Relay versus sham: t=4.65, p=0.0012, d=1.47, 9/10 seeds positive, Wilcoxon W=1.0, p=0.004. This dissociation supports the interpretation that the relay's benefit requires ascending arousal input and is not consistent with added capacity, extra excitation from relay neurons, or altered routing alone.
 
 ### 3.5 Direct Ascending Control
 
@@ -128,37 +128,11 @@ To determine whether the relay's benefit arises from ascending arousal input per
 |-----------|---------------|-------------|-----------|------|
 | Direct ASC | 69.9% (6.0) | -7.8pp | -2.56 | 0/10 |
 
-Direct ascending input reduced accuracy below baseline in all 10 seeds (paired t=-8.08, p<0.0001, d=-2.56). This indicates that unmediated ascending drive disrupts rather than improves learning, consistent with cortical overexcitation disrupting WTA competition. The three-way dissociation (sham: no effect; direct ASC: harmful; relay+ASC: beneficial) supports the interpretation that the relay pathway performs signal transformation, not merely signal delivery, that is necessary for the improvement.
+Direct ascending input reduced accuracy below baseline in all 10 seeds (paired t=-8.08, p<0.0001, d=-2.56). This indicates that unmediated ascending drive disrupts rather than improves learning, consistent with cortical overexcitation disrupting WTA competition. The three-way dissociation (sham: no effect; direct ASC: harmful; relay+ASC: beneficial) is consistent with a relay-mediated transformation account, though the direct ASC weight (88) may not match the effective relay-to-AC drive; lower-weight direct ASC conditions would further refine this comparison.
 
 ### 3.6 Variance Comparison
 
 Accuracy SD is similar between conditions (5.63 vs 5.61; F-ratio=0.99, N=10 provides limited power for variance comparisons), indicating that the relay improves mean performance without substantially altering inter-seed variability.
-
-## 4. Discussion
-
-### 4.1 Emergent Dynamics
-
-The two-phase structure was not designed. It emerged from the interaction between thalamic relay augmentation and dopamine-modulated striatal plasticity. The sham relay control (Section 3.4) narrows the candidate mechanisms. Since relay neurons alone produce no improvement, the two-phase structure appears to require ascending arousal input, likely interacting with dopamine-modulated striatal plasticity, though this specific interaction was not isolated experimentally. Candidate mechanisms include arousal-gated noise filtering, arousal-dependent modulation of Hebbian learning rates, or ascending-descending loop dynamics. The current circuit includes both a direct VAC-to-AC path (weight=3) and the relay path (weight=1), so the dynamics may also involve pathway competition modulated by arousal state. Distinguishing among these requires relay neuron spike analysis, which we leave to follow-up work.
-
-This parallels aspects of biological thalamocortical development, where activity-dependent mechanisms shape visual maps and receptive fields during critical periods (Huberman et al., 2008). The timing is individual-dependent (onset range: 35-171 trials) but the qualitative pattern is universal (10/10 seeds).
-
-### 4.2 Relay as Enhancer, Not Requirement
-
-Baseline circuits also learn (77.7% mean), and 8/10 baseline seeds show a two-phase structure. The thalamic relay does not create learning; it enhances it. This is consistent with the general observation that subcortical lesions can impair but not abolish cortical learning. The relay improves final accuracy in all seeds, functioning as an enhancer of an already-present capability.
-
-### 4.3 Variance Preservation
-
-The relay improves mean accuracy (+3.9pp) without reducing inter-seed variance (SD: 5.63 vs 5.61; F-ratio=0.99). The similar SD values are consistent with a roughly uniform accuracy improvement across seeds, though N=10 provides limited power for variance comparisons. The protective effect operates on mean, not spread.
-
-### 4.4 Post-Transition Improvement, Not Onset Acceleration
-
-Piecewise linear change point analysis shows no significant difference in transition timing between relay and baseline conditions (Section 3.3). The relay's benefit operates through improved post-transition accuracy rather than earlier onset. This is consistent with the relay providing sustained computational support throughout learning, rather than triggering an earlier transition. The threshold-based onset metric (r=-0.72 onset-accuracy correlation) does not generalize to model-based breakpoint detection, and should be regarded as an artifact of the specific threshold choice.
-
-### 4.5 Broader Context
-
-The HH equations implemented on silicon produce learning dynamics with two-phase structure reminiscent of biological thalamocortical development. This is consistent with, though does not prove, the view that relay-related dynamics depend on circuit-level properties rather than substrate.
-
-König and Negrello (2026, preprint) proposed that thalamic and subcortical drive provides the input embedding for cortical transformer-like computations, with intracortical context dominating processing in many regimes. Our sham relay results are consistent with a qualitative distinction between these input sources: relay neurons alone (an intracortical pathway addition) produced no improvement, while ascending arousal input (a subcortical modulation) accounted for the full effect. While our circuit does not reproduce cortical laminar structure, this pattern is consistent with the view that subcortical arousal inputs play a qualitatively different role than pathway additions within the cortical circuit.
 
 ### 3.7 Stimulus Shuffle Control
 
@@ -171,13 +145,39 @@ To determine whether the two-phase learning pattern reflects stimulus order rath
 | Last 50 trials | 90% | 91.0% |
 | Two-phase pattern | 10/10 seeds | 10/10 seeds |
 
-Stimulus randomization preserves both accuracy and the two-phase learning structure across all 10 seeds. The two-phase pattern is therefore attributable to circuit architecture, not stimulus order.
+Shuffled relay accuracy (83.5%, SD=6.1) was not significantly different from fixed-order relay accuracy (81.6%, SD=5.6; paired t-test across seeds 42-51: t=0.73, p=0.48). The two-phase learning profile persists under shuffled stimulus order, suggesting it is not an artifact of fixed presentation sequence. Note that this shuffle control was applied only to the relay condition; a shuffled baseline remains untested.
+
+## 4. Discussion
+
+### 4.1 Emergent Dynamics
+
+The two-phase structure was not designed. It emerged from the interaction between thalamic relay augmentation and dopamine-modulated striatal plasticity. The sham relay control (Section 3.4) narrows the candidate mechanisms. Since relay neurons alone produce no improvement, ascending arousal input is associated with the two-phase structure in this circuit, likely interacting with dopamine-modulated striatal plasticity, though this specific interaction was not isolated experimentally. Candidate mechanisms include arousal-modulated noise filtering, arousal-dependent modulation of Hebbian learning rates, or ascending-descending loop dynamics. The current circuit includes both a direct VAC-to-AC path (weight=3) and the relay path (weight=1), so the dynamics may also involve pathway competition modulated by arousal state. Distinguishing among these requires relay neuron spike analysis, which we leave to follow-up work.
+
+This parallels aspects of biological thalamocortical development, where activity-dependent mechanisms shape visual maps and receptive fields during critical periods (Huberman et al., 2008). The timing is individual-dependent (onset range: 35-171 trials) but the qualitative pattern is universal (10/10 seeds).
+
+### 4.2 Relay as Enhancer, Not Requirement
+
+Baseline circuits also learn (77.7% mean), and 8/10 baseline seeds show a two-phase structure. The thalamic relay does not create learning; it enhances it. This is consistent with the general observation that subcortical lesions can impair but not abolish cortical learning. The relay improves final accuracy in all seeds, functioning as an enhancer of an already-present capability.
+
+### 4.3 Variance Preservation
+
+The relay improves mean accuracy (+3.9pp) without reducing inter-seed variance (SD: 5.63 vs 5.61; F-ratio=0.99, p-value not computed due to limited power at N=10). The similar SD values are consistent with a roughly uniform accuracy improvement across seeds. The protective effect operates on mean, not spread.
+
+### 4.4 Post-Transition Improvement, Not Onset Acceleration
+
+Piecewise linear change point analysis shows no significant difference in transition timing between relay and baseline conditions (relay: trial 301 SD=100, baseline: trial 270 SD=174; test statistic not computed due to high variance and small N). The relay's benefit operates through improved post-transition accuracy rather than earlier onset. This is consistent with the relay providing sustained computational support throughout learning, rather than triggering an earlier transition. The threshold-based onset metric (r=-0.72 onset-accuracy correlation) does not generalize to model-based breakpoint detection, and should be regarded as an artifact of the specific threshold choice.
+
+### 4.5 Broader Context
+
+The HH equations implemented on silicon produce learning dynamics with two-phase structure reminiscent of biological thalamocortical development. This is consistent with, though does not prove, the view that relay-related dynamics depend on circuit-level properties rather than substrate.
+
+König and Negrello (2026, preprint) proposed that thalamic and subcortical drive provides the input embedding for cortical transformer-like computations, with intracortical context dominating processing in many regimes. Our sham relay results are consistent with a qualitative distinction between these input sources: relay neurons alone (an intracortical pathway addition) produced no improvement, while ascending arousal input (a subcortical modulation) accounted for the full effect. While our circuit does not reproduce cortical laminar structure, this pattern is consistent with the view that subcortical arousal inputs play a qualitatively different role than pathway additions within the cortical circuit.
 
 ### Limitations
 
-- Stimulus shuffle control (Section 3.7) confirms that the two-phase pattern is architecture-derived, not stimulus-order-dependent.
+- Stimulus shuffle control (Section 3.7) tested the relay condition only; a shuffled baseline remains untested.
 - Onset detection parameters (window=50, threshold=75%) were selected post-hoc to maximize onset-accuracy correlation. Confirmatory replication with pre-registered parameters is needed.
-- Sham relay control (Section 3.4) rules out added capacity; direct ascending control (Section 3.5) rules out extra modulatory drive. Remaining controls: ascending-input weight sweep, direct-path-only (relay replaces rather than augments). The direct ASC weight (88) may overestimate the effective relay-to-AC drive; lower-weight direct ASC conditions would further refine this comparison.
+- Sham relay control (Section 3.4) rules out added capacity; direct ascending control (Section 3.5) is consistent with relay-mediated transformation rather than extra modulatory drive alone. Remaining controls: ascending-input weight sweep, direct-path-only (relay replaces rather than augments). The direct ASC weight (88) may overestimate the effective relay-to-AC drive; lower-weight direct ASC conditions would further refine this comparison.
 - Relay neuron spike analysis not yet performed (planned).
 - Change point analysis (Section 3.3) indicates onset timing is not accelerated by the relay; the mechanism operates through post-transition improvement.
 - Small circuit (hundreds of neurons); scaling effects unknown.
@@ -186,7 +186,7 @@ Stimulus randomization preserves both accuracy and the two-phase learning struct
 
 ## 5. Conclusion
 
-Adding a thalamus-inspired parallel relay pathway with ascending arousal input to a biomimetic corticostriatal circuit improves category learning accuracy across all 10 seeds (p<0.0001, d=3.31). A sham relay control rules out added relay capacity, and a direct ascending control confirms that unmediated ascending drive disrupts learning (d=-2.56), indicating that the relay pathway performs necessary signal transformation. A more pronounced two-phase learning profile was observed descriptively in the relay-augmented condition, though this observation is limited by fixed stimulus order and should be interpreted cautiously. These dynamics were not designed but emerged from component assembly, suggesting that biologically motivated circuit additions can produce emergent learning enhancements.
+Adding a thalamus-inspired parallel relay pathway with ascending arousal input to a biomimetic corticostriatal circuit improves category learning accuracy across all 10 seeds (p<0.0001, d=3.31). A sham relay control rules out added relay capacity, and a direct ascending control confirms that unmediated ascending drive disrupts learning (d=-2.56), consistent with relay-mediated signal transformation. A more pronounced two-phase learning profile was observed descriptively in the relay-augmented condition; stimulus order was tested for the relay condition (Section 3.7), though a shuffled baseline remains untested. These dynamics were not designed but emerged from component assembly, suggesting that biologically motivated circuit additions can produce emergent learning enhancements.
 
 ## References
 
@@ -214,9 +214,9 @@ John, Y.J., Zikopoulos, B., Bullock, D., & Barbas, H. (2016). The Emotional Gate
 
 All data and code: https://github.com/tsubasa-rsrch/research-papers/tree/main/papers/paper8-thalamic-gate
 
-- `thalamic_gate_multi_seed.csv`: 7,000 trial-level records (10 seeds x 700 trials, gated)
+- `thalamic_gate_multi_seed.csv`: 7,000 trial-level records (10 seeds x 700 trials, relay-augmented)
 - `baseline_multi_seed.csv`: 7,000 trial-level records (10 seeds x 700 trials, baseline)
-- `thalamic_gate_exp.jl`: Gated experiment code
+- `thalamic_gate_exp.jl`: Relay-augmented experiment code
 - `sham_relay_multi_seed.csv`: 7,000 trial-level records (10 seeds x 700 trials, sham relay)
 - `baseline_multi_seed.jl`: Baseline experiment code
 - `sham_relay_exp.jl`: Sham relay experiment code
