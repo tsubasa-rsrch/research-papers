@@ -92,7 +92,7 @@ The quadratized system exhibits exponential error growth in the q = v^2 invarian
 | 200      | 1e-10    | 2.80          |
 | 200      | 1e-14    | 4310          |
 
-Note that at t=200, higher precision (abstol=1e-14) produces larger error than lower precision (abstol=1e-10). This is because the higher-precision solver more faithfully tracks the self-catalytic divergence, while the lower-precision solver's coarser adaptive step size may interact differently with the nonlinear dynamics (a detailed step-size analysis is beyond our current scope). Both cases confirm structural instability: increasing solver precision does not resolve the instability, and at t=200 both precision levels produce errors many orders of magnitude larger than acceptable.
+Note that at t=200, higher precision (abstol=1e-14) produces larger error than lower precision (abstol=1e-10). The instability persists across precision settings; terminal magnitude is solver-dependent but divergence is structural in both cases. Increasing solver precision does not resolve the instability, and at t=200 both precision levels produce errors many orders of magnitude larger than acceptable.
 
 The CRN dual-rail implementation inherits this instability: v_RMSE ≈ 1.33-1.37 across all tested k_ann values (10-1000). Note: the q-v^2 error of 2.80 in Table 1 (dual-rail CRN) differs from the 2.91 reported in Section 3.3 (standalone quadratized system) because dual-rail encoding and annihilation reactions introduce additional perturbations.
 
@@ -128,11 +128,10 @@ Route A's spurious attractor produces qualitatively different dynamics from FHN:
 | Metric         | FHN reference | Route A (Quad) | Route B (QSSA) |
 |----------------|---------------|----------------|----------------|
 | Period (s)     | 39.474        | 22.70          | 39.471         |
-| Peak amplitude | 1.852         | -0.262         | 1.852          |
+| Peak amplitude | 1.8520        | -0.262         | 1.8521         |
 | Period error   | --            | -42.5%         | -0.008%        |
-| Amplitude error| --            | -114%          | +0.005%        |
 
-Route A's period is 42% shorter and peak amplitude is **negative**, indicating complete loss of the FHN firing dynamics. The system has settled onto a spurious limit cycle unrelated to the original neuron model. Route B preserves both period (error 0.008%) and amplitude (error 0.005%) to within measurement precision.
+Route A's period is 42% shorter and peak amplitude is **negative**, indicating complete loss of the FHN firing dynamics. The system has settled onto a spurious limit cycle unrelated to the original neuron model. Route B preserves both period (error 0.008%) and peak amplitude (error <0.01%) to high precision.
 
 ### 3.3 Linear Instability of the Quadratization Invariant
 
