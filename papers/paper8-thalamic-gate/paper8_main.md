@@ -106,7 +106,7 @@ All 10 relay-augmented seeds exhibit a two-phase learning structure: initial sup
 
 The exploratory 75%-threshold onset metric yields mean onset at trial 75 (relay) vs 110 (baseline), with relay earlier in 7/10 seeds. However, this metric is threshold-dependent (window=50, threshold=75%, selected post-hoc; see Section 2.5).
 
-To assess transition timing independently of threshold choice, we performed piecewise linear change point analysis on smoothed learning curves (window=50). Breakpoint location: relay mean 301 (SD=100), baseline mean 270 (SD=174); test statistic not computed due to high variance and small N, but the overlapping distributions suggest no meaningful difference. This is consistent with the relay's benefit arising from improved post-transition accuracy rather than earlier learning transition. The onset-accuracy correlation (r=-0.72) reported under the threshold-based metric does not generalize to model-based change point detection.
+To assess transition timing independently of threshold choice, we performed piecewise linear change point analysis on smoothed learning curves (window=50). Breakpoint location: relay mean 270 (SD=113), baseline mean 295 (SD=174); paired t-test: t(9)=-0.37, p=0.72, d=-0.12, not significant. This is consistent with the relay's benefit arising from improved post-transition accuracy rather than earlier learning transition. The onset-accuracy correlation (r=-0.72) reported under the threshold-based metric does not generalize to model-based change point detection.
 
 ### 3.4 Sham Relay Control
 
@@ -165,7 +165,7 @@ The relay improves mean accuracy (+3.9pp) without reducing inter-seed variance (
 
 ### 4.4 Post-Transition Improvement, Not Onset Acceleration
 
-Piecewise linear change point analysis shows no significant difference in transition timing between relay and baseline conditions (relay: trial 301 SD=100, baseline: trial 270 SD=174; test statistic not computed due to high variance and small N). The relay's benefit operates through improved post-transition accuracy rather than earlier onset. This is consistent with the relay providing sustained computational support throughout learning, rather than triggering an earlier transition. The threshold-based onset metric (r=-0.72 onset-accuracy correlation) does not generalize to model-based breakpoint detection, and should be regarded as an artifact of the specific threshold choice.
+Piecewise linear change point analysis shows no significant difference in transition timing between relay and baseline conditions (relay: trial 270, SD=113; baseline: trial 295, SD=174; paired t(9)=-0.37, p=0.72, d=-0.12). The relay's benefit operates through improved post-transition accuracy rather than earlier onset. This is consistent with the relay providing sustained computational support throughout learning, rather than triggering an earlier transition. The threshold-based onset metric (r=-0.72 onset-accuracy correlation) does not generalize to model-based breakpoint detection, and should be regarded as an artifact of the specific threshold choice.
 
 ### 4.5 Broader Context
 
@@ -200,7 +200,6 @@ Sherman, S.M. & Guillery, R.W. (2006). Exploring the Thalamus and Its Role in Co
 
 Hensch, T.K. (2005). Critical period plasticity in local cortical circuits. Nature Reviews Neuroscience, 6(11), 877-888.
 
-Eisen, A.J. et al. (2026). Similar destabilization of neural dynamics under different general anesthetics. Cell Reports. DOI: 10.1016/j.celrep.2026.117048.
 
 Frank, M.J., Loughry, B., & O'Reilly, R.C. (2001). Interactions between frontal cortex and basal ganglia in working memory: A computational model. Cognitive, Affective, & Behavioral Neuroscience, 1(2), 137-160.
 
