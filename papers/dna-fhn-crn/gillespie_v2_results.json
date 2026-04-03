@@ -1,0 +1,62 @@
+[
+  {
+    "N": 100,
+    "route": "B",
+    "k_fast": 1000,
+    "period": 37.6333333333312,
+    "cycles": 3,
+    "v_range": 4.3,
+    "n_rxn": 81621408,
+    "elapsed": 372.36708521842957
+  },
+  {
+    "N": 100,
+    "route": "A",
+    "k_fast": 1.0,
+    "period": null,
+    "cycles": 0,
+    "v_range": 2.66,
+    "n_rxn": 100000000,
+    "elapsed": 528.8893229961395
+  },
+  {
+    "N": 1000,
+    "route": "B",
+    "k_fast": 100,
+    "period": 39.29999999999777,
+    "cycles": 3,
+    "v_range": 3.943,
+    "n_rxn": 79177706,
+    "elapsed": 366.3243839740753
+  },
+  {
+    "N": 1000,
+    "route": "A",
+    "k_fast": 1.0,
+    "period": null,
+    "cycles": 0,
+    "v_range": 8.27,
+    "n_rxn": 100000000,
+    "elapsed": 534.9465351104736
+  },
+  {
+    "N": 10000,
+    "route": "B",
+    "k_fast": 10,
+    "period": 39.03333333333112,
+    "cycles": 3,
+    "v_range": 3.8764,
+    "n_rxn": 89028914,
+    "elapsed": 415.20257568359375
+  },
+  {
+    "N": 10000,
+    "route": "A",
+    "k_fast": 1.0,
+    "period": null,
+    "cycles": 0,
+    "v_range": 4.7943,
+    "n_rxn": 100000000,
+    "elapsed": 528.1114830970764
+  }
+]
