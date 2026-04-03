@@ -160,9 +160,22 @@ The HH equations implemented on silicon produce learning dynamics with two-phase
 
 König and Negrello (2026, preprint) proposed that thalamic and subcortical drive provides the input embedding for cortical transformer-like computations, with intracortical context dominating processing in many regimes. Our sham relay results are consistent with a qualitative distinction between these input sources: relay neurons alone (an intracortical pathway addition) produced no improvement, while ascending arousal input (a subcortical modulation) accounted for the full effect. While our circuit does not reproduce cortical laminar structure, this pattern is consistent with the view that subcortical arousal inputs play a qualitatively different role than pathway additions within the cortical circuit.
 
+### 3.7 Stimulus Shuffle Control
+
+To determine whether the two-phase learning pattern reflects stimulus order rather than circuit architecture, we ran the relay-augmented condition with shuffled stimulus presentation order (independent permutation per seed, seeds 42-51).
+
+| Metric | Original (fixed order) | Shuffled |
+|--------|----------------------|----------|
+| Mean accuracy | 81.6% (SD=5.6) | 83.5% (SD=6.1) |
+| First 50 trials | 49% | 53.8% |
+| Last 50 trials | 90% | 91.0% |
+| Two-phase pattern | 10/10 seeds | 10/10 seeds |
+
+Stimulus randomization preserves both accuracy and the two-phase learning structure across all 10 seeds. The two-phase pattern is therefore attributable to circuit architecture, not stimulus order.
+
 ### Limitations
 
-- 10 seeds with fixed stimulus order; the two-phase pattern could partly reflect sequence structure rather than architecture. Stimulus randomization across seeds is needed. This is the most important interpretive limitation.
+- Stimulus shuffle control (Section 3.7) confirms that the two-phase pattern is architecture-derived, not stimulus-order-dependent.
 - Onset detection parameters (window=50, threshold=75%) were selected post-hoc to maximize onset-accuracy correlation. Confirmatory replication with pre-registered parameters is needed.
 - Sham relay control (Section 3.4) rules out added capacity; direct ascending control (Section 3.5) rules out extra modulatory drive. Remaining controls: ascending-input weight sweep, direct-path-only (relay replaces rather than augments). The direct ASC weight (88) may overestimate the effective relay-to-AC drive; lower-weight direct ASC conditions would further refine this comparison.
 - Relay neuron spike analysis not yet performed (planned).
@@ -209,6 +222,8 @@ All data and code: https://github.com/tsubasa-rsrch/research-papers/tree/main/pa
 - `sham_relay_exp.jl`: Sham relay experiment code
 - `direct_asc_control_results.csv`: 10 seeds, direct ascending control
 - `paper8_direct_asc.jl`: Direct ascending control experiment code
+- `shuffle_relay_results.csv`: 10 seeds, shuffled stimulus order
+- `paper8_shuffle.jl`: Shuffle experiment code
 - `analyze_thalamic_gate.py`: Statistical analysis
 - Figures: `fig2_learning_curves.png`, `fig3_onset_accuracy.png`, `fig4_paired_comparison.png`
 
