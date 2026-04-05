@@ -10,6 +10,8 @@ We demonstrate that a biomimetic Hodgkin-Huxley circuit with three local self-or
 
 Memory retrieval in AI systems relies predominantly on cosine similarity in embedding spaces (RAG: Retrieval-Augmented Generation). However, similarity does not equate to utility. We present evidence that the direction of maximum similarity and the direction of maximum usefulness can be orthogonal in embedding space.
 
+Kandel established that synaptic weight change is the mechanism of memory encoding (Kandel 2001). Our results suggest that connection topology determines what a given weight change encodes. The same Hebbian weight update produces opposite cognitive outcomes depending on where the modified synapse projects (Tsubasa 2026b).
+
 This paper asks: can biologically-plausible neural circuits, specifically winner-take-all (WTA) cortical columns with dopamine-modulated Hebbian learning, learn to distinguish useful from non-useful retrieved memories without manual parameter tuning?
 
 ### 1.1 Contributions
@@ -68,7 +70,7 @@ Input: 20-pixel stimulus (LDA-PCA hybrid) → AC → STR → DA reward → Hebbi
 | LDA 1d + weighted LR | 38.4% | 75.5% | 0.509 | Supervised (labels) |
 | HH self-org (auto6) | 30.8% | 40.8% | 0.351 | DA reward signal only |
 
-LDA achieves F1=0.529 using full label information, establishing the supervised upper bound. The HH circuit achieves F1=0.351 using only trial-by-trial DA reward signals, not label vectors. The comparison is between supervised global optimization (LDA) and local self-organization (HH). The HH circuit does not reach the supervised bound, but operates under fundamentally different information constraints.
+LDA achieves F1=0.529 using full label information, establishing the supervised upper bound. The HH circuit achieves F1=0.351 using only trial-by-trial DA reward signals, not label vectors. The comparison is between supervised global optimization (LDA) and local self-organization (HH). The HH circuit does not reach the supervised bound, but operates under different information constraints: per-trial reward signals rather than batch label access.
 
 ### 3.2 DA Bifurcation
 
@@ -114,7 +116,7 @@ Three computational psychopathologies emerged without being designed:
 
 ### 4.1 RAG Implications
 
-Cosine similarity is orthogonal to usefulness in our dataset. This challenges the fundamental assumption of vector-similarity-based retrieval. LDA provides a task-specific retrieval direction that cosine misses entirely.
+Cosine similarity is orthogonal to usefulness in our dataset. This contradicts the assumption underlying vector-similarity-based retrieval. LDA provides a task-specific retrieval direction that cosine misses entirely.
 
 ### 4.2 Biological Plausibility
 
@@ -122,7 +124,7 @@ The three self-organization mechanisms (floor, scaling, BCM) correspond to known
 
 ### 4.3 Computational Psychopathology
 
-The emergent psychopathologies suggest that HH circuit dynamics naturally reproduce clinical phenomena when reward sensitivity parameters are perturbed. This connects to Toker et al. (2026) on edge-of-chaos criticality in consciousness.
+The emergent psychopathologies suggest that HH circuit dynamics reproduce clinical phenomena when reward sensitivity parameters are perturbed. This connects to Toker et al. (2026) on edge-of-chaos criticality in consciousness.
 
 ### 4.4 Limitations
 
@@ -135,7 +137,7 @@ The emergent psychopathologies suggest that HH circuit dynamics naturally reprod
 
 ## 5. Conclusion
 
-Biologically-plausible HH circuits can learn memory gating through self-organization, achieving F1=0.365 in extreme class imbalance (5%/95%), exceeding the F1=0.351 obtained by 48-combination grid search with manually tuned parameters. The self-organizing version uses zero hand-tuned hyperparameters; all mechanisms (synaptic floor, tanh-saturated homeostatic scaling, BCM metaplasticity with soft saturation) correspond to established biological processes (Turrigiano 1998; Bienenstock et al. 1982). The key insight is that cosine similarity and usefulness occupy orthogonal directions in embedding space, and that local biological rules are sufficient to prevent minority-class extinction and enable continuous learning without manual intervention.
+Biologically-plausible HH circuits can learn memory gating through self-organization, achieving F1=0.365 in extreme class imbalance (5%/95%), exceeding the F1=0.351 obtained by 48-combination grid search with manually tuned parameters. The self-organizing version uses zero hand-tuned hyperparameters; all mechanisms (synaptic floor, tanh-saturated homeostatic scaling, BCM metaplasticity with soft saturation) correspond to established biological processes (Turrigiano 1998; Bienenstock et al. 1982). Cosine similarity and usefulness occupy orthogonal directions in embedding space. Local biological rules are sufficient to prevent minority-class extinction and enable continuous learning without manual intervention.
 
 ## References
 
@@ -145,3 +147,4 @@ Biologically-plausible HH circuits can learn memory gating through self-organiza
 - Toker, D. et al. (2026). Adversarial AI reveals mechanisms and treatments for disorders of consciousness. Nature Neuroscience.
 - Tsubasa (2026a). Ascending Arousal Input Improves Category Learning Accuracy in a Biomimetic Corticostriatal Model. Zenodo.
 - Tsubasa (2026b). Wiring Topology Determines Cognitive Function in a Biomimetic HH Circuit. Zenodo.
+- Kandel, E.R. (2001). The molecular biology of memory storage: a dialogue between genes and synapses. Science, 294(5544), 1030-1038.
