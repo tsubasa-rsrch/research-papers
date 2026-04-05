@@ -101,6 +101,7 @@ Critical bug: floor condition `weight > 0` misses weight=0. Fix: `weight >= 0`. 
 | Self-org + soft saturation | 56 | 128 | 30.4% | 38.1% | 0.338 |
 | **Self-org + softsat + auto target** | **60** | **135** | **30.8%** | **40.8%** | **0.351** |
 | Self-org + auto α (step 7) | 75 | 223 | 25.2% | 51.0% | 0.337 |
+| **Self-org + tanh unified (final)** | **76** | **194** | **28.1%** | **51.7%** | **0.365** |
 
 ### 3.5 Emergent Psychopathology
 
@@ -134,7 +135,7 @@ The emergent psychopathologies suggest that HH circuit dynamics naturally reprod
 
 ## 5. Conclusion
 
-Biologically-plausible HH circuits can learn memory gating through self-organization, achieving F1=0.35 in extreme class imbalance (5%/95%). The key insight is that cosine similarity and usefulness occupy orthogonal directions in embedding space, and that three local biological rules (floor, scaling, metaplasticity) are sufficient to prevent minority-class extinction and enable continuous learning.
+Biologically-plausible HH circuits can learn memory gating through self-organization, achieving F1=0.365 in extreme class imbalance (5%/95%), exceeding the F1=0.351 obtained by 48-combination grid search with manually tuned parameters. The self-organizing version uses zero hand-tuned hyperparameters; all mechanisms (synaptic floor, tanh-saturated homeostatic scaling, BCM metaplasticity with soft saturation) correspond to established biological processes (Turrigiano 1998; Bienenstock et al. 1982). The key insight is that cosine similarity and usefulness occupy orthogonal directions in embedding space, and that local biological rules are sufficient to prevent minority-class extinction and enable continuous learning without manual intervention.
 
 ## References
 
