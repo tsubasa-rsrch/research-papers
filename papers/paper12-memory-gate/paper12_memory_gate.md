@@ -126,9 +126,24 @@ The three self-organization mechanisms (floor, scaling, BCM) correspond to known
 
 The emergent psychopathologies suggest that HH circuit dynamics reproduce clinical phenomena when reward sensitivity parameters are perturbed. This connects to Toker et al. (2026) on edge-of-chaos criticality in consciousness.
 
+### 3.6 Multi-Seed Stability (Train/Test Split)
+
+10-seed evaluation with proper train (70%) / test (30%) split. LDA fit on train set only.
+
+| Metric | Mean ± SD | Range |
+|--------|-----------|-------|
+| Precision | 15.8% ± 0.7% | 14.6–16.7% |
+| Recall | 91.1% ± 5.6% | 82.2–100% |
+| F1 | 0.269 ± 0.011 | 0.250–0.287 |
+| tp (of 45 test positives) | 41.0 ± 2.5 | 37–45 |
+
+Seed-to-seed variability is small (CV < 5% for precision, < 7% for recall). Two seeds (46, 48) achieved 100% recall (all test positives captured). The circuit reliably detects useful items at the cost of high false positive rates.
+
+Note: These results use the auto6 configuration. The final tanh-unified version (F1=0.365 on full data) has not yet been evaluated with train/test split and multi-seed.
+
 ### 4.4 Limitations
 
-- **Single seed** (42) for most experiments. Multi-seed validation needed for all conditions.
+- Multi-seed validation completed for auto6 configuration; final tanh-unified version awaits multi-seed evaluation.
 - **LDA supervision**: LDA projection uses ground truth labels, making it a supervised preprocessing step. The HH circuit's self-organization operates downstream of this supervised encoder. End-to-end biological plausibility would require the circuit to discover the discriminant direction itself.
 - **LDA upper bound**: Simple LDA thresholding achieves F1=0.529, exceeding HH circuit F1=0.351. The circuit does not fully exploit the information available in LDA-projected inputs. This gap may reflect WTA dynamics' difficulty with graded (non-binary) input differences.
 - **PCA 20d** captures only 40% variance. Higher dimensions may improve circuit precision.
