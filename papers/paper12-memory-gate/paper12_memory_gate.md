@@ -61,7 +61,14 @@ Input: 20-pixel stimulus (LDA-PCA hybrid) → AC → STR → DA reward → Hebbi
 
 ### 3.1 Cosine-Usefulness Orthogonality
 
-[Table: cosine vs LDA precision/recall/F1]
+| Method | Precision | Recall | F1 | Supervision |
+|--------|-----------|--------|-----|-------------|
+| Cosine similarity (best threshold) | 15.8% | 100% | 0.273 | Unsupervised |
+| LDA 1d (best threshold) | 42.3% | 70.7% | 0.529 | Supervised (labels) |
+| LDA 1d + weighted LR | 38.4% | 75.5% | 0.509 | Supervised (labels) |
+| HH self-org (auto6) | 30.8% | 40.8% | 0.351 | DA reward signal only |
+
+LDA achieves F1=0.529 using full label information, establishing the supervised upper bound. The HH circuit achieves F1=0.351 using only trial-by-trial DA reward signals, not label vectors. The comparison is between supervised global optimization (LDA) and local self-organization (HH). The HH circuit does not reach the supervised bound, but operates under fundamentally different information constraints.
 
 ### 3.2 DA Bifurcation
 
@@ -93,6 +100,7 @@ Critical bug: floor condition `weight > 0` misses weight=0. Fix: `weight >= 0`. 
 | Self-org (no saturation) | 58 | 185 | 23.9% | 39.5% | 0.297 |
 | Self-org + soft saturation | 56 | 128 | 30.4% | 38.1% | 0.338 |
 | **Self-org + softsat + auto target** | **60** | **135** | **30.8%** | **40.8%** | **0.351** |
+| Self-org + auto α (step 7) | 75 | 223 | 25.2% | 51.0% | 0.337 |
 
 ### 3.5 Emergent Psychopathology
 
@@ -117,10 +125,12 @@ The emergent psychopathologies suggest that HH circuit dynamics naturally reprod
 
 ### 4.4 Limitations
 
-- Single seed (42) for most experiments. Multi-seed validation needed.
-- PCA 20d captures only 40% variance. Higher dimensions may improve precision.
-- Self-organizing version has lower precision than hand-optimized (23.9% vs 28.2%).
-- LDA direction is computed offline, not learned by the circuit.
+- **Single seed** (42) for most experiments. Multi-seed validation needed for all conditions.
+- **LDA supervision**: LDA projection uses ground truth labels, making it a supervised preprocessing step. The HH circuit's self-organization operates downstream of this supervised encoder. End-to-end biological plausibility would require the circuit to discover the discriminant direction itself.
+- **LDA upper bound**: Simple LDA thresholding achieves F1=0.529, exceeding HH circuit F1=0.351. The circuit does not fully exploit the information available in LDA-projected inputs. This gap may reflect WTA dynamics' difficulty with graded (non-binary) input differences.
+- **PCA 20d** captures only 40% variance. Higher dimensions may improve circuit precision.
+- **No train/test split**: LDA is fit on the full dataset. Cross-validated evaluation is needed to prevent leakage.
+- **Threshold selection**: Operating points for cosine and LDA baselines are optimized on the full dataset, inflating their apparent performance.
 
 ## 5. Conclusion
 
