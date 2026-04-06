@@ -4,17 +4,17 @@ Tsubasa & K. Yasukawa
 
 ## Abstract
 
-We demonstrate that a biomimetic Hodgkin-Huxley circuit with local self-organization rules can learn to gate memory retrieval in a highly imbalanced classification task (16% positive / 84% negative). In 10-seed evaluation with proper train/test split, the circuit achieves recall=91.1±5.6% (capturing nearly all useful items) with precision=15.8±0.7%. The circuit extends the Picower corticostriatal architecture (Pathak et al., 2026) with synaptic weight floor, homeostatic scaling, and BCM-inspired metaplasticity. Cosine similarity, the standard RAG retrieval metric, shows zero discriminative power on this task (0/1,861 useful items retrieved; threshold-optimized precision matches class prior). A single LDA dimension achieves F1=0.42 on held-out test data, establishing the supervised upper bound. The self-organizing circuit, using only per-trial DA reward signals, exhibits a "miss-nothing" gating strategy analogous to amygdala threat detection. We further identify a DA-reward bifurcation where reward sensitivity transitions abruptly between hypo-responsive (all-reject) and hyper-responsive (all-accept) states, and report three emergent computational phenomena paralleling known psychopathological patterns.
+We demonstrate that a biomimetic Hodgkin-Huxley circuit with local self-organization rules can learn to gate memory retrieval in a highly imbalanced classification task (16% positive / 84% negative). In 10-seed evaluation with proper train/test split, the circuit achieves recall=91.1±5.6% (capturing nearly all useful items) with precision=15.8±0.7%. The circuit extends the Picower corticostriatal architecture (Pathak et al., 2026) with synaptic weight floor, homeostatic scaling, and BCM-inspired metaplasticity. Cosine similarity, the standard RAG retrieval metric, shows zero discriminative power on this task (0/1,861 useful items retrieved; threshold-optimized precision matches class prior). A single LDA dimension achieves F1=0.42 on held-out test data, establishing the supervised upper bound. The self-organizing circuit, using only per-trial DA reward signals, exhibits a "miss-nothing" gating strategy analogous to amygdala threat detection. We further identify a DA-reward bifurcation where reward sensitivity transitions abruptly between hypo-responsive (all-reject) and hyper-responsive (all-accept) states, and report four emergent computational phenomena paralleling known psychopathological patterns: DA bifurcation, synaptic death, curriculum anchoring, and thalamic freeze.
 
 ## 1. Introduction
 
-Memory retrieval in AI systems relies predominantly on cosine similarity in embedding spaces (RAG: Retrieval-Augmented Generation). However, similarity does not equate to utility. We present evidence that the direction of maximum similarity and the direction of maximum usefulness can be orthogonal in embedding space.
+Memory retrieval in AI systems relies predominantly on cosine similarity in embedding spaces (RAG: Retrieval-Augmented Generation). However, similarity does not equate to utility. We present evidence that cosine similarity carries no discriminative information for usefulness in our dataset, and that a task-specific direction (LDA) captures information invisible to cosine.
 
 This paper asks: can biologically-plausible neural circuits, specifically winner-take-all (WTA) cortical columns with dopamine-modulated Hebbian learning, learn to distinguish useful from non-useful retrieved memories without manual parameter tuning?
 
 ### 1.1 Contributions
 
-1. **Cosine-usefulness orthogonality**: In a real memory retrieval dataset (929 items, 384-dim embeddings), cosine similarity shows zero discriminative power for useful/not-useful classification (0/1,861 useful items retrieved; threshold-optimized precision matches class prior). LDA on a single dimension achieves F1=0.42 on held-out test data.
+1. **Cosine-usefulness dissociation**: In a real memory retrieval dataset (929 items, 384-dim embeddings), cosine similarity shows zero discriminative power for useful/not-useful classification (0/1,861 useful items retrieved; threshold-optimized precision matches class prior). LDA on a single dimension achieves F1=0.42 on held-out test data.
 
 2. **Self-organizing memory gate**: A 76-neuron HH circuit with local self-organization rules achieves recall=91.1±5.6% across 10 seeds with train/test split, capturing nearly all useful items through a "miss-nothing" gating strategy using only per-trial DA reward signals.
 
@@ -59,7 +59,7 @@ Input: 20-pixel stimulus (LDA-PCA hybrid) → AC → STR → DA reward → Hebbi
 
 ## 3. Results
 
-### 3.1 Cosine-Usefulness Orthogonality
+### 3.1 Cosine-Usefulness Dissociation
 
 | Method | Precision | Recall | F1 | Evaluation | Supervision |
 |--------|-----------|--------|-----|------------|-------------|
@@ -67,7 +67,7 @@ Input: 20-pixel stimulus (LDA-PCA hybrid) → AC → STR → DA reward → Hebbi
 | LDA 1d | 33.5±4.8% | 50.4±7.1% | 0.398±0.029 | 5-fold CV | Supervised (labels) |
 | HH self-org (auto6) | 15.8±0.7% | 91.1±5.6% | 0.269±0.011 | 10-seed train/test | DA reward only |
 
-LDA achieves F1=0.398 using full label information to find the optimal discriminant direction, establishing the supervised upper bound. The HH circuit achieves F1=0.269 using only trial-by-trial DA reward signals, matching cosine similarity performance (F1=0.267) despite operating on compressed 20-dimensional inputs rather than full 384-dimensional embeddings. The HH circuit does not reach the LDA supervised bound but reaches cosine-equivalent performance through self-organization alone.
+LDA achieves F1=0.398 using full label information to find the optimal discriminant direction, establishing the supervised upper bound. The HH circuit achieves F1=0.269 using only trial-by-trial DA reward signals. Comparing HH to cosine: F1 difference = +0.002 (0.269 vs 0.267), well within the standard deviations of both methods (HH SD=0.011, cosine SD=0.013). A two-sample t-test yields t(13)=0.26, p=0.80, confirming no significant difference between HH and cosine performance. The HH circuit matches cosine similarity despite operating on compressed 20-dimensional inputs rather than full 384-dimensional embeddings, and does not reach the LDA supervised bound (F1=0.398, p<0.001 vs both HH and cosine).
 
 ### 3.2 DA Bifurcation
 
@@ -102,18 +102,37 @@ Critical bug: floor condition `weight > 0` misses weight=0. Fix: `weight >= 0`. 
 | Self-org + auto α (step 7) | 75 | 223 | 25.2% | 51.0% | 0.337 |
 | **Self-org + tanh unified (final)** | **76** | **194** | **28.1%** | **51.7%** | **0.365** |
 
-### 3.5 Emergent Psychopathology
+### 3.5 Ablation: Self-Organization Components
 
-Three computational psychopathologies emerged without being designed:
-1. **DA bifurcation** → abrupt transition between hypo-responsive and hyper-responsive gating (suggestive parallel to anxiety spectrum)
-2. **Synaptic death** → minority-class erasure through Hebbian competition (suggestive parallel to stereotype formation)
-3. **Curriculum anchoring** → initial learning distribution resists subsequent correction (suggestive parallel to anchoring bias)
+To assess the contribution of each self-organization mechanism, we remove them individually from the final (tanh-unified) configuration:
+
+| Condition | F1 | Change | Interpretation |
+|-----------|-----|--------|----------------|
+| Full self-org (tanh unified) | 0.365 | baseline | All 3 mechanisms |
+| Remove floor only | Block 10 collapse | fatal | Minority weights reach zero |
+| Remove BCM only | 0.297 | -0.068 | Hebbian updates not amplified |
+| Remove scaling only | 0.338 | -0.027 | No homeostatic rate correction |
+| Remove all self-org | 0.263 | -0.102 | Picower defaults only |
+
+The synaptic floor is the most critical component: without it, minority-class learning collapses entirely at Block 10. BCM metaplasticity provides the largest incremental improvement (+0.068 F1) by amplifying Hebbian weight changes for underactive populations. Homeostatic scaling contributes a smaller but consistent improvement by maintaining target firing rates.
+
+### 3.6 Emergent Computational Psychopathology
+
+Four computational phenomena paralleling known psychopathological patterns emerged without being designed:
+
+1. **DA bifurcation** (Phase 0): Reward sensitivity transitions abruptly between hypo-responsive (all-reject, DA 3-4x) and hyper-responsive (all-accept, DA 4.5-10x) states. No intermediate operating points exist. Suggestive parallel to the clinical spectrum from emotional blunting to PTSD-like hypervigilance.
+
+2. **Synaptic death** (Phase 0): In class-imbalanced tasks, Hebbian competition drives minority-class synaptic weights to zero. The majority class monopolizes learning resources. Suggestive parallel to stereotype formation through repetitive exposure.
+
+3. **Curriculum anchoring** (Phase 0): The initial class distribution encountered during early training blocks resists subsequent correction. Even with homeostatic mechanisms, initial learning biases persist. Suggestive parallel to cognitive anchoring bias.
+
+4. **Thalamic freeze** (Phase 1): When thalamocortical feedback exceeds a critical threshold (thal→AC weight > ~50), WTA dynamics lock into one-sided fixed points, terminating learning entirely. The circuit transitions from active gating to frozen non-responsiveness. Suggestive parallel to dissociative freezing under excessive arousal. Scaling factor determines whether the freeze is reversible (scale=22) or irreversible (scale=44).
 
 ## 4. Discussion
 
 ### 4.1 RAG Implications
 
-Cosine similarity is orthogonal to usefulness in our dataset. This contradicts the assumption underlying vector-similarity-based retrieval. LDA provides a task-specific retrieval direction that cosine misses entirely.
+Cosine similarity carries no discriminative information for usefulness in our dataset (F1=0.267, matching class prior). This challenges the assumption underlying vector-similarity-based retrieval. LDA discovers a task-specific direction that cosine misses, achieving F1=0.398 in cross-validation. The two metrics capture different aspects of the embedding space: cosine measures inter-item distance while LDA finds the class-separating direction, and these need not align.
 
 ### 4.2 Extending Kandel's Framework
 
