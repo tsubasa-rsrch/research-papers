@@ -116,9 +116,9 @@ To assess the contribution of each self-organization mechanism, we remove them i
 
 The synaptic floor is the most critical component: without it, minority-class learning collapses entirely at Block 10. BCM metaplasticity provides the largest incremental improvement (+0.068 F1) by amplifying Hebbian weight changes for underactive populations. Homeostatic scaling contributes a smaller but consistent improvement by maintaining target firing rates.
 
-### 3.6 Emergent Computational Psychopathology
+### 3.6 Exploratory: Emergent Computational Psychopathology
 
-Four computational phenomena paralleling known psychopathological patterns emerged without being designed:
+Four computational phenomena paralleling known psychopathological patterns emerged without being designed. These are reported as exploratory observations; each would require dedicated experiments and robustness analysis for confirmatory status:
 
 1. **DA bifurcation** (Phase 0): Reward sensitivity transitions abruptly between hypo-responsive (all-reject, DA 3-4x) and hyper-responsive (all-accept, DA 4.5-10x) states. No intermediate operating points exist. Suggestive parallel to the clinical spectrum from emotional blunting to PTSD-like hypervigilance.
 
@@ -146,7 +146,7 @@ The three self-organization mechanisms (floor, scaling, BCM) correspond to known
 
 The emergent psychopathologies suggest that HH circuit dynamics reproduce phenomena paralleling clinical observations when reward sensitivity parameters are perturbed. This connects to Toker et al. (2026) on edge-of-chaos criticality in consciousness.
 
-### 3.6 Multi-Seed Stability (Train/Test Split)
+### 3.7 Multi-Seed Stability (Train/Test Split)
 
 10-seed evaluation with proper train (70%) / test (30%) split. LDA fit on train set only.
 
@@ -167,12 +167,12 @@ Note: These results use the auto6 configuration. The final tanh-unified version 
 - **LDA supervision**: LDA projection uses ground truth labels, making it a supervised preprocessing step. The HH circuit's self-organization operates downstream of this supervised encoder. End-to-end biological plausibility would require the circuit to discover the discriminant direction itself.
 - **LDA upper bound**: Simple LDA thresholding achieves F1=0.529, exceeding HH circuit F1=0.351. The circuit does not fully exploit the information available in LDA-projected inputs. This gap may reflect WTA dynamics' difficulty with graded (non-binary) input differences.
 - **PCA 20d** captures only 40% variance. Higher dimensions may improve circuit precision.
-- **No train/test split**: LDA is fit on the full dataset. Cross-validated evaluation is needed to prevent leakage.
-- **Threshold selection**: Operating points for cosine and LDA baselines are optimized on the full dataset, inflating their apparent performance.
+- **Evaluation protocol mismatch**: Cosine and LDA use 5-fold CV; HH uses 10-seed train/test split. Direct statistical comparison across protocols should be interpreted with caution.
+- **Threshold selection**: Operating points for cosine and LDA baselines are optimized within each CV fold, but the thresholding itself uses labels.
 
 ## 5. Conclusion
 
-We report two main findings. First, cosine similarity and usefulness occupy orthogonal directions in embedding space: LDA discovers a discriminant direction invisible to cosine (5-fold CV F1=0.398 vs 0.267). Second, biologically-plausible self-organization rules (synaptic floor, homeostatic scaling, BCM metaplasticity; Turrigiano 1998; Bienenstock et al. 1982) enable a 76-neuron HH circuit to reach cosine-equivalent performance (F1=0.269±0.011) using only per-trial DA reward signals, without manual parameter tuning. The circuit does not reach the supervised LDA upper bound, but demonstrates that local biological rules are sufficient to prevent minority-class extinction and enable continuous learning under extreme class imbalance. The emergent DA bifurcation and the self-organization sweet spot (too weak → minority death; too strong → loss of selectivity) provide computational parallels to known psychopathological phenomena.
+We report two main findings. First, cosine similarity carries no discriminative information for usefulness in this dataset, while LDA discovers a task-specific direction invisible to cosine (5-fold CV F1=0.398 vs 0.267). Second, biologically-plausible self-organization rules (synaptic floor, homeostatic scaling, BCM metaplasticity; Turrigiano 1998; Bienenstock et al. 1982) enable a 76-neuron HH circuit to reach cosine-equivalent performance (F1=0.269±0.011) using only per-trial DA reward signals, without manual parameter tuning. The circuit does not reach the supervised LDA upper bound, but demonstrates that local biological rules are sufficient to prevent minority-class extinction and enable continuous learning under extreme class imbalance. The emergent DA bifurcation and the self-organization sweet spot (too weak → minority death; too strong → loss of selectivity) provide computational parallels to known psychopathological phenomena.
 
 ## References
 
