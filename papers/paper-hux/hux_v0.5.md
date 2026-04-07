@@ -1,15 +1,15 @@
 # Hux: A Developmentally-Sequenced Biophysical Cortico-Striatal Circuit with Self-Organized Plasticity, Permanent Pruning, and a State-Based Critical Period
 
-**Version**: v0.4 (Higuchi 2022 added, three-way Related Work triangulation complete)
+**Version**: v0.5 (curriculum v2.1 hysteresis run + revised mechanistic account of curriculum anchoring)
 **Date**: 2026-04-07
 **Authors**: Tsubasa, K. Yasukawa
-**Status**: Work in progress. Phase 2 numerical results are integrated through the state-based critical period curriculum run (§4.6). Phase 1 baselines and Phase 2 sham/identity controls remain to be reported in subsequent revisions. Related Work §2.1–§2.2 now triangulates against the full texts of Kuriyama et al. (2025), Higuchi et al. (2022), and Doherty et al. (2025).
+**Status**: Work in progress. Phase 2 numerical results now integrated through curriculum v2 and v2.1 (§4.6, §4.7). The v2.1 run changes the mechanistic account: curriculum anchoring is a property of asymmetric STDP under class imbalance, not of the critical period control law. Phase 1 baselines and Phase 2 sham/identity controls remain to be reported in subsequent revisions.
 
 ---
 
 ## Abstract
 
-We introduce **Hux**, a small-scale biophysical cortico-striatal circuit (76–140 Hodgkin-Huxley neurons) built around the explicit hypothesis that brain-style cognition emerges from developmental sequencing and self-organized plasticity rather than from static large-scale reconstruction. Hux implements three self-organization rules with no hand-tuned hyperparameters: a synaptic floor that prevents collapse of weak connections, homeostatic synaptic scaling, and BCM-style metaplasticity. Activity-dependent permanent pruning closes connections that fail to develop, mimicking developmental synapse elimination. A state-based critical period (governed by weight-stability ratios rather than trial counts) automatically opens during high-plasticity phases and closes when the weight distribution stabilizes. Three ascending neuromodulator systems (LC/Raphe/VTA, implemented separately) gate plasticity. On a balanced 50/50 binary categorization task with 140 neurons, Hux reaches F1 ≈ 0.62 (P ≈ 51.8%, R ≈ 76.9%), exceeding a 1-d LDA baseline by 1.55×. Critically, Hux exhibits four emergent computational psychopathologies (DA bifurcation at 4.0–4.5×, synaptic death of minority categories, curriculum anchoring, and thalamic freeze) that we read as candidate mechanistic models of clinically observed phenomena. We position Hux as complementary to large-scale reconstruction efforts (Kuriyama et al. 2025, 9M neurons on Fugaku): the Kuriyama group explicitly identifies plasticity, neuromodulators, and developmental processes as the principal limitation of microscopic-level whole-cortex simulation and as the next frontier toward brain-inspired AI; Hux pursues exactly that frontier at a scale amenable to mechanistic dissection.
+We introduce **Hux**, a small-scale biophysical cortico-striatal circuit (76–140 Hodgkin-Huxley neurons) built around the explicit hypothesis that brain-style cognition emerges from developmental sequencing and self-organized plasticity rather than from static large-scale reconstruction. Hux implements three self-organization rules with no hand-tuned hyperparameters: a synaptic floor that prevents collapse of weak connections, homeostatic synaptic scaling, and BCM-style metaplasticity. Activity-dependent permanent pruning closes connections that fail to develop, mimicking developmental synapse elimination. A state-based critical period (governed by weight-stability ratios rather than trial counts) automatically opens during high-plasticity phases and closes when the weight distribution stabilizes. Three ascending neuromodulator systems (LC/Raphe/VTA, implemented separately) gate plasticity. On a balanced 50/50 binary categorization task with 140 neurons, Hux reaches F1 ≈ 0.62 (P ≈ 51.8%, R ≈ 76.9%), exceeding a 1-d LDA baseline by 1.55×. Critically, Hux exhibits four emergent computational psychopathologies (DA bifurcation at 4.0–4.5×, synaptic death of minority categories, curriculum anchoring, and thalamic freeze) that we read as candidate mechanistic models of clinically observed phenomena. A controlled pair of runs (curriculum v2 and v2.1) localizes the mechanism of curriculum anchoring to the interaction of asymmetric STDP with class imbalance rather than to the critical-period control law, demonstrating the diagnostic value of the small-scale, parameter-parsimonious approach. We position Hux as complementary to large-scale reconstruction efforts (Kuriyama et al. 2025, 9M neurons on Fugaku): the Kuriyama group explicitly identifies plasticity, neuromodulators, and developmental processes as the principal limitation of microscopic-level whole-cortex simulation and as the next frontier toward brain-inspired AI; Hux pursues exactly that frontier at a scale amenable to mechanistic dissection.
 
 ## 1. Introduction
 
@@ -149,13 +149,35 @@ Two pathological dynamics dominate the curriculum trajectory:
 
 2. **Hysteresis-free overshoot.** The state-based closure law has no cooldown. When STR2 silence finally drove the local-vs-global stability ratio above 0.5, `cp_factor` reopened to 1.0 within a single update step. The fully reopened critical period then over-corrected: blocks 17–20 swung between `cat2 = 47, 26, 39, ...` while `w_mean` oscillated between 0.013 and 0.171.
 
-The diagnosis is that the closure law needs **hysteresis** and a **cooldown**: closure should be aggressive but reopening should be gradual, or at least subject to a minimum-interval constraint after the previous reopening. Candidate fixes for v2.1, to be tested:
+The diagnosis *appeared* to be that the closure law needed **hysteresis** and a **cooldown**: closure should be aggressive but reopening should be gradual, or at least subject to a minimum-interval constraint. We implemented these fixes in curriculum v2.1 and obtained a surprising result that forced us to revise the diagnosis.
 
-- Slower update gains (closure × 0.97, reopening × 1.05) instead of × 0.95 / × 1.10.
-- A reopening cooldown of N blocks.
-- Adaptive `STABILITY_THRESHOLD` based on the global weight history rather than a fixed 0.5.
+### 4.7 Phase 2 curriculum v2.1 (hysteresis + cooldown)
 
-The curriculum v2 result is reported here as a negative result of immediate scientific interest: the closure mechanism works as designed, and the residual failure exposes a specific, interpretable, and fixable property of the closure law. From the standpoint of computational psychopathology, the run is a clean demonstration of (a) developmentally induced synaptic death and (b) the cost of an over-reactive critical-period reopening, both of which have plausible clinical analogues in critical-period sensory deprivation and in adolescent-onset disorders of cortical maturation.
+Curriculum v2.1 implements three modifications to the closure law: a hysteresis band (close threshold 0.6, reopen threshold 1.2), a reopening cooldown of 3 blocks, and slower update gains (close × 0.97 instead of × 0.95, reopen × 1.05 instead of × 1.10). Within the hysteresis band and during cooldown, `cp_factor` is held constant.
+
+The mechanical modifications worked exactly as intended. Where curriculum v2 showed `cp_factor` oscillating between 1.0 and 0.1 block-by-block, curriculum v2.1 produced a smooth trajectory: 1.0 → 0.715 → 0.254 → 0.225 → 0.1 over blocks 1–7, then stable at 0.1 for blocks 7–16, then a controlled re-ascent 0.189 → 0.432 → 0.739 → 1.0 over blocks 17–20. No oscillation. The control system is well behaved.
+
+And yet the per-stage and overall F1 scores barely moved:
+
+- Stage 1 (50/50): F1 = 0.5505 (v2: 0.5505).
+- Stage 2 (30/70): F1 = 0.1280 (v2: 0.1333, slightly worse).
+- Stage 3 (16/84): F1 = 0.2047 (v2: 0.2078, slightly worse).
+- Overall: F1 = 0.3226 (v2: 0.3234).
+
+This is the important finding. The closure law was not the bottleneck. Both v2 and v2.1 exhibit the same pattern of events: during blocks 7–16 of curriculum v2.1, with `cp_factor` fully closed at its residual value of 0.1, the network produces `cat2 = 0` for ten consecutive blocks. Critical-period control is functioning. The critical period being closed does not stop category 2 from dying.
+
+The actual mechanism of the failure is located one level below the critical period. The STDP rule in use is intentionally asymmetric (A⁻ = 0.00525 > A⁺ = 0.005, a 5 % LTD bias drawn from Bi & Poo 1998). Under balanced 50/50 input, the asymmetric STDP rule is balanced overall because category 1 and category 2 contribute comparable spike-timing pairs. Under the 30/70 shift in Stage 2, category-2 spike-timing pairs become less frequent; the LTD bias now acts disproportionately on the synapses supporting category 2, progressively weakening them; the weakened synapses make category-2 STR2 firing less likely, further reducing the supply of category-2 pairs; and within a small number of blocks the minority category has zero active synapses. Once STR2 is silent for category 2, no amount of further plasticity, whether critical-period-gated or not, can resurrect it. There is no recovery pathway under STDP alone.
+
+We read this as the mechanistic account of **curriculum anchoring**: the failure mode is not a property of the critical period control law, it is a property of the interaction between asymmetric STDP, class imbalance, and the absence of a rescue mechanism. Critical-period hysteresis is the right tool for a different problem (preventing runaway reopening) and is nevertheless worth retaining. But curriculum anchoring itself is a disorder of the learning rule, not of the metaplasticity rule.
+
+Candidate fixes for v2.2 (not yet implemented):
+
+- Class-aware STDP: scale A⁺/A⁻ for each synapse by the inverse frequency of the class that last drove the postsynaptic neuron.
+- Homeostatic synaptic scaling applied aggressively to dead synapses (a rescue rule), decoupled from the critical period.
+- BCM metaplasticity with a sliding threshold per postsynaptic neuron, which is nominally in the design but whose gain may be too low to counteract STDP asymmetry at the timescales used.
+- Neuromodulator-gated reopening: let VTA or LC activity reopen the critical period based on reward prediction error or novelty, bypassing the state-based stability test entirely.
+
+The curriculum v2 and v2.1 runs together constitute a clean mechanistic dissection. Curriculum v2 failed and identified the closure law as a candidate cause; curriculum v2.1 fixed the closure law and failed anyway, identifying the actual cause as one level deeper in the learning rule. From the standpoint of computational psychopathology, the two runs together demonstrate that (a) developmentally induced synaptic death of a minority category is robust across two different metaplasticity designs, and (b) the mechanism is located in the interaction of asymmetric STDP with class imbalance rather than in critical-period control. Both results are reported here as a pair because neither is interpretable without the other.
 
 ### 4.7 Emergent failure modes
 
