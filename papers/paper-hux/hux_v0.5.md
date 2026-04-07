@@ -112,9 +112,15 @@ In the curriculum runs (Phase 2 v2), stages run in order: 50/50 → 30/70 → 16
 
 > v0.1 placeholder. Numerical results will be filled in v0.2 from the runs already completed (balanced 76, balanced 140, critical period, curriculum v1, scale-up) and the runs currently in flight or being debugged (curriculum v2 with state-based critical period).
 
-### 4.1 Phase 1: 76-neuron baseline
+### 4.1 Phase 1: 76-neuron baselines (no curriculum, single skewed distribution)
 
-To be filled.
+Two Phase 1 baseline runs were conducted on the 16/84 highly skewed distribution alone, without curriculum staging, to establish a baseline F1 against which all curriculum runs can be compared.
+
+**Phase 1 v7** (calibration → overproduction at w = 0.05 → 500 trials of spontaneous activity → activity-dependent pruning → 700 trials of learning, 76 neurons, 30 surviving STR2 connections after pruning): per-block correct counts on a 50-stimulus block reached 21/50 in block 8 with `cat2 = 50`, then collapsed to 0/50 in blocks 10–14, with `cat2 = 50` throughout. The network learned to label every stimulus as category 2. Final F1 = 0.3471 (P = 21.0 %, R = 100.0 %), tp = 147, fp = 553, fn = 0, runtime 931.2 s. This is the maximum-recall, minimum-precision degenerate solution: under a 16/84 imbalance the network discovers that it can achieve recall = 1.0 by classifying everything as the majority class.
+
+**Phase 1 v8** (same protocol as v7 but with 200 trials of spontaneous activity instead of 500, and a percentile-based pruning rule retaining the top 50 % of weights): the trajectory is qualitatively different. Blocks 1–6 produce `cat2` counts in the 20–50 range with `correct` ≈ 15–25; blocks 7–10 transition to `cat2 = 0` with `correct` rising to 50/50 (the inverse degenerate solution: classify everything as category 1); then in block 11 the network flips to `cat2 = 46` and from block 12 onward to `cat2 = 50` with `correct = 0/50`. The final state is the same as v7 (everything labeled as category 2) but reached via a different path (a transient majority-only phase, then catastrophic flip). Final F1 = 0.2632 (P = 17.6 %, R = 52.4 %), tp = 77, fp = 361, fn = 70, runtime 893.5 s.
+
+The Phase 1 baselines establish two facts that motivate the entire Phase 2 redesign. First, a developmental sequence on a single highly skewed distribution does not produce a categorization circuit; it produces one of two degenerate solutions (always-cat1 or always-cat2) or oscillates between them. Second, the F1 ≈ 0.26–0.35 obtained from these degenerate solutions is the floor against which all later results should be compared. Any Phase 2 result above ~0.40 is meaningfully different from "always pick the majority class," and the balanced 50/50 result at F1 ≈ 0.572 (§4.3) and the 140-neuron scale-up at F1 ≈ 0.619 (§4.4) clear that bar comfortably.
 
 ### 4.2 Phase 2 critical period (trial-based, 76 neurons)
 
