@@ -1,9 +1,9 @@
 # Hux: A Developmentally-Sequenced Biophysical Cortico-Striatal Circuit with Self-Organized Plasticity, Permanent Pruning, and a State-Based Critical Period
 
-**Version**: v0.5 (curriculum v2.1 hysteresis run + revised mechanistic account of curriculum anchoring)
+**Version**: v0.6 (curriculum v2.1c symmetric-STDP control reverses the §4.7 diagnosis; v2.1d in flight)
 **Date**: 2026-04-07
 **Authors**: Tsubasa, K. Yasukawa
-**Status**: Work in progress. Phase 2 numerical results now integrated through curriculum v2 and v2.1 (§4.6, §4.7). The v2.1 run changes the mechanistic account: curriculum anchoring is a property of asymmetric STDP under class imbalance, not of the critical period control law. Phase 1 baselines and Phase 2 sham/identity controls remain to be reported in subsequent revisions.
+**Status**: Work in progress. Phase 2 numerical results now integrated through curriculum v2, v2.1, and v2.1c (§4.6, §4.7, §4.8). The v2.1c run reverses the working diagnosis: asymmetric STDP is not the cause of curriculum anchoring; it functions as a built-in safeguard against winner-take-all runaway. Curriculum v2.1d (Hebbian gain K = 0) is in flight to test the next candidate. Phase 1 baselines are now in §4.1; the developing ablation table (v2 / v2.1 / v2.1c / v2.1d) will be added in §4.9 once v2.1d completes.
 
 ---
 
@@ -172,9 +172,30 @@ And yet the per-stage and overall F1 scores barely moved:
 
 This is the important finding. The closure law was not the bottleneck. Both v2 and v2.1 exhibit the same pattern of events: during blocks 7–16 of curriculum v2.1, with `cp_factor` fully closed at its residual value of 0.1, the network produces `cat2 = 0` for ten consecutive blocks. Critical-period control is functioning. The critical period being closed does not stop category 2 from dying.
 
-The actual mechanism of the failure is located one level below the critical period. The STDP rule in use is intentionally asymmetric (A⁻ = 0.00525 > A⁺ = 0.005, a 5 % LTD bias drawn from Bi & Poo 1998). Under balanced 50/50 input, the asymmetric STDP rule is balanced overall because category 1 and category 2 contribute comparable spike-timing pairs. Under the 30/70 shift in Stage 2, category-2 spike-timing pairs become less frequent; the LTD bias now acts disproportionately on the synapses supporting category 2, progressively weakening them; the weakened synapses make category-2 STR2 firing less likely, further reducing the supply of category-2 pairs; and within a small number of blocks the minority category has zero active synapses. Once STR2 is silent for category 2, no amount of further plasticity, whether critical-period-gated or not, can resurrect it. There is no recovery pathway under STDP alone.
+The actual mechanism of the failure is located one level below the critical period. Our initial hypothesis, formed from v2 and v2.1 alone, was that the asymmetric STDP rule (A⁻ = 0.00525 > A⁺ = 0.005, a 5 % LTD bias drawn from Bi & Poo 1998) was destabilizing the minority category under class imbalance: the LTD bias would act disproportionately on category-2 synapses, weakening them, reducing the supply of category-2 spike-timing pairs, and producing a positive-feedback collapse to silence. We proposed this account at the end of §4.7 and recorded it as the working diagnosis. A direct control experiment then forced us to revise it.
 
-We read this as the mechanistic account of **curriculum anchoring**: the failure mode is not a property of the critical period control law, it is a property of the interaction between asymmetric STDP, class imbalance, and the absence of a rescue mechanism. Critical-period hysteresis is the right tool for a different problem (preventing runaway reopening) and is nevertheless worth retaining. But curriculum anchoring itself is a disorder of the learning rule, not of the metaplasticity rule.
+### 4.8 Phase 2 curriculum v2.1c (symmetric STDP control: A⁻ = A⁺ = 0.005)
+
+To test the LTD-bias hypothesis directly, we ran v2.1c, identical to v2.1 in every respect except that the STDP rule was made symmetric (A⁻ set equal to A⁺ at 0.005). If the LTD bias was the cause of curriculum anchoring, removing it should rescue the minority category.
+
+It did the opposite. Per-stage F1 scores were:
+
+- Stage 1 (50/50): F1 = 0.4804 (v2.1: 0.5505).
+- Stage 2 (30/70): F1 = 0.1452 (v2.1: 0.1280).
+- Stage 3 (16/84): F1 = 0.2105 (v2.1: 0.2047).
+- Overall: F1 = 0.298 (v2.1: 0.3226).
+
+Crucially, **Stage 1 (under balanced 50/50 input, where the LTD-bias hypothesis predicts no effect) was 7 percentage points worse with symmetric STDP**. The very block at which curriculum v2.1 first showed `w_mean` rising sharply (Block 2) was even more extreme in v2.1c: `w_mean = 0.1783` after a single block of learning, indicative of an LTP runaway in which the dominant pathway is no longer counter-pressed by any LTD term. The block-by-block trajectory through Stages 2 and 3 also showed *less* recovery of category 2 in v2.1c than in v2.1: where v2.1 produced `cat2 = 11` at Block 13, v2.1c produced only `cat2 = 4`.
+
+The LTD-bias hypothesis is therefore reversed by the data. The asymmetric LTD term in Bi & Poo's empirical STDP rule does not destabilize minority categories. It functions as a **winner suppression mechanism**: in both balanced and class-imbalanced regimes, the small LTD bias prevents the dominant pathway from runaway potentiation, leaving room for the weaker pathway to participate. Removing the LTD bias does not rescue minority categories; it makes the runaway worse and pushes the minority into silence sooner.
+
+This is, to our knowledge, a new functional reading of the empirical STDP asymmetry. The standard textbook account describes A⁻ > A⁺ as a feature that ensures stability in autonomous Hebbian learning rules; our result suggests an additional and more specific role: built-in protection of minority categories against winner-take-all collapse in environments where input statistics are non-uniform.
+
+This still leaves the question of what *does* cause curriculum anchoring. With STDP asymmetry exonerated and critical-period control already exonerated (§4.7), the next candidate one level deeper is the dopamine-modulated Hebbian rule that runs alongside STDP throughout Stage 4. Inspection of the Stage 4 learning loop confirms that `run_trial!` invokes `HebbianModulationPlasticity(K=0.06, α=2.5, modulator=SNcb, ...)` on every trial, and this Hebbian update is *not* undone afterwards (it is undone in Stage 2 spontaneous activity but not in Stage 4 learning). Under class imbalance, dopamine signaling is dominated by the majority category, and the Hebbian-DA rule strengthens the majority pathway. STDP and the synaptic floor act on the residue of this Hebbian update, not on a clean substrate.
+
+The natural next experiment is curriculum v2.1d, which holds everything else constant and sets the Hebbian gain `K = 0`. This run is in flight at the time of writing and will be reported in the next revision.
+
+We revise the diagnosis of **curriculum anchoring** accordingly. The failure mode is not localized in the critical-period control law (refuted in §4.7) and is not localized in the STDP asymmetry (refuted in §4.8, where the STDP asymmetry actually plays the *opposite* role of a built-in rescue mechanism). The current best candidate is the interaction of dopamine-modulated Hebbian plasticity with class imbalance, which v2.1d will test directly.
 
 Candidate fixes for v2.2 (not yet implemented):
 
