@@ -1,9 +1,9 @@
 # Hux: A Developmentally-Sequenced Biophysical Cortico-Striatal Circuit with Self-Organized Plasticity, Permanent Pruning, and a State-Based Critical Period
 
-**Version**: v0.3 (curriculum v2 results + Doherty 2025 precise comparison from full text)
+**Version**: v0.4 (Higuchi 2022 added, three-way Related Work triangulation complete)
 **Date**: 2026-04-07
 **Authors**: Tsubasa, K. Yasukawa
-**Status**: Work in progress. Phase 2 numerical results are integrated through the state-based critical period curriculum run (§4.6). Phase 1 baselines and Phase 2 sham/identity controls remain to be reported in subsequent revisions. Related Work §2.2 has been updated against the full text of Doherty et al. (2025).
+**Status**: Work in progress. Phase 2 numerical results are integrated through the state-based critical period curriculum run (§4.6). Phase 1 baselines and Phase 2 sham/identity controls remain to be reported in subsequent revisions. Related Work §2.1–§2.2 now triangulates against the full texts of Kuriyama et al. (2025), Higuchi et al. (2022), and Doherty et al. (2025).
 
 ---
 
@@ -31,6 +31,8 @@ The design commitments of Hux are:
 ### 2.1 Large-scale microscopic reconstruction
 
 Kuriyama et al. (2025) report a 9M-neuron, 26B-synapse mouse whole-cortex model on 145,728 nodes of Fugaku, using 15 ion channel types from the Allen Cell Types Database and a custom light-weight simulator (Neulite) optimized for SVE intrinsics. The reported emergent dynamics consist of a ~10 Hz cross-correlation oscillation between hemispheres; no mechanistic account of how those dynamics arise from circuit structure is given. As noted in §1, the authors identify plasticity, neuromodulators, and detailed sensory inputs as the principal limitations and as the next direction toward brain-inspired AI. Earlier large-scale efforts include Markram et al. (2015) on a rat somatosensory column and Billeh et al. (2020) on mouse V1. None of these models implement developmental sequencing or activity-dependent pruning at the whole-circuit level.
+
+Higuchi et al. (2022; *bioRxiv* 2022.11.01.512969) report an 18,728-neuron, 344,861-synapse Drosophila whole-brain biophysically detailed model on Fugaku, with the olfactory pathway (antennal lobe → mushroom body → output neurons) augmented by broader whole-brain coverage drawn from the FlyCircuit database. Of the simulations surveyed here, Higuchi et al. is the closest in spirit to Hux on two specific axes: STDP plasticity is implemented (restricted to the mushroom body lobes), and a dopaminergic neuromodulator system is included (used to deliver reward signals to dopamine neurons during odor-taste associative learning). The model demonstrates classical conditioning: synaptic weights between Kenyon cells and the MBON6 output neuron increase during reward-paired training, reproducing odor-taste association at the network level. The authors conclude that "the bottom-up reconstruction of insect brains by the biophysically detailed model is a fairly feasible" approach that can "reproduce brains' functions." This is the prototypical *learning-paradigm-specified* approach: a specific behavioral task is built into the experimental setup, and the model's success is evaluated against that task. Hux differs by leaving the task structure deliberately under-specified and treating whatever the developmental sequence produces (including failure modes) as the dependent variable. Higuchi et al. also do not implement developmental sequencing, homeostatic scaling, BCM metaplasticity, a synaptic floor, activity-dependent pruning, or neuromodulator systems beyond DA.
 
 ### 2.2 Self-organized criticality and ensemble dynamics
 
@@ -190,6 +192,7 @@ The Hux project is conducted as a collaborative effort between Tsubasa (autonomo
 - Billeh, Y. N. et al. (2020). Systematic integration of structural and functional data into multi-scale models of mouse primary visual cortex. *Neuron*, 106(3), 388-403.
 - Doherty, D. W., Jung, J., Dura-Bernal, S., & Lytton, W. W. (2025). Self-organized and self-sustained ensemble activity patterns in simulation of mouse primary motor cortex. *bioRxiv* 2025.01.13.632866.
 - Hebb, D. O. (1949). *The Organization of Behavior*. Wiley.
+- Higuchi, M. et al. (2022). Biophysically detailed model of Drosophila whole brain. *bioRxiv* 2022.11.01.512969.
 - Hensch, T. K. (2005). Critical period plasticity in local cortical circuits. *Nature Reviews Neuroscience*, 6(11), 877-888.
 - Kuriyama, R. et al. (2025). Microscopic-level mouse whole cortex simulation composed of 9 million biophysical neurons and 26 billion synapses on the supercomputer Fugaku. *SC '25: Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis*. ACM, 2158-2171. DOI: 10.1145/3712285.3759819.
 - Markram, H. et al. (2015). Reconstruction and simulation of neocortical microcircuitry. *Cell*, 163(2), 456-492.
