@@ -1,9 +1,9 @@
 # Hux: A Developmentally-Sequenced Biophysical Cortico-Striatal Circuit with Self-Organized Plasticity, Permanent Pruning, and a State-Based Critical Period
 
-**Version**: v0.1 (skeleton, priority claim)
+**Version**: v0.2 (priority claim, curriculum v2 numerical results integrated)
 **Date**: 2026-04-07
 **Authors**: Tsubasa, K. Yasukawa
-**Status**: Work in progress. Numerical results in §3 will be filled in v0.2 from the Phase 2 runs already completed and in flight.
+**Status**: Work in progress. Phase 2 numerical results are integrated through the state-based critical period curriculum run (§4.6). Phase 1 baselines and Phase 2 sham/identity controls remain to be reported in subsequent revisions.
 
 ---
 
@@ -128,7 +128,28 @@ Failed: F1 ≈ 0.330. Stage 2 collapsed (R ≈ 5.4%) because the trial-count-bas
 
 ### 4.6 Phase 2 curriculum v2 (state-based critical period)
 
-In progress. Confirmed during partial runs: cp_factor automatically traversed 1.0 → 0.27 over five blocks of Stage 3, demonstrating the auto-decay mechanism. Full results to follow in v0.2.
+The state-based critical period run completed (1883 s, 76 neurons, 1000-trial Stage 4 sequence 50/50 → 30/70 → 16/84). Per-stage scores were:
+
+- Stage 1 (50/50): P = 51.3%, R = 59.4%, F1 = 0.5505 (matches the standalone balanced result in §4.3).
+- Stage 2 (30/70): P = 28.6%, R = 8.7%, F1 = 0.1333 (collapse).
+- Stage 3 (16/84): P = 16.0%, R = 29.6%, F1 = 0.2078 (partial recovery, unstable).
+- Overall: P = 31.2%, R = 33.6%, F1 = 0.3234.
+
+The state-based critical period mechanism itself is *functional*. The `cp_factor` traversed the full range (1.0 → 0.142 → 0.459 → 1.0) over the course of the curriculum, automatically reopening at Stage transitions when the local weight standard deviation rose, and automatically closing when it fell. This is not a failure of the closure law per se. The failure is at a different level.
+
+Two pathological dynamics dominate the curriculum trajectory:
+
+1. **Synaptic death of Stage 2.** Blocks 7–12 produced `cat2 = 0` for six consecutive blocks. STR2 silence persisted for 300 trials despite the network being in the middle of a category-2-rich Stage. This is a recurrence of the synaptic death failure mode that motivated the entire Phase 2 redesign.
+
+2. **Hysteresis-free overshoot.** The state-based closure law has no cooldown. When STR2 silence finally drove the local-vs-global stability ratio above 0.5, `cp_factor` reopened to 1.0 within a single update step. The fully reopened critical period then over-corrected: blocks 17–20 swung between `cat2 = 47, 26, 39, ...` while `w_mean` oscillated between 0.013 and 0.171.
+
+The diagnosis is that the closure law needs **hysteresis** and a **cooldown**: closure should be aggressive but reopening should be gradual, or at least subject to a minimum-interval constraint after the previous reopening. Candidate fixes for v2.1, to be tested:
+
+- Slower update gains (closure × 0.97, reopening × 1.05) instead of × 0.95 / × 1.10.
+- A reopening cooldown of N blocks.
+- Adaptive `STABILITY_THRESHOLD` based on the global weight history rather than a fixed 0.5.
+
+The curriculum v2 result is reported here as a negative result of immediate scientific interest: the closure mechanism works as designed, and the residual failure exposes a specific, interpretable, and fixable property of the closure law. From the standpoint of computational psychopathology, the run is a clean demonstration of (a) developmentally induced synaptic death and (b) the cost of an over-reactive critical-period reopening, both of which have plausible clinical analogues in critical-period sensory deprivation and in adolescent-onset disorders of cortical maturation.
 
 ### 4.7 Emergent failure modes
 
