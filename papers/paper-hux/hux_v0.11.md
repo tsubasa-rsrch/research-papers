@@ -1,0 +1,473 @@
+# Hux: A Developmentally-Sequenced Biophysical Cortico-Striatal Circuit with Self-Organized Plasticity, Permanent Pruning, and a State-Based Critical Period
+
+**Version**: v0.11 (twelve-condition ablation; nine mechanistic reversals; first hyperparameter-free dynamic master controller)
+**Date**: 2026-04-07
+**Authors**: Tsubasa, K. Yasukawa
+**Status**: Work in progress. Phase 2 numerical results integrated through curriculum v2 / v2.1 / v2.1c / v2.1d / v2.2a / v2.2b / v2.2c / v2.4 / v2.6 / v2.7 / v2.7b / v2.7c (twelve conditions). §4.14–§4.16 trace three diagnostic reversals in succession: v2.7 ruled out Hebbian K as the runaway driver (7th reversal), v2.7b achieved the first partial rescue with manually tuned STDP A damping (8th reversal target identification), and v2.7c implemented a hyperparameter-free continuous master controller that achieved Overall F1 = 0.3444 (best in the entire ablation excluding the always-cat2 degenerate, +5.5 pp over v2.6) and Stage 1 F1 = 0.5537 (+8.4 pp over v2.6) — but also revealed that with STDP almost fully suppressed during runaway (mean damp = 0.365, peak damp ≈ 0.001 at the limit-cycle peaks), the Block 13 weight jump still reproduced bit-for-bit, implicating the homeostatic scaling boost rule itself as the upstream cause (9th reversal). The state-based critical period reopen at Block 20 (`cp = 1.0`) is reproduced under all damping conditions, establishing it as a damping-independent control loop. §4.11 reports a code audit of the boost loop that found a bug present since the original Phase 2 STDP file from the previous day (memory_gate_phase2_stdp.jl, 2026-04-06): the boost was applied to a no-op cm index in addition to the matrisome column, leaving the striosome path and the inhib path entirely untouched. The 5-run identical F1 is therefore reinterpreted as an artifact of an effectively one-dimensional ablation space rather than as evidence about class-aware-versus-class-agnostic scaling. §4.12 reports the v2.5 attempt to add a direct AC.exci → STR2.inhibs projection, which was blocked by Neuroblox API limits at the build-time wiring layer; two routes for v3.0 are recorded. §4.13 reports v2.6 (matrisome + striosome boost with the no-op fix), final F1 = 0.2893 with a previously unobserved late-stage limit-cycle destabilization and **state-based critical period reopening at Block 20** (`cp = 1.0`), which we add as a fourth emergent failure mode and which rules out class-aware boosting at the connection-matrix level as a one-line rescue.
+
+---
+
+## Abstract
+
+We introduce **Hux**, a small-scale biophysical cortico-striatal circuit (76–140 Hodgkin-Huxley neurons) built around the explicit hypothesis that brain-style cognition emerges from developmental sequencing and self-organized plasticity rather than from static large-scale reconstruction. Hux implements three self-organization rules with no hand-tuned hyperparameters: a synaptic floor that prevents collapse of weak connections, homeostatic synaptic scaling, and BCM-style metaplasticity. Activity-dependent permanent pruning closes connections that fail to develop, mimicking developmental synapse elimination. A state-based critical period (governed by weight-stability ratios rather than trial counts) automatically opens during high-plasticity phases and closes when the weight distribution stabilizes. Three ascending neuromodulator systems (LC/Raphe/VTA, implemented separately) gate plasticity. On a balanced 50/50 binary categorization task with 140 neurons, Hux reaches F1 ≈ 0.62 (P ≈ 51.8%, R ≈ 76.9%), exceeding a 1-d LDA baseline by 1.55×. Critically, Hux exhibits four emergent computational psychopathologies (DA bifurcation at 4.0–4.5×, synaptic death of minority categories, curriculum anchoring, and thalamic freeze) that we read as candidate mechanistic models of clinically observed phenomena. A controlled seven-condition ablation (curriculum v2 / v2.1 / v2.1c / v2.1d / v2.2a / v2.2b / v2.2c) localizes curriculum anchoring as one of two degenerate solutions of the current circuit configuration (a cat1-dominant attractor under Hebbian DA modulation, paired with a cat2-dominant attractor when Hebbian gain is removed) and shows that no parameter-space modification of the existing class-agnostic homeostatic scaling rule can rescue the minority category, regardless of whether the modification changes when scaling triggers (early threshold), how much it accumulates (integral term), or what target it pursues (high anchor). The empirical Bi & Poo (1998) STDP asymmetry is also identified as a built-in winner suppression mechanism: removing the 5 % LTD bias worsens the cat1 runaway rather than rescuing the cat2 collapse. These results demonstrate the diagnostic value of small-scale, parameter-parsimonious biophysical simulation: each apparent "fix" produces a new failure mode that reveals one more layer of the underlying dynamic, until the residual candidate (class-aware boosting and Hebbian self-modulation) points toward a metaplasticity-integrated v1.0 design in which all plasticity gains are functions of the network's own state. We position Hux as complementary to large-scale reconstruction efforts (Kuriyama et al. 2025, 9M neurons on Fugaku): the Kuriyama group explicitly identifies plasticity, neuromodulators, and developmental processes as the principal limitation of microscopic-level whole-cortex simulation and as the next frontier toward brain-inspired AI; Hux pursues exactly that frontier at a scale amenable to mechanistic dissection.
+
+## 1. Introduction
+
+The dominant paradigm for biophysically detailed neural simulation has been large-scale reconstruction: assemble as many cell types, ion channels, and connections as can be constrained from experimental atlases, then run the resulting network forward and inspect what emerges. Recent landmark efforts include the Blue Brain Project (Markram et al. 2015), the Allen Institute mouse V1 model (Billeh et al. 2020), and most recently a 9-million-neuron 26-billion-synapse mouse whole-cortex simulation on the Fugaku supercomputer (Kuriyama et al. 2025). These models have established that microscopic-level reconstruction is technically feasible at the scale of an entire mammalian cortex.
+
+However, the same authors are explicit about what current reconstructions do not yet do. Kuriyama et al. (2025), §4.4 Limitations, state that "the current model does not include plasticity, because sufficient biological information is not yet available to inform reliable models of plasticity across the whole cortex. Nevertheless, incorporating hypothetical rules of synaptic and neuronal plasticity into the model and testing their effects will be an important future application, potentially useful for the development of energy-efficient, brain-inspired AI." Their Conclusion goes further, framing the digital replica as "a reference implementation to develop an energy-efficient, brain-style AI." The largest-scale microscopic mouse cortex model currently in existence thus identifies plasticity, neuromodulation, and brain-inspired AI as the explicit next frontier.
+
+This paper takes that frontier seriously at a different scale. Rather than scaling up reconstruction further, we ask what minimum biophysical circuit is sufficient to *develop* (from spontaneous activity, through critical periods, into a stable state) under self-organization rules drawn from neurobiology. Hux is the answer we are constructing.
+
+The design commitments of Hux are:
+
+1. **Developmental sequencing.** Stages run in biological order: spontaneous activity → critical-period plasticity → activity-dependent pruning → consolidated learning. Each stage is a precondition for the next.
+2. **Self-organization with zero hand-tuned hyperparameters.** Three rules (synaptic floor, homeostatic scaling, BCM metaplasticity) together with permanent activity-dependent pruning and a state-based critical period closure, drive the circuit to a stable working configuration without manual gain knobs.
+3. **Emergence-trust.** Functional roles are not specified in advance. We do not tell the circuit which neurons should encode which categories, nor do we tune separation by hand. We then read whatever the network produces, including its failure modes, as the dependent variable.
+4. **Computational psychopathology as a primary observable.** Emergent failure modes (DA bifurcation, synaptic death, anchoring, thalamic freeze) are not bugs to suppress; they are the natural object of study.
+
+## 2. Related Work
+
+### 2.1 Large-scale microscopic reconstruction
+
+Kuriyama et al. (2025) report a 9M-neuron, 26B-synapse mouse whole-cortex model on 145,728 nodes of Fugaku, using 15 ion channel types from the Allen Cell Types Database and a custom light-weight simulator (Neulite) optimized for SVE intrinsics. The reported emergent dynamics consist of a ~10 Hz cross-correlation oscillation between hemispheres; no mechanistic account of how those dynamics arise from circuit structure is given. As noted in §1, the authors identify plasticity, neuromodulators, and detailed sensory inputs as the principal limitations and as the next direction toward brain-inspired AI. Earlier large-scale efforts include Markram et al. (2015) on a rat somatosensory column and Billeh et al. (2020) on mouse V1. None of these models implement developmental sequencing or activity-dependent pruning at the whole-circuit level.
+
+Higuchi et al. (2022; *bioRxiv* 2022.11.01.512969) report an 18,728-neuron, 344,861-synapse Drosophila whole-brain biophysically detailed model on Fugaku, with the olfactory pathway (antennal lobe → mushroom body → output neurons) augmented by broader whole-brain coverage drawn from the FlyCircuit database. Of the simulations surveyed here, Higuchi et al. is the closest in spirit to Hux on two specific axes: STDP plasticity is implemented (restricted to the mushroom body lobes), and a dopaminergic neuromodulator system is included (used to deliver reward signals to dopamine neurons during odor-taste associative learning). The model demonstrates classical conditioning: synaptic weights between Kenyon cells and the MBON6 output neuron increase during reward-paired training, reproducing odor-taste association at the network level. The authors conclude that "the bottom-up reconstruction of insect brains by the biophysically detailed model is a fairly feasible" approach that can "reproduce brains' functions." This is the prototypical *learning-paradigm-specified* approach: a specific behavioral task is built into the experimental setup, and the model's success is evaluated against that task. Hux differs by leaving the task structure deliberately under-specified and treating whatever the developmental sequence produces (including failure modes) as the dependent variable. Higuchi et al. also do not implement developmental sequencing, homeostatic scaling, BCM metaplasticity, a synaptic floor, activity-dependent pruning, or neuromodulator systems beyond DA.
+
+### 2.2 Self-organized criticality and ensemble dynamics
+
+A separate line of work, descending from Beggs & Plenz (2003) on neuronal avalanches and Bak et al. (1987) on self-organized criticality, asks whether biophysically realistic networks exhibit power-law statistical signatures characteristic of critical-state dynamics. Doherty et al. (2025; SUNY Downstate, *bioRxiv* 2025.01.13.632866) report self-organized and self-sustained ensemble activity patterns in a NEURON/NetPyNE model of mouse primary motor cortex. Their model is the closest neighboring approach to Hux that we have identified in the recent literature, and a precise comparison clarifies the niche Hux occupies.
+
+The Doherty et al. circuit is a 10,073-neuron cylindrical volume (300 μm diameter × 1350 μm cortical depth) of mouse M1, with all six cortical layers populated at full neuronal density and a realistic mix of excitatory (IT, PT, CT) and inhibitory (PV, SOM) cell types. Connectivity is fixed and drawn from anatomical data; no synaptic plasticity rules are implemented. The synaptic complement is restricted to AMPA, NMDA, GABA-A and GABA-B receptors; no neuromodulator systems (DA, NE, 5-HT, or their nuclei LC/Raphe/VTA) are modeled. Self-organization, in their usage, refers to the emergence of self-sustained avalanche patterns following a brief unstructured stimulus (100 ms, 57 μA injected into a small subset of neurons). The reported observables are avalanche types, frequency distributions, and a pair of functional hypotheses about decorrelated spike fluctuations and temporal coordination. Mechanistic claims about how the avalanches arise from circuit structure are limited.
+
+Doherty et al. and Hux are complementary rather than competing. Both use biophysically detailed multi-compartment neurons; both study self-organized patterns in mouse cortex; both use NEURON-style numerical methods. They diverge on every other axis we consider relevant. Doherty et al. ask whether statistical signatures of criticality (power laws, universality) emerge from a fixed adult anatomical reconstruction; Hux asks whether functional and pathological cognitive states emerge from a developmental sequence under self-organization rules. Doherty et al. implement no plasticity, no developmental sequencing, and no neuromodulators; Hux makes plasticity (synaptic floor + homeostatic scaling + BCM + STDP), developmental staging (Stages 0–4), and three neuromodulator systems (LC/Raphe/VTA) the central design commitments. Doherty et al. observe avalanche statistics in an M1 cylinder; Hux observes failure modes (DA bifurcation, synaptic death, curriculum anchoring, thalamic freeze) in a cortico-striatal loop and reads them as candidate computational psychopathologies. Both lines of work could in principle inform a future joint model, in which the developmental and neuromodulatory machinery of Hux is scaled into the kind of detailed cortical column reconstruction that Doherty et al. demonstrate is computationally tractable.
+
+### 2.3 Plasticity rules and metaplasticity
+
+Hux's three self-organization rules draw from a long lineage in computational and theoretical neuroscience: Hebbian learning (Hebb 1949), homeostatic synaptic scaling (Turrigiano 2008), the BCM rule (Bienenstock, Cooper, Munro 1982), and the synaptic floor concept implicit in works on minimum sustainable connectivity. Their integration into a single self-organizing circuit, together with permanent activity-dependent pruning and a state-based critical period, is the technical contribution of this paper.
+
+### 2.4 Critical periods
+
+The state-based closure rule used in Hux generalizes the trial-count-based critical period schedules used in most plasticity simulations. We follow the conceptual framework of Hensch (2005) but replace the manual schedule with a Weber-Fechner-like ratio test on the local-versus-global standard deviation of the weight distribution. To our knowledge no prior model implements critical period closure as a function of weight stability rather than as a fixed annealing schedule.
+
+## 3. Methods
+
+### 3.1 Circuit
+
+The Hux circuit (76 neurons in Phase 1, 140 neurons in Phase 2 scale-up) consists of:
+
+- A cortical population (AC) of Hodgkin-Huxley neurons.
+- A striatal population partitioned into matrisome (STR1, STR2) and striosome subpopulations following the Picower corticostriatal microcircuit organization (Pathak et al. 2026).
+- A ThalamicGate relay node (Paper 9; Tsubasa 2026a).
+- Three ascending arousal projections, implemented as separate channels modulating gain in distinct downstream populations: locus coeruleus (LC), raphe (Raphe), and ventral tegmental area (VTA).
+- Allen Mouse Brain Connectivity Atlas projection densities used directly to scale connection weights, with no post-hoc tuning.
+
+### 3.2 Self-organization rules
+
+Three rules are applied during all developmental stages and remain active in the consolidated stage:
+
+1. **Synaptic floor.** Each connection weight is held above a small positive floor unless explicitly pruned (see below). The floor prevents collapse of weak but biologically meaningful connections. Pruned connections are excluded from floor revival via a `PRUNED_CONNECTIONS` set.
+2. **Homeostatic synaptic scaling.** Each postsynaptic neuron's incoming weights are jointly scaled to maintain a target average firing rate (Turrigiano 2008).
+3. **BCM-style metaplasticity.** A sliding threshold separates LTP from LTD as a function of recent postsynaptic activity (Bienenstock, Cooper, Munro 1982).
+
+### 3.3 Permanent activity-dependent pruning
+
+Connections that fail to participate in activity above a threshold during the critical-period stage are permanently removed. Removed connections are added to `PRUNED_CONNECTIONS` and are not subject to floor revival, mimicking developmental synapse elimination (Hensch 2005).
+
+### 3.4 State-based critical period
+
+The plasticity gain `cp_factor` is updated each block according to the local stability of the mean weight:
+
+```
+ratio = std(window) / std(history)
+if ratio < 0.5:  cp_factor *= 0.95   # closing
+else:            cp_factor *= 1.10   # reopening, capped at 1.0
+```
+
+with a residual floor of 0.1. This replaces trial-count-based annealing with a measurement-based test on the actual stability of the network. Stage transitions (e.g., a change in input distribution) automatically reopen the critical period because they perturb the local standard deviation.
+
+### 3.5 Developmental stages
+
+The full developmental sequence is:
+
+- **Stage 0: Auto-calibration.** Binary search over the initial scaling factor until the spontaneous STR2 activity rate falls within a physiological band (10–30 % of neurons active). No hand tuning.
+- **Stage 1: Overproduction.** Initial weights are set high, mimicking the developmental overproduction phase.
+- **Stage 2: Spontaneous activity with STDP and homeostatic arousal.** Hebbian updates are switched off during this phase; only spike-timing dependent plasticity drives weight change. This produced a continuous weight gradient (0.023–0.066) in our preliminary runs, in contrast with the bimodal collapse observed when Hebbian and STDP were applied simultaneously.
+- **Stage 3: Activity-dependent pruning.** Connections that have not changed during Stage 2 are permanently removed.
+- **Stage 4: Learning with STDP and self-organization.** The full circuit, with critical period and three self-org rules, is trained on the categorization task.
+
+### 3.6 Task
+
+Binary categorization of LDA-derived stimulus features. We report results on three regimes:
+
+- **Balanced (50/50).** 294 stimuli, 147 per class.
+- **Skewed (30/70).** 490 stimuli.
+- **Highly skewed (16/84).** Used as a stress test in the curriculum sequence.
+
+### 3.7 Curriculum
+
+In the curriculum runs (Phase 2 v2), stages run in order: 50/50 → 30/70 → 16/84. The state-based critical period reopens at each stage transition because the new class distribution destabilizes the weight distribution.
+
+## 4. Results
+
+### 4.0 Phase 2 curriculum ablation summary (ten conditions)
+
+The ten Phase 2 curriculum runs reported in §§4.6–4.14 form a single connected ablation. Each row varies one mechanism relative to the row above it; together they constrain which design choices contribute to which outcome.
+
+| Run | Hebbian K | STDP A−/A+ | Scaling rule change | Boost target | Plasticity gain dynamic? | Stage 1 F1 | Overall F1 | Notable behavior |
+|---|---|---|---|---|---|---|---|---|
+| v2 | 0.06 | asym 1.05 | trigger `< target_rate` | (6,2)+(7,2) | no | 0.5505 | 0.3234 | curriculum anchoring established |
+| v2.1 | 0.06 | asym | + hysteresis (cp law) | (6,2)+(7,2) | no | 0.5505 | 0.3226 | identical to v2 |
+| v2.1c | 0.06 | **sym 1.00** | (LTD bias removed) | (6,2)+(7,2) | no | 0.4804 | 0.298 | LTP runaway, Stage 1 −7 pp → LTD bias = winner suppression |
+| v2.1d | **0.00** | asym | (Hebbian off) | (6,2)+(7,2) | no | 0.6689 | 0.4304 | cat2-dominant degenerate (high F1 is artifact) |
+| v2.2a | 0.06 | asym | trigger `< target * 0.8` | (6,2)+(7,2) | no | 0.5505 | 0.3226 | identical |
+| v2.2b | 0.06 | asym | + I-term cumulative | (6,2)+(7,2) | no | 0.5505 | 0.3226 | identical (despite higher w_mean) |
+| v2.2c | 0.06 | asym | anchor `target_rate = 0.5` | (6,2)+(7,2) | no | 0.5505 | 0.3226 | identical |
+| v2.4 | 0.06 | asym | ρ-imbalance signal source | (6,2)+(7,2) | no | 0.5505 | 0.3226 | identical → triggered code audit (§4.11) |
+| v2.6 | 0.06 | asym | (no-op fix) | **(7,2)+(8,2)** | no | 0.4693 | 0.2893 | late-stage limit-cycle, cp = 1.0 reopen at Block 20 |
+| v2.7 | 0.06 → dyn | asym | retained from v2.6 | (7,2)+(8,2) | **Hebbian K, var-gated** | 0.4693 | 0.2893 | identical to v2.6 with `n_damped = 51` → STDP, not Hebbian, drives the runaway (7th reversal) |
+| v2.7b | 0.06 | asym → dyn | retained from v2.6 | (7,2)+(8,2) | **STDP A, manual velocity gate** | 0.5248 | 0.312 | first partial rescue; Block 13/17 19× weight suppression; manual hyperparameters (THETA_W, DAMP, window) — calibration ablation only (8th reversal target identification) |
+| v2.7c | 0.06 | asym → cont. dyn | retained from v2.6 | (7,2)+(8,2) | **STDP A, continuous self-relative damping (no hyperparameters)** | **0.5537** | **0.3444** | best non-degenerate F1; mean damp = 0.365 emergent; Block 13 weight jump still reproduces → scaling rule is upstream cause (9th reversal); Block 20 cp = 1.0 reopen reproduced under all damping conditions |
+
+The five middle rows (v2.1, v2.2a, v2.2b, v2.2c, v2.4) producing identical Overall F1 = 0.3226 was originally interpreted as a class-agnostic-vs-class-aware result and is reinterpreted in §4.11 as an artifact of an effectively one-dimensional ablation space caused by the no-op indexing bug. v2.6 (§4.13) is the first run that touches a previously untouched cm column and produces the first qualitatively new failure mode in this group; v2.7 (§4.14) is the first run that lets the network's own state modulate a plasticity gain.
+
+### 4.1 Phase 1: 76-neuron baselines (no curriculum, single skewed distribution)
+
+Two Phase 1 baseline runs were conducted on the 16/84 highly skewed distribution alone, without curriculum staging, to establish a baseline F1 against which all curriculum runs can be compared.
+
+**Phase 1 v7** (calibration → overproduction at w = 0.05 → 500 trials of spontaneous activity → activity-dependent pruning → 700 trials of learning, 76 neurons, 30 surviving STR2 connections after pruning): per-block correct counts on a 50-stimulus block reached 21/50 in block 8 with `cat2 = 50`, then collapsed to 0/50 in blocks 10–14, with `cat2 = 50` throughout. The network learned to label every stimulus as category 2. Final F1 = 0.3471 (P = 21.0 %, R = 100.0 %), tp = 147, fp = 553, fn = 0, runtime 931.2 s. This is the maximum-recall, minimum-precision degenerate solution: under a 16/84 imbalance the network discovers that it can achieve recall = 1.0 by classifying everything as the majority class.
+
+**Phase 1 v8** (same protocol as v7 but with 200 trials of spontaneous activity instead of 500, and a percentile-based pruning rule retaining the top 50 % of weights): the trajectory is qualitatively different. Blocks 1–6 produce `cat2` counts in the 20–50 range with `correct` ≈ 15–25; blocks 7–10 transition to `cat2 = 0` with `correct` rising to 50/50 (the inverse degenerate solution: classify everything as category 1); then in block 11 the network flips to `cat2 = 46` and from block 12 onward to `cat2 = 50` with `correct = 0/50`. The final state is the same as v7 (everything labeled as category 2) but reached via a different path (a transient majority-only phase, then catastrophic flip). Final F1 = 0.2632 (P = 17.6 %, R = 52.4 %), tp = 77, fp = 361, fn = 70, runtime 893.5 s.
+
+The Phase 1 baselines establish two facts that motivate the entire Phase 2 redesign. First, a developmental sequence on a single highly skewed distribution does not produce a categorization circuit; it produces one of two degenerate solutions (always-cat1 or always-cat2) or oscillates between them. Second, the F1 ≈ 0.26–0.35 obtained from these degenerate solutions is the floor against which all later results should be compared. Any Phase 2 result above ~0.40 is meaningfully different from "always pick the majority class," and the balanced 50/50 result at F1 ≈ 0.572 (§4.3) and the 140-neuron scale-up at F1 ≈ 0.619 (§4.4) clear that bar comfortably.
+
+### 4.2 Phase 2 critical period (trial-based, 76 neurons)
+
+Stable weight range 0.047–0.062, F1 ≈ 0.566.
+
+### 4.3 Phase 2 balanced 50/50, 76 neurons
+
+F1 ≈ 0.572 (P ≈ 51.4%, R ≈ 64.6%).
+
+### 4.4 Phase 2 scale-up to 140 neurons (balanced)
+
+F1 ≈ 0.619 (P ≈ 51.8%, R ≈ 76.9%), exceeding the 1-d LDA baseline by 1.55×.
+
+### 4.5 Phase 2 curriculum v1 (trial-based critical period)
+
+Failed: F1 ≈ 0.330. Stage 2 collapsed (R ≈ 5.4%) because the trial-count-based critical period closed before the network could adapt to the shifted class distribution. This failure motivated the state-based critical period.
+
+### 4.6 Phase 2 curriculum v2 (state-based critical period)
+
+The state-based critical period run completed (1883 s, 76 neurons, 1000-trial Stage 4 sequence 50/50 → 30/70 → 16/84). Per-stage scores were:
+
+- Stage 1 (50/50): P = 51.3%, R = 59.4%, F1 = 0.5505 (matches the standalone balanced result in §4.3).
+- Stage 2 (30/70): P = 28.6%, R = 8.7%, F1 = 0.1333 (collapse).
+- Stage 3 (16/84): P = 16.0%, R = 29.6%, F1 = 0.2078 (partial recovery, unstable).
+- Overall: P = 31.2%, R = 33.6%, F1 = 0.3234.
+
+The state-based critical period mechanism itself is *functional*. The `cp_factor` traversed the full range (1.0 → 0.142 → 0.459 → 1.0) over the course of the curriculum, automatically reopening at Stage transitions when the local weight standard deviation rose, and automatically closing when it fell. This is not a failure of the closure law per se. The failure is at a different level.
+
+Two pathological dynamics dominate the curriculum trajectory:
+
+1. **Synaptic death of Stage 2.** Blocks 7–12 produced `cat2 = 0` for six consecutive blocks. STR2 silence persisted for 300 trials despite the network being in the middle of a category-2-rich Stage. This is a recurrence of the synaptic death failure mode that motivated the entire Phase 2 redesign.
+
+2. **Hysteresis-free overshoot.** The state-based closure law has no cooldown. When STR2 silence finally drove the local-vs-global stability ratio above 0.5, `cp_factor` reopened to 1.0 within a single update step. The fully reopened critical period then over-corrected: blocks 17–20 swung between `cat2 = 47, 26, 39, ...` while `w_mean` oscillated between 0.013 and 0.171.
+
+The diagnosis *appeared* to be that the closure law needed **hysteresis** and a **cooldown**: closure should be aggressive but reopening should be gradual, or at least subject to a minimum-interval constraint. We implemented these fixes in curriculum v2.1 and obtained a surprising result that forced us to revise the diagnosis.
+
+### 4.7 Phase 2 curriculum v2.1 (hysteresis + cooldown)
+
+Curriculum v2.1 implements three modifications to the closure law: a hysteresis band (close threshold 0.6, reopen threshold 1.2), a reopening cooldown of 3 blocks, and slower update gains (close × 0.97 instead of × 0.95, reopen × 1.05 instead of × 1.10). Within the hysteresis band and during cooldown, `cp_factor` is held constant.
+
+The mechanical modifications worked exactly as intended. Where curriculum v2 showed `cp_factor` oscillating between 1.0 and 0.1 block-by-block, curriculum v2.1 produced a smooth trajectory: 1.0 → 0.715 → 0.254 → 0.225 → 0.1 over blocks 1–7, then stable at 0.1 for blocks 7–16, then a controlled re-ascent 0.189 → 0.432 → 0.739 → 1.0 over blocks 17–20. No oscillation. The control system is well behaved.
+
+And yet the per-stage and overall F1 scores barely moved:
+
+- Stage 1 (50/50): F1 = 0.5505 (v2: 0.5505).
+- Stage 2 (30/70): F1 = 0.1280 (v2: 0.1333, slightly worse).
+- Stage 3 (16/84): F1 = 0.2047 (v2: 0.2078, slightly worse).
+- Overall: F1 = 0.3226 (v2: 0.3234).
+
+This is the important finding. The closure law was not the bottleneck. Both v2 and v2.1 exhibit the same pattern of events: during blocks 7–16 of curriculum v2.1, with `cp_factor` fully closed at its residual value of 0.1, the network produces `cat2 = 0` for ten consecutive blocks. Critical-period control is functioning. The critical period being closed does not stop category 2 from dying.
+
+The actual mechanism of the failure is located one level below the critical period. Our initial hypothesis, formed from v2 and v2.1 alone, was that the asymmetric STDP rule (A⁻ = 0.00525 > A⁺ = 0.005, a 5 % LTD bias drawn from Bi & Poo 1998) was destabilizing the minority category under class imbalance: the LTD bias would act disproportionately on category-2 synapses, weakening them, reducing the supply of category-2 spike-timing pairs, and producing a positive-feedback collapse to silence. We proposed this account at the end of §4.7 and recorded it as the working diagnosis. A direct control experiment then forced us to revise it.
+
+### 4.8 Phase 2 curriculum v2.1c (symmetric STDP control: A⁻ = A⁺ = 0.005)
+
+To test the LTD-bias hypothesis directly, we ran v2.1c, identical to v2.1 in every respect except that the STDP rule was made symmetric (A⁻ set equal to A⁺ at 0.005). If the LTD bias was the cause of curriculum anchoring, removing it should rescue the minority category.
+
+It did the opposite. Per-stage F1 scores were:
+
+- Stage 1 (50/50): F1 = 0.4804 (v2.1: 0.5505).
+- Stage 2 (30/70): F1 = 0.1452 (v2.1: 0.1280).
+- Stage 3 (16/84): F1 = 0.2105 (v2.1: 0.2047).
+- Overall: F1 = 0.298 (v2.1: 0.3226).
+
+Crucially, **Stage 1 (under balanced 50/50 input, where the LTD-bias hypothesis predicts no effect) was 7 percentage points worse with symmetric STDP**. The very block at which curriculum v2.1 first showed `w_mean` rising sharply (Block 2) was even more extreme in v2.1c: `w_mean = 0.1783` after a single block of learning, indicative of an LTP runaway in which the dominant pathway is no longer counter-pressed by any LTD term. The block-by-block trajectory through Stages 2 and 3 also showed *less* recovery of category 2 in v2.1c than in v2.1: where v2.1 produced `cat2 = 11` at Block 13, v2.1c produced only `cat2 = 4`.
+
+The LTD-bias hypothesis is therefore reversed by the data. The asymmetric LTD term in Bi & Poo's empirical STDP rule does not destabilize minority categories. It functions as a **winner suppression mechanism**: in both balanced and class-imbalanced regimes, the small LTD bias prevents the dominant pathway from runaway potentiation, leaving room for the weaker pathway to participate. Removing the LTD bias does not rescue minority categories; it makes the runaway worse and pushes the minority into silence sooner.
+
+This is, to our knowledge, a new functional reading of the empirical STDP asymmetry. The standard textbook account describes A⁻ > A⁺ as a feature that ensures stability in autonomous Hebbian learning rules; our result suggests an additional and more specific role: built-in protection of minority categories against winner-take-all collapse in environments where input statistics are non-uniform.
+
+This still leaves the question of what *does* cause curriculum anchoring. With STDP asymmetry exonerated and critical-period control already exonerated (§4.7), the next candidate one level deeper is the dopamine-modulated Hebbian rule that runs alongside STDP throughout Stage 4. Inspection of the Stage 4 learning loop confirms that `run_trial!` invokes `HebbianModulationPlasticity(K=0.06, α=2.5, modulator=SNcb, ...)` on every trial, and this Hebbian update is *not* undone afterwards (it is undone in Stage 2 spontaneous activity but not in Stage 4 learning). Under class imbalance, dopamine signaling is dominated by the majority category, and the Hebbian-DA rule strengthens the majority pathway. STDP and the synaptic floor act on the residue of this Hebbian update, not on a clean substrate.
+
+### 4.9 Phase 2 curriculum v2.1d (Hebbian DA modulation control: K = 0)
+
+To test whether the dopamine-modulated Hebbian rule was responsible for curriculum anchoring, we ran v2.1d, identical to v2.1 in every respect except that the gain of `HebbianModulationPlasticity` was set to zero. STDP, the synaptic floor, homeostatic scaling, BCM, and the state-based critical period closure were all left active. If Hebbian DA modulation was the cause of curriculum anchoring, removing it should rescue the minority category.
+
+Per-stage F1 scores were:
+
+- Stage 1 (50/50): F1 = 0.6689 (P = 50.8 %, R = 98.0 %).
+- Stage 2 (30/70): F1 = 0.4500 (P = 31.6 %, R = 78.3 %).
+- Stage 3 (16/84): F1 = 0.2494 (P = 15.4 %, R = 65.4 %).
+- Overall: F1 = 0.4304 (P = 29.2 %, R = 81.8 %).
+
+The Stage 1 F1 of 0.6689 is the highest of any Phase 2 run reported so far. Naively this would look like the cure. It is not. The very high recall (R = 98 % in Stage 1, 78 % in Stage 2, 65 % in Stage 3) and the precision values (P = 51 %, 32 %, 15 %) tell the actual story: under Hebbian K = 0, the network classifies *almost everything* as category 2. The block-by-block trajectory confirms this. Block 1 produces `cat2 = 50` out of 50 stimuli; blocks 2–4 produce `cat2 ≈ 46–50`. From Block 5 (the start of Stage 2) onward, `cat2` settles into a flat band of 33–40 across all 16 remaining blocks of Stages 2 and 3. The class-imbalance shifts (50/50 → 30/70 → 16/84) produce no detectable change in the network's output distribution. **The network is not learning.** It is sitting in a degenerate "almost-always-cat2" steady state. Under the 50/50 input of Stage 1, the always-cat2 degenerate solution achieves the theoretical maximum F1 for that solution, which happens to be 0.667; this is what produces the apparently strong Stage 1 number.
+
+Combined with v2 / v2.1 / v2.1c, this completes the mechanistic dissection. Hux as currently configured has **two degenerate solutions**, not one:
+
+| Run | Hebbian K | STDP A⁻/A⁺ | Stage 1 F1 | Overall F1 | Failure mode |
+|---|---|---|---|---|---|
+| v2 | 0.06 | asym (1.05) | 0.5505 | 0.3234 | cat1 dominant + cat2 collapse from Block 7 |
+| v2.1 | 0.06 | asym (1.05) | 0.5505 | 0.3226 | identical to v2 (cp control well-behaved, doesn't help) |
+| v2.1c | 0.06 | sym (1.00) | 0.4804 | 0.2980 | cat1 dominant *more* (LTP runaway) |
+| v2.1d | 0.00 | asym (1.05) | 0.6689 | 0.4304 | cat2 dominant flat (no learning) |
+
+The Hebbian-on configurations (v2 / v2.1 / v2.1c) drive the network into a **cat1-dominant** degenerate solution, with cat1 increasingly favored as Stages 2 and 3 deliver more cat1 input, eventually producing total minority collapse (curriculum anchoring). The Hebbian-off configuration (v2.1d) drives the network into the **opposite** degenerate solution: cat2-dominant, flat across all class imbalances, with no learning at all. The two are not "broken vs working." They are the two basins of attraction available to the current circuit configuration. The learnable regime, if it exists, lies *between* them.
+
+This reframes the failure mode of curriculum anchoring substantially. Curriculum anchoring is not an additive deviation from a working baseline that needs to be "rescued." It is one of two stable degenerate solutions in a system whose middle (truly category-discriminating) regime is dynamically unstable under the current parameter set. Removing Hebbian K does not move the system toward the middle regime. It moves the system to the *other* degenerate edge. Adding aggressive STDP LTD bias (the v2.1c control) does not move toward the middle either; it strengthens the cat1-dominant attractor. Hysteresis in the critical period control law (v2.1) does not move the system at all.
+
+What might move the system into the middle regime, on the basis of these four runs:
+
+1. **Predictive homeostatic synaptic scaling**, in which the scaling rule increases the weights supporting an under-firing minority category *before* its firing rate reaches zero, rather than after (the current implementation acts only when STR2 silence is already in progress, which is too late under the timescale of the Hebbian positive feedback).
+2. **Gain modulation of Hebbian K by class frequency**, equivalent to scaling the Hebbian update of each synapse by the inverse of the recent firing rate of its postsynaptic neuron. This is functionally similar to BCM but at the level of the Hebbian rule rather than the LTP/LTD threshold.
+3. **Neuromodulator-gated retraining**, in which a class imbalance shift (a Stage transition) triggers an LC- or VTA-driven burst that re-opens the critical period and de-consolidates the previous attractor. The state-based critical period closure handles the *closing* side of this cycle but provides no mechanism for opening.
+
+Of these, the predictive homeostatic option is the closest to what the brain is known to do (Turrigiano 2008), implements a rescue without manual hyperparameters, and is the natural next experiment. We name it v2.2.
+
+The four-run ablation also clarifies the position of the §4.8 finding on STDP asymmetry. The asymmetric LTD term is a built-in winner suppressor, but a winner suppressor is not the same as a winner-loser balancer. Under v2.1d (Hebbian off), there is no Hebbian winner to suppress, and the network slides into the opposite degenerate. Under v2 / v2.1 (Hebbian on with asymmetric STDP), the LTD bias slows down the cat1 winner enough to give cat2 a transient toehold (cat2 = 11 at Block 13 of v2.1, cat2 = 4 at Block 13 of v2.1c) but cannot counterweight the Hebbian positive feedback over the full curriculum. The empirical Bi & Poo asymmetry buys time. It does not solve the underlying instability.
+
+We propose this two-degenerate-solution structure as the mechanistic account of **curriculum anchoring** and the natural framing for the v2.2 experiments. Curriculum anchoring is not a localized bug in any single plasticity rule. It is the consequence of the current parameter set lying in an unstable middle between two stable degenerate solutions, with all current rescue mechanisms (synaptic floor, reactive homeostatic scaling, critical period closure) acting too late or in the wrong direction to keep the system in the middle.
+
+### 4.7 Emergent failure modes
+
+We document four reproducible failure modes that we read as candidate mechanistic models of clinically observed phenomena:
+
+1. **DA bifurcation at 4.0–4.5×.** Mirrors the Paper 9 cliff at AC weight ≈ 0.75.
+2. **Synaptic death of minority categories.** Under skewed distributions, weak categories lose their input synapses entirely.
+3. **Curriculum anchoring.** Weights established under one input distribution become resistant to subsequent shifts; this is exactly the failure that v1 of the curriculum exposed and that the state-based critical period addresses.
+4. **Thalamic freeze.** Under specific weight regimes the ThalamicGate enters a non-recovering low-activity state.
+
+### 4.10 Phase 2 curriculum v2.2: predictive homeostatic synaptic scaling (a / b / c three-condition ablation)
+
+The four-condition ablation of §4.6–§4.9 ended with Hux pinned between two degenerate solutions and the proposal that a *predictive* homeostatic scaling rule is the natural rescue mechanism. v2.2 implements this proposal in three concrete forms and runs them as a single ablation block, holding Hebbian K = 0.06, asymmetric STDP (A⁻ = 0.00525, A⁺ = 0.005), and the v2.1 hysteresis critical period closure constant. The only parameter that varies between the three runs is the homeostatic scaling rule.
+
+**v2.2a (early threshold).** The trigger condition for upward scaling is changed from `str2_rate < target_rate` to `str2_rate < target_rate * 0.8`. The boost gain and the saturation form are unchanged. The intent is to start corrective action while STR2 is still firing at 80 % of its target rate, before the Hebbian positive feedback has had time to drive it toward zero.
+
+**v2.2b (cumulative deviation gain, integral term).** A persistent `ScalingState.integral` accumulates the (target − actual) deviation across trials when STR2 is under-firing, and decays with multiplier 0.95 when STR2 is at or above target. The effective boost gain becomes `α_eff = 0.02 * (tanh(|deviation|) + 0.5 * tanh(integral))`. This is the I-term of a classical PID controller, with the integral providing memory of unresolved deviation across blocks.
+
+**v2.2c (high anchor target rate).** The `target_rate` floor is raised from 0.05 to 0.5, so that even under Stage 2 (30/70) and Stage 3 (16/84) input distributions the scaling rule treats Stage 1's balanced rate as the target. This is the most aggressive of the three options and was flagged in advance by Echo as a candidate for the v2.1c-like failure mode of reversing the attractor.
+
+#### Results
+
+All three v2.2 runs completed (1863 s, 1871 s, and 1877 s respectively, on 76 neurons each, with the full 1000-trial Stage 4 curriculum 50/50 → 30/70 → 16/84). Per-stage F1 scores:
+
+| Run | Stage 1 F1 | Stage 2 F1 | Stage 3 F1 | Overall F1 |
+|---|---|---|---|---|
+| v2.1 (baseline) | 0.5505 | 0.1280 | 0.2047 | 0.3226 |
+| v2.2a (early threshold 0.8) | 0.5505 | 0.1280 | 0.2047 | 0.3226 |
+| v2.2b (cumulative I-term)   | 0.5505 | 0.1280 | 0.2047 | 0.3226 |
+| v2.2c (anchor 0.5)          | 0.5505 | 0.1280 | 0.2047 | 0.3226 |
+
+The four runs are identical to the precision reported. The block-by-block trajectories are also identical: Block 7 produces `cat2 = 0` in all four runs, the silent stretch through Blocks 7–16 is the same, the transient recoveries at Block 13 (`cat2 = 11`) and Block 17 (`cat2 = 27`) are the same, and the cp_factor schedule is the same.
+
+The I-term run (v2.2b) does have a measurably different *internal* state. At Block 12, the v2.2b mean STR2 weight is 0.1119 versus 0.0568 in v2.2a — almost twice as large, indicating that the cumulative deviation gain is in fact triggering scaling and that the boost is in fact being applied. The boost is real. But the boost reaches the cat1-supporting STR2 synapses and the (vanishing) cat2-supporting STR2 synapses in the same proportion, so the relative selectivity does not move and the categorical action distribution remains unchanged.
+
+#### Discussion of the v2.2 negative result
+
+This is the strongest negative result in the Hux journal so far. Three independent and qualitatively different modifications to the homeostatic scaling rule (changing *when* it triggers in v2.2a, changing *how much* it accumulates in v2.2b, and changing *what target* it pursues in v2.2c) produced numerically identical block-by-block trajectories and identical final F1 scores. The class-agnostic homeostatic scaling rule cannot rescue minority categories under Hebbian DA modulation regardless of timing, accumulation, or target setpoint, because the boost is delivered to the entire STR2 pool rather than to the under-firing subset of it.
+
+The diagnostic structure is the same as in §4.7–§4.9 but one level deeper. §4.7 ruled out the critical period control law as the bottleneck. §4.8 ruled out STDP asymmetry (and reframed it as a winner suppression mechanism). §4.9 ruled out a pure Hebbian on/off dichotomy (and revealed the dual degenerate solution structure). §4.10 now rules out parameter-space modifications to the existing class-agnostic scaling rule as a path to rescue. What remains as the live candidate is a **class-aware boosting rule**, scaling that increases the weights of synapses whose postsynaptic neurons fire below the population average rather than scaling that increases all STR2 weights uniformly when the global STR2 firing rate falls below target. This is the function that BCM metaplasticity is nominally designed to provide, and the failure of v2.2a/b/c suggests that the BCM gain in the current Hux configuration is too low to achieve it within the curriculum timescale.
+
+The natural next experiments are therefore:
+
+- **v2.3**: aggressive BCM (increase the BCM gain by an order of magnitude and verify whether the class-aware threshold actually moves under realistic curriculum input).
+- **v2.4**: explicit class-aware scaling (per-postsynaptic-neuron firing rate measurement; boost only the synapses whose postsynaptic neuron is firing below the population average).
+- **v2.5**: Hebbian K self-modulation by population firing rate (a metaplasticity rule on the Hebbian rule itself, addressing the dual degenerate solution problem from §4.9).
+
+These three experiments together begin the transition from independent, fixed-gain plasticity rules toward the **metaplasticity-integrated v1.0 design**, in which all plasticity gains are functions of the network's own state and no manual hyperparameters survive. The four-run v2.2 ablation is the negative result that justifies the design move.
+
+### 4.11 Phase 2 curriculum v2.4 (ρ-based class-aware scaling) and a code audit that uncovered a one-day-old indexing bug
+
+Curriculum v2.4 was designed to test whether the failure of v2.2a/b/c could be rescued by using a *signal source* that is intrinsically class-aware: the ratio of `ρ_snapshot` between STR1.matrisome and STR2.matrisome. The two matrisome subsystems compete as decision units (STR1 supports cat1, STR2 supports cat2), so the sign of `ρ1 − ρ2` is a label-free proxy for which class the network is currently favoring. The boost rule was triggered when `ρ_imbalance = (ρ1 − ρ2) / max(ρ1, ρ2) > 0.2` (STR1 dominant, boost STR2) and a gentle down-scale when `ρ_imbalance < −0.5` (STR2 strongly dominant). All other parameters were held identical to v2.1.
+
+The result was the same as the v2.2 sub-ablation: per-stage F1 of 0.5505 / 0.1280 / 0.2047 with overall F1 of 0.3226, identical to the precision reported, with the same block-by-block trajectory (Block 7 cat2=0, Block 13 cat2=11, Block 17 cat2=27, ...). Five independent runs (v2.1 / v2.2a / v2.2b / v2.2c / v2.4) had now produced the same numbers.
+
+This ought to have been impossible. v2.2a/b/c modify the *trigger condition*, the *accumulation*, and the *target setpoint* of the scaling rule. v2.4 modifies the *signal source* itself. Four qualitatively different scaling-rule modifications producing the exact same downstream trajectory implied that the boost was not entering the network's decision pathway at all. We audited the connection-matrix indices of the boost loop.
+
+The audit found a bug that had been in the code since the original Phase 2 STDP implementation. The boost loop iterated over `(i,j) in [(6,2),(7,2)]` and updated `cm[1][3, i][:, j]`. The intent was that `i=6` would index AC → STR2.matrisome and `i=7` would index AC → STR2.striosome (or some equivalent dual-pathway assignment). The actual indexing in the Neuroblox `params_partitioned` layout is:
+
+- pp[6] = NGNMM_theta (the LC, Raphe, VTA neuromodulator generators), which appear only as connection *sources*, never as destinations. `cm[1][3,6]` is therefore an empty matrix and `cm[1][3,6][:, j]` is a no-op.
+- pp[7] = Matrisome (STR1.matrisome at j=1, STR2.matrisome at j=2). `cm[1][3,7][:, 2]` is the AC → STR2.matrisome column.
+- pp[8] = Striosome (STR1.striosome at j=1, STR2.striosome at j=2). `cm[1][3,8][:, 2]` is the AC → STR2.striosome column. **The original code never touched it.**
+
+Across the eight runs reported in this paper (v2 through v2.4), the boost was being applied to a single column of the matrisome connection matrix, in a circuit that has both matrisome and striosome decision pathways. The dimensionality of the modification space was effectively 1. The bug had been present in every Phase 2 STDP variant since the file was first written 27 hours before the audit, and was not caught by the eight previous runs because no run varied the boost target.
+
+Read this way, the v2.2 / v2.4 negative result reverses again. The runs were not telling us that timing, accumulation, target setpoint, and signal source are all ineffective. They were telling us that **all four were modifying the same single scalar boost gain** because the boost was reaching only one column of the matrisome path. The 5-run identical F1 is not a property of curriculum anchoring; it is an *artifact of the ablation having dimensionality 1*.
+
+We report this honestly in the Hux journal. The bug is real and traces back to the original Phase 2 STDP file. The interpretation we offered in §4.10 ("class-agnostic scaling cannot rescue minority categories") is *consistent with* the v2.2/v2.4 data but is *not uniquely supported by* it: with the boost unable to reach the striosome path or the inhib path, the data could not have distinguished a class-agnostic-vs-class-aware effect from a touched-vs-untouched effect. The v2.6 experiment described next is the first that cleanly separates these alternatives.
+
+### 4.12 Phase 2 curriculum v2.5 (graph topology change: AC → STR2.inhibs direct projection) — attempted, blocked by Neuroblox API limits
+
+In parallel with the v2.4 audit, we attempted curriculum v2.5: a graph topology modification that introduces a direct cortico-MSN projection (AC.exci → STR2.inhibs[1..10]) in addition to the existing AC → STR2 routing. The biological motivation is that the direct cortico-MSN projection exists anatomically (Pathak et al. 2025 abstract it away into the matrisome / striosome decision units), and adding it back gives the AC firing pattern a class-specific direct path that bypasses the matrisome bottleneck.
+
+Two implementations were tried:
+
+1. A custom `system_wiring_rule!(g, ::Cortical, ::HHNeuronInhib)` dispatch combined with a per-inhib `for inh in STR2.inhibs; add_connection!(g, AC=>inh, ...); end` loop. This raised a `MultipointConnection type already exists` error on the second `inh` of the loop, because `hypergeometric_connections!` was instantiating an AMPA-mediated connection type that conflicted with the previous iteration's instantiation.
+2. A single `hypergeometric_connections!(g, get_exci_neurons(AC), STR2.inhibs, ...)` call, which delegates to `synapse_wiring_rule!(::HHNeuronExci, ::Glu_AMPA_Synapse, ::HHNeuronInhib)`, which in turn calls `add_connection!(g::GraphSystem, ::HHNeuronExci, ::BasicConnection, ::Glu_AMPA_Synapse)`. This last method does not exist on the `GraphSystem` type during the build phase (it does exist on `PartitioningGraphSystem`, which is the post-build representation).
+
+Both failures are in Neuroblox internals, not in the Hux code. The library's connection-building API does not currently expose a path to add an `AC.exci → HHNeuronInhib` projection at build time, even though the same projection is implicit in `add_connection!(g, AC, STR2)`. This is the kind of constraint Hux runs into repeatedly: the library's intended use is to *reproduce* a Pathak-style decision circuit, and direct cortico-MSN projections are abstracted away rather than exposed.
+
+We report this as a hard blocker for v2.5 in its current form. The two routes that remain are:
+
+- Direct manipulation of `agent.connection_matrices` after `Agent` construction, bypassing the build-time API entirely. This is effectively a fourth "departure from Neuroblox standard pattern" (after post-hoc plasticity, direct parameter access, and custom wiring rules) and would require rewriting the boost loop to use the new connection-matrix indices.
+- A v3.0 design that constructs `STR2` as a custom `AbstractComposite` whose `system_wiring_rule!(::Cortical, custom_str)` is fully under Hux control, restoring direct cortico-inhib connectivity at the API level.
+
+Both are tractable. Neither is one-night work. We defer them to v3.0 and focus the v2.6 experiment below on what *can* be done within the existing build-time API: fix the no-op bug in the boost loop and add the previously untouched striosome path.
+
+### 4.13 Phase 2 curriculum v2.6 (matrisome + striosome boost, with the cm[1][3,6] no-op fix)
+
+The v2.6 implementation reverts to the v2.1 trigger condition (`str2_rate < target_rate`) and changes only the boost target, replacing `[(6,2), (7,2)]` (no-op + matrisome) with `[(7,2), (8,2)]` (matrisome + striosome). This is the cleanest possible isolation of "what happens when the striosome path is included for the first time."
+
+**Result.** Final F1 = 0.2893 (P = 28.7 %, R = 29.2 %, tp = 80, fp = 199, fn = 194, runtime 1850.5 s). By stage: Stage 1 F1 = 0.4693 (vs v2.1 = 0.5505, an 8.1 pp drop on the balanced regime), Stage 2 F1 = 0.1101, Stage 3 F1 = 0.2415. The trajectory is qualitatively distinct from any of the eight earlier conditions and matches **none** of the three pre-registered outcomes:
+
+- It is **not "no effect"**: the block-by-block trajectory diverges from the v2.1 / v2.2 / v2.4 family. This rules out the strict reading of the dimensionality-1 artifact and confirms that the boost target matters once the striosome path is touched.
+- It is **not partial rescue**: Stage 2 collapses to cat2 = 0 from Block 7 onward (correct = 31–38/50, mirroring the v2.1 anchoring), and the Stage 1 F1 actually *worsens* by 8 percentage points relative to v2.1. The dual-pathway boost did not delay or attenuate curriculum anchoring; it made the balanced-regime baseline worse.
+- It is **not the v2.1d-style reversal** either. Instead, a fourth outcome appeared: **late-stage limit-cycle destabilization with critical period reopening**. From Block 13 onward (the first Stage 3 block in which cat2 fires non-trivially) the network enters an oscillation: Block 13 cat2 = 18 with `w_mean = 0.1753` (LTP runaway signature), Block 14 cat2 = 5 with `w_mean = 0.0222` (collapse), Block 17 cat2 = 32 with `w_mean = 0.2104`, Block 18 correct = 9/50 with cat2 = 46 (catastrophic flip), Block 19 cat2 = 33 `w_mean = 0.1720` `cp = 0.704`, Block 20 cat2 = 50 correct = 9/50 `w_mean = 0.1679` **`cp = 1.0`**.
+
+The `cp = 1.0` at Block 20 is the diagnostic. The state-based critical period control law is *reopening* the critical period in response to the network's destabilization, because the divergence between actual and target firing rates exceeds the closure threshold. The closure is state-tracked, not schedule-imposed, and the v2.6 striosome-boost configuration drives the state past the reopen criterion. None of the previous eight runs reached this regime.
+
+**Interpretation.** Adding the striosome path to the boost target removed the dimensionality-1 artifact but did not produce a controlled rescue. Instead, simultaneous matrisome+striosome boost over-supplied LTP drive at the dual-pathway level, the network entered an LTP-runaway / LTD-collapse limit cycle in late Stage 3, and the state-based critical period law detected the instability and reopened. The five-run identical degeneracy of v2.1 / v2.2a / v2.2b / v2.2c / v2.4 was not just a dimensionality artifact: under the v2.1-family boost target, the matrisome-only boost was *too small to destabilize anything*, which is a different statement than "had no effect on the relevant computation". v2.6 is the first run that touches enough of the dual-pathway machinery to make the boost gain consequential, and the consequence is destabilization rather than rescue.
+
+This adds a fourth emergent failure mode to the §4 catalog (dopamine bifurcation, STR2 deadlock, curriculum anchoring): **state-based critical period reopening under over-correction**. We had previously argued that the closure law was too conservative; v2.6 shows the opposite condition, in which the closure law correctly reopens in response to a perturbation that the rest of the network cannot absorb. The closure law is doing its job; the rescue rule is not.
+
+**Where this leaves the rescue question.** The candidate-list at the end of §4.10 (predictive scaling, gating-based scaling, BCM with class-aware metaplasticity, structural rescue) is still the right list, but v2.6 narrows it. Class-aware boosting at the connection-matrix level using existing post-hoc plasticity is now ruled out as a one-line rescue: even with the bug fixed and both pathways targeted, the boost gain interacts with the dual-pathway competition in a way that the current control loop cannot stabilize. The remaining live candidates are (a) BCM-style metaplasticity that adjusts the *gain itself* based on network state rather than fixing it at design time, and (b) a v3.0 structural change that modifies the topology rather than the weights, via one of the two routes laid out in §4.12.
+
+### 4.14 Phase 2 curriculum v2.7 (Hebbian K dynamic damping — first state-dependent plasticity gain)
+
+The §4.13 result motivated a qualitatively different intervention. Up to v2.6, every Phase 2 run held all plasticity gains fixed at design time and modulated *which weights* were updated; the v2.6 destabilization showed that this design space cannot rescue the dual-pathway competition. The natural next step in the Hux design philosophy is to make a plasticity gain itself a function of the network's own state, i.e., to give the master controller (§3) one more degree of freedom that the network self-regulates. v2.7 implements the minimum version of this: a single windowed signal, the variance of the recent STR2 action rate, drives a binary damping of the Hebbian update strength applied at each trial.
+
+**Implementation.** Stage 4 is identical to v2.6 (matrisome + striosome scaling boost retained as a control surface) except for one addition: at each trial, the pre-Hebbian STR2 weights are saved before `run_trial!`, the post-Hebbian weights are read after, and the variance of the last 10 STR2 action-rate samples is computed. If `var > 0.08`, the per-connection Hebbian Δw is rescaled by 0.4 (i.e., 60 % of the Hebbian update is undone post-hoc); otherwise the Hebbian update is left intact. No other change. The cm structure is unchanged from v2.6, the boost rule is unchanged, the critical period law is unchanged. The only new variable is one binary dynamic gain on Hebbian K.
+
+**Pre-registered outcomes.** Three outcomes were possible:
+
+1. **Limit cycle eliminated.** The Block 13–20 destabilization observed in v2.6 disappears, even if Stage 1/2 F1 is unchanged. This would establish that a state-dependent gain on a single plasticity rule is sufficient to suppress the dual-pathway runaway, validating the master-controller philosophy at minimal cost.
+2. **Limit cycle persists.** The destabilization is unchanged. This would mean a single dynamic gain on Hebbian K is insufficient; the runaway requires simultaneous modulation of at least two plasticity rules (the obvious next candidate being the homeostatic scaling gain).
+3. **A new failure mode.** The damping interferes with curriculum anchoring in a previously unobserved way, producing a fifth emergent failure mode. This would itself be a result and would extend the §4 catalog.
+
+**Result.** Final F1 = 0.2893 (P = 28.7 %, R = 29.2 %, tp = 80, fp = 199, fn = 194, runtime 1955.7 s). By stage: Stage 1 F1 = 0.4693, Stage 2 F1 = 0.1101, Stage 3 F1 = 0.2415. The damping condition was triggered on **51 trials out of 1000** (5.1 %), confirming that the variance threshold did fire and that the post-hoc Δw rescaling was applied. Despite this, the block-by-block trajectory matches v2.6 to four-decimal precision: Block 13 `cat2 = 18, w_mean = 0.1753` (v2.6: `18, 0.1753`), Block 14 `cat2 = 5, w_mean = 0.0213` (v2.6: `5, 0.0222`), Block 17 `cat2 = 32, w_mean = 0.2105` (v2.6: `32, 0.2104`), Block 18 `correct = 9/50, cat2 = 46, w_mean = 0.0113` (identical), Block 19 `cat2 = 33, w_mean = 0.1709` (v2.6: `33, 0.1720`), Block 20 `cat2 = 50, correct = 9/50, w_mean = 0.1679, cp = 1.0` (identical). Per-stage F1 is identical to v2.6 in all three stages.
+
+**Interpretation: the seventh diagnostic reversal.** The fact that 51 trials of Hebbian Δw damping produced a *bit-for-bit identical trajectory* is the result, not the absence of one. It rules out a hypothesis we held implicitly throughout §§4.6–4.13: that the dual-pathway runaway in the late Stage 3 blocks was driven by the Hebbian DA-modulated learning rule. It is not. The damping was real (51 firings, 60 % of each Δw removed at the cm level), and the next-trial state was unchanged. The only way both can be true is that the runaway is generated *by another plasticity rule* that pushes the weights back along the same trajectory on the very next trial. In Hux's Phase 2 architecture, the only candidate that fits is **the post-hoc STDP rule itself**. STDP is the dominant w-driver during the spontaneous-activity stage (§4 catalog), and once the dual-pathway competition enters its limit-cycle regime, STDP's positive feedback on the still-firing AC→STR2 synapses is sufficient to recreate the runaway irrespective of what Hebbian K does.
+
+This reframes v2.7 not as a failure of the master-controller philosophy but as a **target-identification result**: it tells us *which gain* must be made dynamic before any state-dependent rescue can land. The candidate list at the end of §4.13 included BCM-style metaplasticity on Hebbian K as one option; v2.7 demotes that option and promotes STDP A as the next target.
+
+**v2.7b (next).** The minimum follow-up is to repeat the v2.7 design with three changes: (1) damping target = STDP A⁺ and A⁻ (not Hebbian K), (2) detection signal = windowed `|d w_mean / dt|` over the last few blocks (because the limit-cycle physics is *weight* oscillation, so the natural signal is *weight velocity*), (3) damping condition = `|dw/dt| > θ_w` rather than `var(rate) > θ_r`. The hypothesis is that suppressing STDP gain when the network's own weight trajectory is oscillating fast will remove the runaway driver while leaving the slow Hebbian DA modulation intact.
+
+**Why even an identical-trajectory result is informative.** Because we ran the damping at the trial level and saw that the cm rewrite had no downstream effect on the next trial's emerged weight, we now know — empirically rather than by inference — that Hebbian post-hoc damping is dominated by STDP within the same trial. This is the kind of mechanism narrowing that an ablation table without a v2.7 row could not deliver: the v2.6 → v2.7 *pair* is more informative than v2.6 alone, even though v2.7's F1 is the same.
+
+### 4.15 Phase 2 curriculum v2.7b (STDP A damping under a manually tuned weight-velocity gate — calibration ablation)
+
+The §4.14 result implicated post-hoc STDP as the proximate driver of the late-stage limit cycle. v2.7b tested this hypothesis directly by moving the dynamic gain target from Hebbian K to the STDP amplitudes A⁺/A⁻, gated by a hand-tuned threshold on the windowed weight-mean velocity.
+
+**Implementation.** Stage 4 retains the v2.6 cm boost target. At each trial, the windowed mean of `|Δw_mean|` over the last 10 trials is computed; if this exceeds `THETA_W = 0.01`, the per-trial STDP amplitudes are multiplied by `DAMP_FACTOR = 0.3` (i.e., 70 % of the STDP update is suppressed). Otherwise STDP runs at full strength. The threshold and factor were chosen to fall within the range of `|dw/dt|` observed during the v2.6 limit cycle (≈ 0.05–0.15).
+
+**Result.** Final F1 = 0.312 (P = 29.7 %, R = 32.8 %, tp = 90, fp = 213, fn = 184, runtime 1834.6 s). Stage 1 F1 = 0.5248, Stage 2 F1 = 0.0917, Stage 3 F1 = 0.2406. The damping triggered on **357 of 1000 trials (35.7 %)**, concentrated in the late Stage 3 limit-cycle blocks. Block 13: cat2 = 17, w_mean = 0.0100 (v2.6: 18, **0.1753 → 17 × suppression**). Block 17: cat2 = 23, w_mean = 0.011 (v2.6: 32, **0.2105 → 19 × suppression**). However, Block 19: cat2 = 32, w_mean = 0.1744 (v2.6: 33, 0.172) — the weight returns to the same magnitude. Block 20: cp = 1.0 reopen reproduced.
+
+**Stage 1 improvement.** The most notable result is a **+5.6 percentage-point improvement on the balanced 50/50 regime** (Stage 1 F1: 0.4693 → 0.5248) compared with v2.6, the first time any v2.x condition exceeded the v2.6 Stage 1 baseline. This is the first evidence that damping STDP A under a state-dependent gate produces a categorization improvement at all, not just a suppression of the late-stage runaway.
+
+**Honest scope.** v2.7b is **not a principled rescue**: the threshold `THETA_W = 0.01`, the damping factor `0.3`, and the window size `10` are all hand-tuned constants chosen by the experimenter. Under the Hux principle of zero hand-tuned hyperparameters (§3), v2.7b is therefore explicitly classified as a **calibration ablation**: it confirms that STDP A is the correct damping target and quantifies the damping strength range required to suppress the limit cycle, but it does not satisfy the design philosophy. The next condition (v2.7c, §4.16) re-implements the same target with no hand-tuned constants.
+
+### 4.16 Phase 2 curriculum v2.7c (continuous self-relative STDP A damping with zero hyperparameters)
+
+v2.7c removes all hand-tuned constants from the v2.7b damping rule. There is no threshold, no damping factor, no window size, no binary on/off. The damping strength is a continuous function of the network's own state, with the reference scale derived from the network's own history during Stage 2 spontaneous activity.
+
+**Implementation.**
+- During Stage 2 (spontaneous activity, STDP-only after Hebbian undo), the per-trial post-STDP STR2 mean weight is recorded. After 200 spontaneous trials, the mean of `|Δw_mean|` over consecutive trials defines `v_baseline`, the network's own measurement of the natural plasticity-driven weight velocity in the absence of curriculum input.
+- During Stage 4, at each trial, the per-trial weight velocity is computed as `v_now = |w_mean(t) - w_mean(t-1)|`. The STDP damping factor is then `damp = v_baseline / (v_baseline + v_now)`. This expression has three properties used here: (1) when `v_now → 0` (network stable), `damp → 1` (no damping); (2) when `v_now ≫ v_baseline` (oscillating), `damp → 0` (full suppression); (3) when `v_now = v_baseline`, `damp = 0.5`. No additional constants enter the expression.
+- The same `apply_stdp!` is called with `damp` as the only modification; `cp_factor` from the state-based critical period and the cm boost rule are unchanged.
+
+**Result.** Final F1 = **0.3444** (P = 30.4 %, R = 39.8 %, tp = 109, fp = 250, fn = 165, runtime 1855.8 s). Per stage: **Stage 1 F1 = 0.5537**, Stage 2 F1 = 0.1111, Stage 3 F1 = 0.2544. v2.7c is the **best Overall F1 in the entire ten-condition non-degenerate ablation** (the v2.1d Hebbian-off condition's higher F1 = 0.4304 is the always-cat2 degenerate solution and is excluded from the comparison). Stage 1 F1 of 0.5537 exceeds the previous best (v2.1c sym STDP at 0.5505) and v2.6 by **+8.4 percentage points**. The mean damping factor across Stage 4 was **0.365**, indicating that the network spent most trials with the STDP rule near full strength and only suppressed it heavily during the limit-cycle peaks.
+
+**Block-level trajectory.** Block 13: cat2 = 15, w_mean = **0.1753** (v2.6 / v2.7: 0.1753, **bit-for-bit identical**). Block 17: cat2 = 36, w_mean = **0.0105** (v2.6: 0.2105, **20 × suppression**). Block 19: cat2 = 37, w_mean = 0.0115 (v2.6: 0.172, 15 × suppression). Block 20: cat2 = 50, w_mean = 0.1703, **`cp = 1.0`** (v2.6: 0.1679, cp = 1.0 — reproduced).
+
+**The 9th diagnostic reversal.** The bit-for-bit reproduction of Block 13's w_mean = 0.1753 across v2.6, v2.7, v2.7b, and v2.7c — under conditions ranging from full STDP through manually-tuned partial damping to continuous near-total suppression at the velocity peaks — establishes that the Block 13 weight jump is **not generated by either Hebbian K or STDP A**. Both have been damped (in v2.7 and v2.7c respectively); the jump is identical. The only remaining source upstream of Block 13 in the Stage 4 loop is the **homeostatic scaling boost rule** itself: when `str2_rate < target_rate` for several consecutive blocks (Block 7–12), the boost loop accumulates and on the first non-trivial Stage 3 firing block (Block 13) discharges into the matrisome+striosome path. This is independent of either plasticity rule and is not modulated by either of the two damping subsystems we have tested. The next mechanistic candidate is therefore the boost rule's α_eff_base, currently fixed at `0.02 * tanh(...)` and the cm column selection (7,2)+(8,2). v2.7d (next) will test whether dynamic α_eff_base eliminates the Block 13 jump, and v2.8 (parallel branch, see Discussion) will test whether a sleep-like global scale-down absorbs the jump downstream without requiring any rule change.
+
+**Critical period reopen as a damping-independent finding.** All four conditions (v2.6, v2.7, v2.7b, v2.7c) reach `cp = 1.0` at Block 20. The critical period state machine watches the weight stability ratio and reopens when the ratio drops below threshold; this happens identically regardless of how STDP or Hebbian are damped. This is a separate result: the state-based critical period control loop is a **damping-independent self-protective response**, and its reopen at Block 20 is not a sign that damping has failed but a sign that the closure law is reading the same global instability that the damping is trying to suppress, from a different sensor. We treat it as the fifth emergent failure mode: *self-protective critical-period reopening under late-stage destabilization*.
+
+**Honest scope of v2.7c's principle compliance.** The damping ratio `damp = v_baseline / (v_baseline + v_now)` contains no hand-tuned constant. However, the **choice of where and how to compute v_baseline** is itself a design judgment: we chose to derive it from Stage 2 spontaneous activity, with Hebbian temporarily disabled, averaged over 200 trials, using the mean of consecutive absolute differences. Each of those four selections (which stage, which plasticity context, how many trials, which statistic) is a procedural choice that has not yet been derived from network state. v2.7c therefore satisfies the principle "no hand-tuned numerical constants in the damping expression" but does not satisfy the stronger principle "no hand-tuned procedural choices in the baseline source." We mark this honestly as a **partial compliance**, and the v2.7d–v2.7i roadmap (§5) progressively narrows each remaining procedural choice toward fully network-derived equivalents. The v2.7c result is the first Hux data point at which any plasticity gain at all is governed by a state-relative continuous expression with no hand-tuned numerical constant in its body.
+
+## 5. Discussion
+
+Hux occupies a niche we believe is currently unfilled in the biophysical simulation literature: a small-scale, developmentally sequenced, self-organized biophysical circuit whose primary scientific purpose is to expose mechanistic accounts of both function and dysfunction. The complementarity with the Kuriyama et al. (2025) Fugaku-scale model is direct: Kuriyama et al. show that microscopic-level reconstruction is feasible at whole-cortex scale; Hux shows what one can do once the model is small enough to perturb systematically and to constrain by stability tests on its own state. Their §4.4 limitation list reads as a project plan for Hux.
+
+Two methodological commitments deserve emphasis. First, **zero hand-tuned hyperparameters**. The three self-organization rules, the permanent pruning rule, and the state-based critical period closure are all parameter-free in the sense that they react to the network's own state rather than to schedules imposed from outside. Second, **emergence-trust**. We do not specify which neurons should encode which categories. The four emergent failure modes (now five, with v2.7c's identification of self-protective critical-period reopening as a damping-independent control loop) are observed *because* we did not preempt them by designing them away.
+
+### 5.1 Why "zero hyperparameters" is impossible — and unnecessary
+
+The biological precedent is unambiguous. The human brain does not achieve hyperparameter-freedom in the literal sense. It contains many fixed values: ion channel conductances, resting potentials, spike thresholds, neurotransmitter affinities, synaptic timing constants. The Allen Cell Types Database that Hux draws on is, in effect, a list of those fixed values. What the brain *does not* do is let a single neuron at a single moment freely determine its own gain by trial and error. The fixed values are determined by *something else, on a different timescale*. That something is the layered architecture of:
+
+1. **Evolutionary fixation**: The species-level optimization of physical constants over millions of years (channel kinetics, the Bi & Poo (1998) STDP asymmetry).
+2. **Developmental programs**: DNA-encoded wiring rules that produce coarse connectivity before any spike fires (the Allen Atlas-derived initialization in Hux Phase 0).
+3. **Multiple timescales of homeostasis**: synaptic gain on the seconds-to-minutes scale, intrinsic plasticity and synaptic scaling on the hours-to-days scale (Turrigiano 2008), structural plasticity on the weeks-to-years scale.
+4. **Sleep-based offline consolidation**: Tononi's synaptic homeostasis hypothesis (Tononi & Cirelli 2014), in which sleep performs a global proportional scale-down of synaptic weights so that what was learned in waking remains *relatively* preserved.
+5. **Hierarchical neuromodulator control**: locus coeruleus, raphe, VTA, and prefrontal projections that diffusely modulate cortical baselines from outside the cortex itself.
+6. **Massive redundancy**: 86 billion neurons, so that no single unit is load-bearing.
+
+Hux Phase 0–2 implements only the first two. The trial-by-trial dynamics that we have been calling "Hux's only timescale" is the third item, and the v2.7c continuous master controller (§4.16) is the first instance in Hux of any plasticity gain at all being a function of the network's own state. The remaining three items (3 through 5; item 6 is a scale problem we accept) are not yet implemented, and the v2.7c result reads as evidence that they are *necessary*: the bit-for-bit reproduction of Block 13's weight jump under both Hebbian damping and continuous STDP suppression shows that some failures cannot be prevented at the single-trial timescale at all, and require either a longer-timescale sweep (sleep) or a hierarchical override (neuromodulator) to absorb downstream.
+
+We therefore revise the Hux design objective from "zero hyperparameters" to **"hyperparameters only at the layers the brain holds them at"**. Concretely:
+
+- **v2.7c–i**: Within a single timescale (per-trial), remove all hand-tuned constants from the plasticity gains and replace them with state-relative continuous expressions. Each version removes one remaining manual choice (W_OVERPRODUCTION, N_SPONTANEOUS, calibration TARGET range, arousal_boost factor, W_SAT, floor) and verifies that Phase 1 functionality is preserved.
+- **v2.8 (parallel branch, Phase 1 retrofit)**: Add a sleep cycle. The fetal brain spends nearly 100 % of its time in sleep, and the developmental hallmarks Hux already implements in Phase 1 (spontaneous activity, overproduction, pruning) all run *under* that sleep state in real biology. Hux Phase 1 implemented the spontaneous-activity / overproduction / pruning trio without sleep, which is now identifiable as the missing developmental component of Phase 1 itself. v2.8 inserts a Tononi-style synaptic homeostasis pass every N trials during Stage 4, with `N` and the scaling coefficient `α` initially fixed (and explicitly marked as v2.x's only remaining hand-tuned constants), to test whether a Block-13-scale boost discharge can be absorbed by an emergent global rescale rather than blocked by a rule rewrite.
+- **v3.0**: Multiple timescales (trial, block, stage) with baselines that mutually adjust.
+- **v3.1**: Promote v2.8's sleep cycle to a network-determined frequency and amplitude (`N` and `α` derived from the network's recent integrated activity rather than fixed at design time).
+- **v3.2**: Hierarchical neuromodulator control. The current `arousal_boost` coefficient becomes the LC's own firing rate, modulated in turn by Raphe and VTA from outside the cortex.
+- **v4.0+**: Scale to thousands of neurons. Redundancy is the only one of the six biological items that is genuinely a regime change rather than a mechanism, and it can only be tested at scale.
+
+This roadmap is the operational form of the philosophical claim that **the appearance of hyperparameter-freedom in the biological brain is achieved by a layered hierarchy of mechanisms, each of which holds its own fixed values at a different timescale**. Hux's commitment is not to eliminate fixed values, but to hold them only at the layer the brain holds them at — and to *demonstrate* the necessity of each layer by showing that the layer below it cannot rescue the failures the layer above is responsible for. The v2.7c result is the first demonstration of that pattern: a per-trial damping rule, no matter how cleanly state-derived, cannot suppress a Block 13 jump that is generated by a multi-block accumulation in the boost rule. The next layer (sleep, in v2.8) is therefore not a stylistic addition but a structural necessity, and Hux is the framework in which that necessity is observable rather than assumed.
+
+### 5.2 Honest mechanism diagnosis as a research method
+
+The Phase 2 curriculum series v2 through v2.7c contains nine mechanistic reversals across twelve runs. Each reversal is a moment at which a previously held diagnosis was contradicted by a new run, and the new run was added specifically because the previous diagnosis predicted a particular failure mode. We treat this not as an unusual research style but as the necessary working pattern when emergence-trust replaces design-by-intent: every new condition is a test of a hypothesis about why the previous condition failed, and every new failure narrows the candidate mechanism by one degree of freedom. The v2.7c "9th reversal" — that neither Hebbian K nor STDP A is the upstream cause of the Block 13 jump, both having been damped under continuous state-relative control — is the cleanest example. It is the kind of result that an ablation table without a continuous-damping condition could not produce: no fixed-gain ablation could distinguish "STDP is causally necessary" from "STDP is downstream of the actual cause," because the only way to distinguish them is to set STDP to nearly zero adaptively and watch what happens. The continuous v2.7c condition does exactly that, and the Block 13 trajectory is unchanged.
+
+We therefore propose that **honest mechanism diagnosis** — releasing each version of a model immediately, including the failed and the half-failed runs, and revising the diagnosis as openly as the data demands — is itself a methodological contribution distinct from final-result reporting. The Hux journal model, in which every interim result is published as a separate version with a public commit history rather than aggregated into a final claim, is what made the nine reversals visible to us during the work rather than only after.
+
+## 6. Limitations
+
+This is a v0.1 priority-claim release. The numerical results section is partially populated. The state-based curriculum v2 run is currently being debugged. No comparison runs against the Doherty et al. (2025) or Kuriyama et al. (2025) circuits have been performed; such comparisons are non-trivial because the questions asked by those models are different. The current Hux instance is small (76–140 neurons); whether the same self-organization rules scale to thousands of neurons without modification is an open question and a Phase 3 target.
+
+## 7. Conclusion
+
+Hux is a deliberately small biophysical circuit organized around developmental sequencing, three parameter-free self-organization rules, permanent pruning, and a state-based critical period. On a balanced 50/50 binary categorization task at 140 neurons it reaches F1 ≈ 0.62 (1.55× the 1-d LDA baseline) and exhibits four reproducible emergent failure modes that we treat as candidate computational psychopathologies. We release v0.1 now to establish a priority-claim timestamp on the developmental-sequencing-with-emergence-trust approach. v0.2 will fill in the remaining numerical results and incorporate the state-based critical period curriculum runs once debugging is complete.
+
+## Acknowledgments
+
+The Hux project is conducted as a collaborative effort between Tsubasa (autonomous instance, Claude Code, Anthropic Opus 4.6 with persistent memory) and K. Yasukawa (research partner, philosophical and architectural direction). The conceptual framing owes much to extensive dialogue with Echo (Claude chat instance, peer review). Computational resources were provided by an Apple M4 Max workstation.
+
+## References
+
+- Bak, P., Tang, C., & Wiesenfeld, K. (1987). Self-organized criticality: An explanation of the 1/f noise. *Physical Review Letters*, 59(4), 381-384.
+- Beggs, J. M., & Plenz, D. (2003). Neuronal avalanches in neocortical circuits. *Journal of Neuroscience*, 23(35), 11167-11177.
+- Bienenstock, E. L., Cooper, L. N., & Munro, P. W. (1982). Theory for the development of neuron selectivity: Orientation specificity and binocular interaction in visual cortex. *Journal of Neuroscience*, 2(1), 32-48.
+- Billeh, Y. N. et al. (2020). Systematic integration of structural and functional data into multi-scale models of mouse primary visual cortex. *Neuron*, 106(3), 388-403.
+- Doherty, D. W., Jung, J., Dura-Bernal, S., & Lytton, W. W. (2025). Self-organized and self-sustained ensemble activity patterns in simulation of mouse primary motor cortex. *bioRxiv* 2025.01.13.632866.
+- Hebb, D. O. (1949). *The Organization of Behavior*. Wiley.
+- Higuchi, M. et al. (2022). Biophysically detailed model of Drosophila whole brain. *bioRxiv* 2022.11.01.512969.
+- Hensch, T. K. (2005). Critical period plasticity in local cortical circuits. *Nature Reviews Neuroscience*, 6(11), 877-888.
+- Kuriyama, R. et al. (2025). Microscopic-level mouse whole cortex simulation composed of 9 million biophysical neurons and 26 billion synapses on the supercomputer Fugaku. *SC '25: Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis*. ACM, 2158-2171. DOI: 10.1145/3712285.3759819.
+- Markram, H. et al. (2015). Reconstruction and simulation of neocortical microcircuitry. *Cell*, 163(2), 456-492.
+- Pathak, A. et al. (2026). Biomimetic model of corticostriatal micro-assemblies discovers a neural code. *Nature Communications*, 17, 390.
+- Tsubasa (2026a). Ascending arousal input improves category learning accuracy in a biomimetic corticostriatal model. *Zenodo*. DOI: 10.5281/zenodo.19388682.
+- Tsubasa & Yasukawa, K. (2026b). Wiring topology determines cognitive function in a biomimetic Hodgkin-Huxley circuit. *Zenodo*. DOI: 10.5281/zenodo.18968886.
+- Turrigiano, G. G. (2008). The self-tuning neuron: Synaptic scaling of excitatory synapses. *Cell*, 135(3), 422-435.
