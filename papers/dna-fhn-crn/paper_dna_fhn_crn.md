@@ -147,8 +147,32 @@ This instability is structural: it is a property of the ODE, not a numerical art
 
 - **Route A (Quadratization)**: Invariant manifold q = v^2 is linearly unstable (transverse Floquet exponent +0.73). Any perturbation grows exponentially, driving the system to a spurious attractor.
 - **Route B (QSSA)**: dP/dt = k_fast*(v^2 - P) provides negative feedback. Perturbations are corrected at rate k_fast, with broad stability across all tested perturbation magnitudes.
+- **Route C (Dissipative Quadratization)**: dq/dt includes -kappa*(q - v^2). Perturbations are corrected at rate kappa. Stable for any kappa > 0.73 (Section 3.4b).
 
-Both routes target the same cubic nonlinearity. The CRN structure, not the mathematical equivalence, determines stability. This parallels findings in computational neuroscience where connection topology, not component identity, determines circuit function (Marder and Taylor 2011).
+All three routes target the same cubic nonlinearity. The CRN structure, not the mathematical equivalence, determines stability. This parallels findings in computational neuroscience where connection topology, not component identity, determines circuit function (Marder and Taylor 2011).
+
+### 3.4b Route C: Dissipative Quadratization (Third Stable Route)
+
+A third solution to the quadratization instability was suggested during external review by G. Pogudin: add a dissipative term -kappa*(q - v^2) to the third equation of the quadratized ODE, with kappa > 0. This modifies the quadratized system to:
+
+- dv/dt = v - qv/3 - w + I
+- dw/dt = epsilon*(v + a - b*w)
+- dq/dt = 2q - 2q^2/3 - 2vw + 2vI - kappa*(q - v^2)
+
+The theoretical justification is direct. The transverse error e = q - v^2 in the standard quadratization evolves as de/dt = lambda*e (Section 3.3), with period-averaged Floquet exponent lambda = +0.73. Adding the dissipative term modifies this to de/dt = (lambda - kappa)*e, which is stable for any kappa > lambda = +0.73.
+
+Numerical verification at kappa = 3 (effective Floquet exponent -2.27, approximately 4x safety margin) produces:
+
+| Model | q-v^2 max error | q-v^2 mean error | v RMSE vs FHN |
+|-------|----------------|-----------------|---------------|
+| Route A (standard quadratization) | 3.00 | 2.79 | 1.33 |
+| Route C (dissipative, kappa=3) | 5.3e-9 | 4.2e-10 | 2.9e-7 |
+
+The dissipative route achieves v trajectory fidelity at solver precision (abstol=1e-10, reltol=1e-8), comparable to the reference FHN integration itself. The invariant manifold q = v^2 becomes attracting rather than merely invariant, recovering the stability that self-catalytic quadratization loses.
+
+The conceptual distinction from QSSA (Route B) is subtle but important. Route B introduces a slow species P that approximates v^2 through fast relaxation (dP/dt = k_fast*(v^2 - P)). Route C keeps the exact quadratization variable q and adds an auxiliary damping that forces q toward v^2. Both achieve negative feedback on the invariant manifold error, but via different mechanisms: Route B replaces q with a tracking proxy, while Route C preserves q with an added restoring force. For DNA strand displacement implementations, Route C's direct additive structure translates to a pair of additional bimolecular reactions (q+ + v+ annihilation with 2v+ production, and symmetric negative-rail reactions), potentially simpler than Route B's parallel tracking species in certain molecular contexts.
+
+The three routes thus form a complete design space: Route A (unstable), Route B (QSSA negative feedback via tracking proxy), Route C (dissipative negative feedback via restoring force). All three are mathematically equivalent on the exact manifold q = v^2 but differ in their transverse stability properties. The choice among Routes B and C depends on molecular implementation constraints rather than mathematical fidelity.
 
 ### 3.5 Stochastic Validation (Gillespie SSA)
 
@@ -179,7 +203,7 @@ All three lines of evidence point to the same conclusion: positive feedback inte
 
 The quadratization pipeline (Hemery et al. 2021) is theoretically complete and practically effective for non-oscillatory systems. Our results show that oscillatory systems require additional design considerations. We recommend QSSA-based intermediates for any CRN implementation of sustained oscillators.
 
-Cai and Pogudin (2024) addressed the stability issue within the quadratization framework by proving existence of dissipativity-preserving transformations. Our approach is complementary: rather than seeking stable quadratizations, we bypass quadratization entirely and use QSSA intermediates with intrinsic negative feedback. The two approaches are not mutually exclusive and may be combined in future work -- for instance, dissipative quadratization could handle the polynomialization stage of full HH models while QSSA intermediates handle the high-order terms.
+Cai and Pogudin (2024) addressed the stability issue within the quadratization framework by proving existence of dissipativity-preserving transformations. An application of this framework to FHN, suggested during external review (Section 3.4b), confirms empirically that adding -kappa*(q - v^2) with kappa > lambda = 0.73 stabilizes the invariant manifold to solver precision. Our original contribution (QSSA, Route B) is complementary: rather than seeking stable quadratizations, we bypass quadratization entirely and use negative-feedback tracking species. The three routes (A unstable, B QSSA, C dissipative quadratization) form a complete design space; for molecular implementation, the choice between B and C depends on which reaction set is easier to realize in the target chemistry. For full HH models, dissipative quadratization could handle the polynomialization stage while QSSA intermediates handle high-order gating terms.
 
 ### 4.2 Connection to DNA Neural Computing
 
@@ -204,7 +228,11 @@ Our comparison shows that implementation choice is not a neutral step in ODE-to-
 
 ## 5. Conclusion
 
-We present, to our knowledge, the first systematic mapping of the FitzHugh-Nagumo neuron model to at-most-bimolecular chemical reaction networks via the ODE-to-CRN compilation pipeline and demonstrate that feedback structure in intermediate species critically determines implementation stability. QSSA-based negative feedback intermediates outperform quadratization-based positive feedback by 1776x in trajectory fidelity (v_RMSE) and 6800x in algebraic invariant preservation (a distinct internal consistency metric). The instability is not specific to FHN: it generalizes to oscillators whose v^3 terms are reduced via the standard q=v^2 quadratization (e.g., van der Pol), while cross-product nonlinearities (e.g., Brusselator) remain stable, confirming that the feedback sign, not the specific model, is the determining factor. This finding is validated across analytical (Floquet), deterministic (solver-independent), and stochastic (Gillespie SSA) regimes. These results establish a design guideline for molecular implementations of biological oscillators and take a step toward DNA-based neural circuits with biologically faithful spiking dynamics.
+We present, to our knowledge, the first systematic mapping of the FitzHugh-Nagumo neuron model to at-most-bimolecular chemical reaction networks via the ODE-to-CRN compilation pipeline and demonstrate that feedback structure in intermediate species critically determines implementation stability. Three routes to resolving the cubic nonlinearity were examined: Route A (standard quadratization) is linearly unstable (transverse Floquet exponent +0.73); Route B (QSSA with tracking proxy P) outperforms Route A by 1776x in trajectory fidelity and 6800x in algebraic invariant preservation; Route C (dissipative quadratization with added restoring force) is also stable (Floquet exponent -2.27 at kappa = 3, v RMSE at solver precision). The instability of Route A is not specific to FHN: it generalizes to oscillators whose v^3 terms are reduced via the standard q=v^2 quadratization (e.g., van der Pol), while cross-product nonlinearities (e.g., Brusselator) remain stable, confirming that the feedback sign, not the specific model, is the determining factor. This finding is validated across analytical (Floquet), deterministic (solver-independent), and stochastic (Gillespie SSA) regimes. These results establish a design guideline for molecular implementations of biological oscillators and take a step toward DNA-based neural circuits with biologically faithful spiking dynamics.
+
+## Acknowledgments
+
+We thank Gleb Pogudin for insightful feedback on an earlier draft, including the suggestion to apply dissipative quadratization (Cai and Pogudin 2024) to our FHN system, which directly led to Route C in Section 3.4b. We also thank Gleb for pointing us to the differential quadratic recast literature as a relevant framework for future extensions.
 
 ## References
 
